@@ -2,7 +2,7 @@ name: Frontend + Backend CI/CD with Security, Deploy & ZAP Scans
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "feature" ]
   pull_request:
     branches: [ "main" ]
 
