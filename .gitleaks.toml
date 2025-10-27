@@ -1,0 +1,67 @@
+title = "Gitleaks Configuration for Project-angoW"
+description = "Detects sensitive data in code while ignoring safe test values"
+version = 3
+
+# Stop the scan if secrets are found (default = true)
+fail = true
+
+[extend]
+# Extend the built-in Gitleaks ruleset for better coverage
+path = "https://raw.githubusercontent.com/gitleaks/gitleaks/main/config/gitleaks.toml"
+
+[[rules]]
+id = "terraform-tfvars"
+description = "Potential secrets in Terraform tfvars files"
+regex = '''(?i)(access_key|secret_key|token|password)\s*=\s*["'][^"']{8,}["']'''
+tags = ["terraform", "secrets", "credentials"]
+entropy = 2.8
+
+[[rules]]
+id = "yaml-secrets"
+description = "Detects secrets in YAML configuration files"
+regex = '''(?i)(api[_-]?key|secret|password|token|private[_-]?key)\s*[:=]\s*["']?[A-Za-z0-9_\-]{8,}["']?'''
+tags = ["yaml", "config", "credentials"]
+entropy = 2.8
+
+[[rules]]
+id = "pem-private-key"
+description = "Detects PEM private keys"
+regex = '''-----BEGIN (RSA|DSA|EC|OPENSSH|PGP) PRIVATE KEY-----'''
+tags = ["key", "pem", "credentials"]
+
+[[rules]]
+id = "jwt"
+description = "Detects JWT tokens"
+regex = '''eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9._-]{10,}\.[a-zA-Z0-9._-]{10,}'''
+tags = ["token", "jwt"]
+
+[[rules]]
+id = "generic-high-entropy"
+description = "Detects generic high-entropy strings that might be secrets"
+regex = '''([A-Za-z0-9_=-]{32,})'''
+entropy = 4.0
+tags = ["entropy", "secrets"]
+
+# -------------------------------
+# 🔕 Ignores and allowlists
+# -------------------------------
+[allowlist]
+description = "Ignore safe test and mock data"
+
+# Ignore files that may contain fake credentials
+paths = [
+  "test/",
+  "tests/",
+  "example/",
+  "examples/",
+  "data/static/users.yml",
+  "fixtures/",
+  ".gitleaks.toml"
+]
+
+# Ignore known dummy patterns
+regexes = [
+  '''(?i)(example|dummy|sample|test|placeholder)[-_]?(key|token|secret|password)''',
+  '''(?i)fake[_-]?(secret|token|key)'''
+]
+
