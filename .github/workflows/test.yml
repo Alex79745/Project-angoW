@@ -129,8 +129,6 @@ jobs:
   build-frontend:
     runs-on: ubuntu-latest
     needs: [yarn_test, gitleaks, njsscan, semgrep, retire]
-    env:
-      FRONTEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/frontend-app
     defaults:
       run:
         working-directory: app/dockerfiles/frontend
@@ -138,19 +136,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build frontend Docker image
         run: |
-          echo "Building $FRONTEND_IMAGE"
-          docker build -t $FRONTEND_IMAGE:${{ github.sha }} -t $FRONTEND_IMAGE:latest .
+          # Safe Docker tag: SHA + branch name, replace invalid chars
+          SAFE_TAG=$(echo "${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
+          docker build -t frontend-app:$SAFE_TAG -t frontend-app:latest .
       - name: Push frontend to DockerHub
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          docker push $FRONTEND_IMAGE:${{ github.sha }}
-          docker push $FRONTEND_IMAGE:latest
+          docker push frontend-app:$SAFE_TAG
+          docker push frontend-app:latest
 
   build-backend:
     runs-on: ubuntu-latest
     needs: [yarn_test, gitleaks, njsscan, semgrep, retire]
-    env:
-      BACKEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/backend-app
     defaults:
       run:
         working-directory: app/dockerfiles/backend
@@ -158,13 +155,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build backend Docker image
         run: |
-          echo "Building $BACKEND_IMAGE"
-          docker build -t $BACKEND_IMAGE:${{ github.sha }} -t $BACKEND_IMAGE:latest .
+          SAFE_TAG=$(echo "${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
+          docker build -t backend-app:$SAFE_TAG -t backend-app:latest .
       - name: Push backend to DockerHub
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          docker push $BACKEND_IMAGE:${{ github.sha }}
-          docker push $BACKEND_IMAGE:latest
+          docker push backend-app:$SAFE_TAG
+          docker push backend-app:latest
 
   # --------------------------------------------------------
   # 5️⃣ TRIVY IMAGE SECURITY SCAN
