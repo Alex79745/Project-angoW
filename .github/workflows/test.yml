@@ -9,6 +9,8 @@ on:
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  BACKEND: ${{ vars.DOCKERHUB_USERNAME }}
+  FRONTEND: ${{ vars.DOCKERHUB_TOKEN }}
 
 
 jobs:
@@ -136,15 +138,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build frontend Docker image
-        run: |
+        run: | 
           # Safe Docker tag: SHA + branch name, replace invalid chars
-          SAFE_TAG=$(echo "${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
-          docker build -f Dockerfile.frontend -t frontend-app:$SAFE_TAG -t frontend-app:latest .
+          SAFE_TAG=$(echo "frontend-app-${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
+          docker build -f Dockerfile.frontend -t frontend:$SAFE_TAG -t frontend:latest .
       - name: Push frontend to DockerHub
         run: |
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-          docker push frontend-app:$SAFE_TAG
-          docker push frontend-app:latest
+          docker push frontend$SAFE_TAG
+          docker push frontend:latest
 
   build-backend:
     runs-on: ubuntu-latest
@@ -156,13 +158,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build backend Docker image
         run: |
-          SAFE_TAG=$(echo "${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
-          docker build -f Dockerfile.backend -t backend-app:$SAFE_TAG -t backend-app:latest .
+          SAFE_TAG=$(echo "backend-app-${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
+          docker build -f Dockerfile.backend -t backend:$SAFE_TAG -t backend:latest .
       - name: Push backend to DockerHub
         run: |
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-          docker push backend-app:$SAFE_TAG
-          docker push backend-app:latest
+          docker push $backend:$SAFE_TAG
+          docker push $backend:latest
 
   # --------------------------------------------------------
   # 5️⃣ TRIVY IMAGE SECURITY SCAN
