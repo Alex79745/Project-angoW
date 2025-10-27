@@ -6,9 +6,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
-# env:
-#   FRONTEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/frontend-app
-#   BACKEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/backend-app
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
 
 jobs:
   # --------------------------------------------------------
@@ -141,7 +142,7 @@ jobs:
           docker build -f Dockerfile.frontend -t frontend-app:$SAFE_TAG -t frontend-app:latest .
       - name: Push frontend to DockerHub
         run: |
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
           docker push frontend-app:$SAFE_TAG
           docker push frontend-app:latest
 
@@ -159,7 +160,7 @@ jobs:
           docker build -f Dockerfile.backend -t backend-app:$SAFE_TAG -t backend-app:latest .
       - name: Push backend to DockerHub
         run: |
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
           docker push backend-app:$SAFE_TAG
           docker push backend-app:latest
 
