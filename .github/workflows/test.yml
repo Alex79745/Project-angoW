@@ -131,7 +131,7 @@ jobs:
     needs: [yarn_test, gitleaks, njsscan, semgrep, retire]
     defaults:
       run:
-        working-directory: app/frontend
+        working-directory: app/dockerfiles/frontend
     steps:
       - uses: actions/checkout@v4
       - name: Build frontend Docker image
@@ -148,7 +148,7 @@ jobs:
     needs: [yarn_test, gitleaks, njsscan, semgrep, retire]
     defaults:
       run:
-        working-directory: app/backend
+        working-directory: app/dockerfiles/backend
     steps:
       - uses: actions/checkout@v4
       - name: Build backend Docker image
