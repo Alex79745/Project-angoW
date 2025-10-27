@@ -23,9 +23,10 @@ ERROR: Could not find Java (1.8 required)
 
 #Run it directly via java -jar:
 
-java -jar "C:\ProgramData\chocolatey\lib\bfg-repo-cleaner\tools\bfg-1.14.0.jar" ^
-  --delete-files "terraform.tfvars,*.tfstate,*.tfstate.backup,*.pem,*.key" ^
-  --delete-folders ".vagrant" --no-blob-protection
+java -jar "C:\ProgramData\chocolatey\lib\bfg-repo-cleaner\tools\bfg-1.13.0.jar" `
+  --delete-files "terraform.tfvars,*.tfstate,*.tfstate.backup,*.pem,*.key" `
+  --delete-folders ".vagrant" `
+  --no-blob-protection
 
 
 ##Post-BFG Cleanup Commands the logs might gime those commands
