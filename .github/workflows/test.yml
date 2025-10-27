@@ -141,12 +141,12 @@ jobs:
         run: | 
           # Safe Docker tag: SHA + branch name, replace invalid chars
           SAFE_TAG=$(echo "frontend-app-${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
-          docker build -f Dockerfile.frontend -t $frontend:$SAFE_TAG -t $frontend:latest .
-      - name: Push $frontend to DockerHub
+          docker build -f Dockerfile.frontend -t $FRONTEND:$SAFE_TAG -t $FRONTEND:latest .
+      - name: Push $FRONTEND to DockerHub
         run: |
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-          docker push $frontend:$SAFE_TAG
-          docker push $frontend:latest
+          docker push $FRONTEND:$SAFE_TAG
+          docker push $FRONTEND:latest
 
   build-backend:
     runs-on: ubuntu-latest
@@ -159,12 +159,12 @@ jobs:
       - name: Build backend Docker image
         run: |
           SAFE_TAG=$(echo "backend-app-${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
-          docker build -f Dockerfile.backend -t $backend:$SAFE_TAG -t $backend:latest .
-      - name: Push backend to DockerHub
+          docker build -f Dockerfile.backend -t $BACKEND:$SAFE_TAG -t $BACKEND:latest .
+      - name: Push $BACKEND to DockerHub
         run: |
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-          docker push $backend:$SAFE_TAG
-          docker push $backend:latest
+          docker push $BACKEND:$SAFE_TAG
+          docker push $BACKEND:latest
 
   # --------------------------------------------------------
   # 5️⃣ TRIVY IMAGE SECURITY SCAN
