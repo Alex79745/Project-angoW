@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "build": "mkdir -p dist && cp -r index.html dist/"
+     "test": "echo \"No tests yet\""
   },
   "dependencies": {}
 }
