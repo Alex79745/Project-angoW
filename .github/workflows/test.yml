@@ -145,7 +145,7 @@ jobs:
       - name: Push $frontend to DockerHub
         run: |
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-          docker push $frontend$SAFE_TAG
+          docker push $frontend:$SAFE_TAG
           docker push $frontend:latest
 
   build-backend:
