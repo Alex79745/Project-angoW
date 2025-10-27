@@ -144,6 +144,7 @@ jobs:
           docker build -f Dockerfile.frontend -t $FRONTEND:$SAFE_TAG -t $FRONTEND:latest .
       - name: Push $FRONTEND to DockerHub
         run: |
+          echo "$SAFE_TAG"
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
           docker push $FRONTEND:$SAFE_TAG
           docker push $FRONTEND:latest
@@ -162,6 +163,7 @@ jobs:
           docker build -f Dockerfile.backend -t $BACKEND:$SAFE_TAG -t $BACKEND:latest .
       - name: Push $BACKEND to DockerHub
         run: |
+          echo "$SAFE_TAG"
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
           docker push $BACKEND:$SAFE_TAG
           docker push $BACKEND:latest
