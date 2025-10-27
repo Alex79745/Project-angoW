@@ -44,7 +44,7 @@ jobs:
     needs: create_cache
     defaults:
       run:
-        working-directory: app/dockerfiles/backend
+        working-directory: app/dockerfiles/frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
