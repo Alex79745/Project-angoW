@@ -178,24 +178,37 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-frontend, build-backend]
     steps:
+      - uses: actions/checkout@v4
+
       - name: Install Trivy
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y wget
-          wget -qO- https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo deb https://aquasecurity.github.io/trivy-repo/deb stable main | sudo tee /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+          wget -qO- https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb stable main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update -y
           sudo apt-get install -y trivy
-      - name: Scan Docker images
+
+      - name: Docker login (for private images)
         run: |
-          trivy image -f json -o trivy-frontend.json --severity HIGH,CRITICAL $FRONTEND_IMAGE:latest
-          trivy image -f json -o trivy-backend.json --severity HIGH,CRITICAL $BACKEND_IMAGE:latest
-      - uses: actions/upload-artifact@v4
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Scan Docker images with Trivy
+        run: |
+          echo "🔍 Scanning frontend image..."
+          trivy image --exit-code 1 --severity HIGH,CRITICAL -f json -o trivy-frontend.json $FRONTEND:latest
+
+          echo "🔍 Scanning backend image..."
+          trivy image --exit-code 1 --severity HIGH,CRITICAL -f json -o trivy-backend.json $BACKEND:latest
+
+      - name: Upload Trivy scan results
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-results
           path: |
             trivy-frontend.json
             trivy-backend.json
+
 
   # --------------------------------------------------------
   # 6️⃣ DEPLOY TO ANGO WEB VM (TEST ENV)
