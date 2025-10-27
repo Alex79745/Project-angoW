@@ -141,12 +141,12 @@ jobs:
         run: | 
           # Safe Docker tag: SHA + branch name, replace invalid chars
           SAFE_TAG=$(echo "frontend-app-${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
-          docker build -f Dockerfile.frontend -t frontend:$SAFE_TAG -t frontend:latest .
-      - name: Push frontend to DockerHub
+          docker build -f Dockerfile.frontend -t $frontend:$SAFE_TAG -t $frontend:latest .
+      - name: Push $frontend to DockerHub
         run: |
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-          docker push frontend$SAFE_TAG
-          docker push frontend:latest
+          docker push $frontend$SAFE_TAG
+          docker push $frontend:latest
 
   build-backend:
     runs-on: ubuntu-latest
@@ -159,7 +159,7 @@ jobs:
       - name: Build backend Docker image
         run: |
           SAFE_TAG=$(echo "backend-app-${GITHUB_REF##*/}-${GITHUB_SHA::7}" | tr / _)
-          docker build -f Dockerfile.backend -t backend:$SAFE_TAG -t backend:latest .
+          docker build -f Dockerfile.backend -t $backend:$SAFE_TAG -t $backend:latest .
       - name: Push backend to DockerHub
         run: |
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
