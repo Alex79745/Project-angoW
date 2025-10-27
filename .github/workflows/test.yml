@@ -181,21 +181,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Trivy (latest)
+      - name: Install Trivy (latest dynamically)
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y rpm
-          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
-          tar zxvf trivy_Linux-64bit.tar.gz
+          sudo apt-get install -y wget jq rpm
+          TRIVY_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/trivy/releases/latest | jq -r .tag_name)
+          wget https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/trivy_${TRIVY_VERSION#v}_Linux-64bit.tar.gz
+          tar zxvf trivy_${TRIVY_VERSION#v}_Linux-64bit.tar.gz
           sudo mv trivy /usr/local/bin/
 
       - name: Docker login
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Scan Docker images with Trivy
+      - name: Scan Docker images
         run: |
-          trivy image --exit-code 1 --severity HIGH,CRITICAL -f json -o trivy-frontend.json $FRONTEND:latest
-          trivy image --exit-code 1 --severity HIGH,CRITICAL -f json -o trivy-backend.json $BACKEND:latest
+          trivy image -f json -o trivy-frontend.json --severity HIGH,CRITICAL --exit-code 1 $FRONTEND:latest
+          trivy image -f json -o trivy-backend.json --severity HIGH,CRITICAL --exit-code 1 $BACKEND:latest
 
       - name: Upload Trivy scan results
         uses: actions/upload-artifact@v4
