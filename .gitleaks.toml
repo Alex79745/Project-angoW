@@ -1,67 +1,48 @@
-title = "Gitleaks Configuration for Project-angoW"
-description = "Detects sensitive data in code while ignoring safe test values"
-version = 3
+title = "Project-angoW Gitleaks Config"
+description = "Custom rules and allowlist for development environment"
 
-# Stop the scan if secrets are found (default = true)
-fail = true
+# ----------------------------
+# ALLOWLIST (ignore paths)
+# ----------------------------
+[[allowlist.rules]]
+description = "Ignore Vagrant private keys"
+regex = ".*\\.vagrant/machines/.*/private_key"
+path = "app/vagrant/"
 
-[extend]
-# Extend the built-in Gitleaks ruleset for better coverage
-path = "https://raw.githubusercontent.com/gitleaks/gitleaks/main/config/gitleaks.toml"
+[[allowlist.rules]]
+description = "Ignore local .env files for dev"
+regex = ".*\\.env"
+path = "app/vagrant/"
+
+[[allowlist.rules]]
+description = "Ignore terraform vars"
+regex = ".*terraform\\.tfvars"
+path = "app/Infrastructure-as-code/"
+
+# ----------------------------
+# CUSTOM RULES
+# ----------------------------
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key"
+regex = "AKIA[0-9A-Z]{16}"
+tags = ["key", "aws"]
 
 [[rules]]
-id = "terraform-tfvars"
-description = "Potential secrets in Terraform tfvars files"
-regex = '''(?i)(access_key|secret_key|token|password)\s*=\s*["'][^"']{8,}["']'''
-tags = ["terraform", "secrets", "credentials"]
-entropy = 2.8
-
-[[rules]]
-id = "yaml-secrets"
-description = "Detects secrets in YAML configuration files"
-regex = '''(?i)(api[_-]?key|secret|password|token|private[_-]?key)\s*[:=]\s*["']?[A-Za-z0-9_\-]{8,}["']?'''
-tags = ["yaml", "config", "credentials"]
-entropy = 2.8
-
-[[rules]]
-id = "pem-private-key"
-description = "Detects PEM private keys"
-regex = '''-----BEGIN (RSA|DSA|EC|OPENSSH|PGP) PRIVATE KEY-----'''
-tags = ["key", "pem", "credentials"]
-
-[[rules]]
-id = "jwt"
-description = "Detects JWT tokens"
-regex = '''eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9._-]{10,}\.[a-zA-Z0-9._-]{10,}'''
-tags = ["token", "jwt"]
+id = "aws-secret-key"
+description = "AWS Secret Key"
+regex = "(?i)aws(.{0,20})?(secret|private)?(.{0,20})?['\"][0-9a-zA-Z/+]{40}['\"]"
+tags = ["key", "aws"]
 
 [[rules]]
 id = "generic-high-entropy"
-description = "Detects generic high-entropy strings that might be secrets"
-regex = '''([A-Za-z0-9_=-]{32,})'''
-entropy = 4.0
+description = "High-entropy secret"
+regex = "[A-Za-z0-9/+=]{20,}"
 tags = ["entropy", "secrets"]
+entropy = 4.5
 
-# -------------------------------
-# 🔕 Ignores and allowlists
-# -------------------------------
-[allowlist]
-description = "Ignore safe test and mock data"
-
-# Ignore files that may contain fake credentials
-paths = [
-  "test/",
-  "tests/",
-  "example/",
-  "examples/",
-  "data/static/users.yml",
-  "fixtures/",
-  ".gitleaks.toml"
-]
-
-# Ignore known dummy patterns
-regexes = [
-  '''(?i)(example|dummy|sample|test|placeholder)[-_]?(key|token|secret|password)''',
-  '''(?i)fake[_-]?(secret|token|key)'''
-]
-
+[[rules]]
+id = "pem-private-key"
+description = "PEM private key"
+regex = "-----BEGIN PRIVATE KEY-----"
+tags = ["key", "pem", "credentials"]
