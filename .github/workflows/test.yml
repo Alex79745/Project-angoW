@@ -193,6 +193,11 @@ jobs:
       - name: Docker login
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
+      - name: Verify image exists
+        run: docker pull $FRONTEND:latest
+      - name: Verify image exists
+        run: docker pull $BACKEND:latest
+        
       - name: Scan Docker images
         continue-on-error: true
         run: |
