@@ -223,8 +223,8 @@ jobs:
           password: ${{ secrets.VM_PASS }}
           script: |
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-            docker pull $FRONTEND_IMAGE:latest
-            docker pull $BACKEND_IMAGE:latest
+            docker pull $FRONTEND:latest
+            docker pull $BACKEND:latest
 
             docker stop frontend-app || true && docker rm frontend-app || true
             docker stop backend-app || true && docker rm backend-app || true
@@ -279,8 +279,8 @@ jobs:
           password: ${{ secrets.PROD_PASS }}
           script: |
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-            docker pull $FRONTEND_IMAGE:latest
-            docker pull $BACKEND_IMAGE:latest
+            docker pull $FRONTEND:latest
+            docker pull $BACKEND:latest
 
             docker stop frontend-prod || true && docker rm frontend-prod || true
             docker stop backend-prod || true && docker rm backend-prod || true
