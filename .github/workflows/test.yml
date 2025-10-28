@@ -201,7 +201,7 @@ jobs:
       - name: Scan Docker images
         continue-on-error: true
         run: |
-          trivy image -f json -o trivy-frontend.json --severity sCRITICAL --exit-code 1 $FRONTEND:latest
+          trivy image -f json -o trivy-frontend.json --severity CRITICAL --exit-code 1 $FRONTEND:latest
           trivy image -f json -o trivy-backend.json --severity CRITICAL --exit-code 1 $BACKEND:latest
 
       - name: Upload Trivy scan results
