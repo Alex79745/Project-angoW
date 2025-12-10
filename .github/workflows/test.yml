@@ -201,7 +201,7 @@ jobs:
       - name: Scan Docker images
         continue-on-error: true
         run: |
-          trivy image -f json -o trivy-frontend.json --severity CRITICAL --exit-code 1 $FRONTEND:latest
+          trivy image -f json -o trivy-frontend.json --severity sCRITICAL --exit-code 1 $FRONTEND:latest
           trivy image -f json -o trivy-backend.json --severity CRITICAL --exit-code 1 $BACKEND:latest
 
       - name: Upload Trivy scan results
@@ -226,11 +226,12 @@ jobs:
           docker pull $FRONTEND:latest
           docker pull $BACKEND:latest
 
-          docker stop $BACKEND:latest || true && docker rm $BACKEND:latest || true
-          docker stop $BACKEND:latest || true && docker rm $BACKEND:latest || true
+          docker stop frontend-app || true && docker rm frontend-app || true
+          docker stop backend-app || true && docker rm backend-app || true
 
-          docker run -d --name $BACKEND:latest -p 80:80 $FRONTEND:latest
-          docker run -d --name $BACKEND:latest -p 3000:3000 $BACKEND:latest
+          docker run -d --name frontend-app -p 80:80 $FRONTEND:latest
+          docker run -d --name backend-app -p 3000:3000 $BACKEND:latest
+
 
   # --------------------------------------------------------
   # 7️⃣ ZAP SCANS (BASELINE & FULL DAST)

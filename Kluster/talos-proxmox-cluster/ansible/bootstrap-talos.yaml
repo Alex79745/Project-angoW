@@ -1,0 +1,28 @@
+- name: Bootstrap Talos cluster
+  hosts: all
+  gather_facts: no
+  vars_files:
+    - group_vars/all.yaml
+
+  tasks:
+    - name: Wait for node API (port 6443)
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host | default(inventory_hostname) }}"
+        port: 6443
+        timeout: 300
+
+    - name: Copy Talos config
+      ansible.builtin.copy:
+        src: "../talos-configs/{{ talos_config }}"
+        dest: /tmp/talos-config.yaml
+
+    - name: Apply Talos config with talosctl
+      ansible.builtin.command: >
+        talosctl --nodes {{ ansible_host | default(inventory_hostname) }} apply-config --insecure --file /tmp/talos-config.yaml
+      register: result
+      failed_when: result.rc != 0 and result.rc != 2
+
+    - name: Reboot node (if config applied)
+      ansible.builtin.command: >
+        talosctl --nodes {{ ansible_host | default(inventory_hostname) }} reboot --insecure
+      when: result.changed

@@ -1,0 +1,2 @@
+controlplane_config: controlplane.yaml
+worker_config: worker.yaml

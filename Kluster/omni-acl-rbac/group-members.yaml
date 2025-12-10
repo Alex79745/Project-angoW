@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Group
+metadata:
+  namespace: default
+  type: Groups.omni.sidero.dev
+  id: omni-admins
+spec:
+  users:
+    - admin@gmail.com
+---
+apiVersion: v1
+kind: Group
+metadata:
+  namespace: default
+  type: Groups.omni.sidero.dev
+  id: omni-developers
+spec:
+  users:
+    - developer@example.com
+---
+apiVersion: v1
+kind: Group
+metadata:
+  namespace: default
+  type: Groups.omni.sidero.dev
+  id: omni-ci
+spec:
+  users:
+    - cicd@example.com

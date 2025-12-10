@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: AccessPolicy
+metadata:
+  namespace: default
+  type: AccessPolicies.omni.sidero.dev
+  id: omni-access
+spec:
+  rules:
+    # ADMIN GROUP → full cluster → system:masters
+    - groups:
+        - omni-admins
+      role: Admin
+      clusters: ["*"]
+      kubernetes:
+        impersonate:
+          groups:
+            - system:masters
+
+# DEVELOPERS GROUP → access only to namespace online-boutique
+    - groups:
+        - omni-developers
+      role: Viewer
+      clusters: ["*"]
+      namespaces:
+        - online-boutique
+
+# CI/CD GROUP → can impersonate system:masters
+    - groups:
+        - omni-ci
+      role: Editor
+      clusters: ["*"]
+      kubernetes:
+        impersonate:
+          groups:
+            - system:masters

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Group
+metadata:
+  namespace: default
+  type: Groups.omni.sidero.dev
+  id: omni-admins
+spec:
+  users: []
+---
+apiVersion: v1
+kind: Group
+metadata:
+  namespace: default
+  type: Groups.omni.sidero.dev
+  id: omni-developers
+spec:
+  users: []
+---
+apiVersion: v1
+kind: Group
+metadata:
+  namespace: default
+  type: Groups.omni.sidero.dev
+  id: omni-ci
+spec:
+  users: []
