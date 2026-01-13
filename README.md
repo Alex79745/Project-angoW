@@ -187,6 +187,7 @@ Note:
  Migration Mode to ensure zero downtime. We have moved from a basic L2 network to a high-performance eBPF fabric
 that natively peers with our Bird2 BGP infrastructure, alinhando-se com a estratégia definida no comando helm."
 
+
 https://docs.cilium.io/en/latest/installation/k8s-install-helm/#k8s-install-helm
 
 https://isovalent.com/blog/post/tutorial-migrating-to-cilium-part-1/
