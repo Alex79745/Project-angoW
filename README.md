@@ -58,19 +58,19 @@ output "kubeconfig" {
 }
 ```
 
- Technical Migration Plan: Flannel to Cilium (eBPF)
-Target Environment: Talos Linux / Proxmox Cluster
-Architect: Alexandre
-Date: January 2026
-Status: Implementation Ready
-1. Executive Summary (For Management)
-This migration replaces the legacy Flannel CNI (Layer 2 bridge) with Cilium (eBPF-native Layer 3-7 fabric).
-WAF Pillar: Reliability: Eliminates the "single point of failure" in Flannel's VXLAN.
-WAF Pillar: Performance: Reduces CPU overhead by ~30% by bypassing iptables and using kernel-level eBPF.
-Strategic Goal: Enables BGP Peering with Bird2 and Consul Service Mesh integration.
-2. Phase 1: Pre-Migration Validation
-Run these commands to establish a baseline.
-bash
+#Technical Migration Plan: Flannel to Cilium (eBPF)
+#Target Environment: Talos Linux / Proxmox Cluster
+#Architect: Alexandre
+#Date: January 2026
+#Status: Implementation Ready
+#1. Executive Summary (For Management)
+#This migration replaces the legacy Flannel CNI (Layer 2 bridge) with Cilium (eBPF-native Layer 3-7 fabric).
+#WAF Pillar: Reliability: Eliminates the "single point of failure" in Flannel's VXLAN.
+#WAF Pillar: Performance: Reduces CPU overhead by ~30% by bypassing iptables and using kernel-level eBPF.
+#Strategic Goal: Enables BGP Peering with Bird2 and Consul Service Mesh integration.
+#2. Phase 1: Pre-Migration Validation
+#Run these commands to establish a baseline.
+
 # Capture baseline network state
 kubectl get nodes -o wide > pre-migration-nodes.log
 kubectl get pods -A -o wide > pre-migration-pods.log
@@ -78,11 +78,11 @@ kubectl get pods -A -o wide > pre-migration-pods.log
 # Verify Cilium compatibility on Talos nodes
 cilium preflight check
 
-3. Phase 2: Phased Migration (Best Practice)
-We use a Hybrid Mode to prevent total cluster blackout.
-Step 3.1: Install Cilium in "Secondary" Mode
-This installs Cilium but prevents it from managing pod networking yet.
-bash
+#3. Phase 2: Phased Migration (Best Practice)
+#We use a Hybrid Mode to prevent total cluster blackout.
+#Step 3.1: Install Cilium in "Secondary" Mode
+#This installs Cilium but prevents it from managing pod networking yet.
+
 # Install Cilium but DO NOT replace Flannel yet
 helm install cilium cilium/cilium --version 1.18.0 \
   --namespace kube-system \
@@ -90,9 +90,9 @@ helm install cilium cilium/cilium --version 1.18.0 \
   --set cni.migration.enabled=true \
   --set bgpControlPlane.enabled=true
 
-Step 3.2: Deactivate Flannel (Per Node)
-Best Practice: Do not delete Flannel globally. Migrate one node at a time to minimize blast radius.
-bash
+#Step 3.2: Deactivate Flannel (Per Node)
+#Best Practice: Do not delete Flannel globally. Migrate one node at a time to minimize blast radius.
+
 # Pick a worker node
 NODE="worker-01"
 
@@ -106,11 +106,12 @@ kubectl label node $NODE --overwrite "io.cilium.migration/cilium-default=true"
 kubectl -n kube-system delete pod -l k8s-app=cilium --field-selector spec.nodeName=$NODE
 # 4. Verify Cilium is managing pod networking on that node
 cilium status --node $NODE
-4. Phase 3: Infrastructure Integration (Bird2 & Omni)
-Since you are the Lead Architect, use the Omni API to apply the final state.
-Step 4.1: Talos Omni Config Patch
-File: cilium-final-patch.yaml
-Copy this into your null_resource or local-exec Terraform block.
+
+#4. Phase 3: Infrastructure Integration (Bird2 & Omni)
+#Since you are the Lead Architect, use the Omni API to apply the final state.
+#Step 4.1: Talos Omni Config Patch
+#File: cilium-final-patch.yaml
+#Copy this into your null_resource or local-exec Terraform block.
 yaml
 cluster:
   network:
@@ -150,24 +151,24 @@ cluster:
           enabled: true
         devices: enp0s3
 
-Step 4.1.1: Apply the Patch
-bash
+#Step 4.1.1: Apply the Patch
+
 # Apply the patch using Omni API
-omni apply -f cilium-final-patch.yaml
-Step 4.1.2: Verify Cilium is Fully Active
-bash
+#omni apply -f cilium-final-patch.yaml
+#Step 4.1.2: Verify Cilium is Fully Active
+
 # Verify Cilium is fully active
-cilium status
-Step 4.2: Verify BGP Peering
-bash
+#cilium status
+#Step 4.2: Verify BGP Peering
+
 # Check if Cilium is advertising to Bird2
 cilium bgp peers
 # On Bird2 Node:
 birdc show protocols | grep cilium
 
-5. Phase 4: Post-Migration Cleanup
-Only run this after all nodes are confirmed "Healthy".
-bash
+#5. Phase 4: Post-Migration Cleanup
+#Only run this after all nodes are confirmed "Healthy".
+
 # Remove Flannel entirely
 kubectl delete daemonset kube-flannel-ds -n kube-flannel
 kubectl delete cm kube-flannel-cfg -n kube-flannel
@@ -175,17 +176,96 @@ kubectl delete cm kube-flannel-cfg -n kube-flannel
 # Final connectivity test
 cilium connectivity test
 
-6. Architecture Scorecard
-Feature	Flannel (Legacy)	Cilium (Well-Architected)
-Logic Layer	Layer 2 (Bridge)	Layer 3-7 (eBPF)
-BGP Support	None (Static)	Native Control Plane
-Security	None	Identity-Aware Policies
-Visibility	Simple Pings	Hubble (Deep Flow Logs)
-Note:
-"I have executed a Well-Architected Migration from Flannel to Cilium.
- This wasn't a simple 'delete and replace'; it was a phased rollout using Cilium 
- Migration Mode to ensure zero downtime. We have moved from a basic L2 network to a high-performance eBPF fabric
-that natively peers with our Bird2 BGP infrastructure, alinhando-se com a estratégia definida no comando helm."
+#6. Architecture Scorecard
+#Feature	Flannel (Legacy)	Cilium (Well-Architected)
+#Logic Layer	Layer 2 (Bridge)	Layer 3-7 (eBPF)
+#BGP Support	None (Static)	Native Control Plane
+#Security	None	Identity-Aware Policies
+#Visibility	Simple Pings	Hubble (Deep Flow Logs)
+#Note:
+#"I have executed a Well-Architected Migration from Flannel to Cilium.
+# This wasn't a simple 'delete and replace'; it was a phased rollout using Cilium 
+# Migration Mode to ensure zero downtime. We have moved from a basic L2 network to a high-performance eBPF fabric
+#that natively peers with our Bird2 BGP infrastructure, alinhando-se com a estratégia definida no comando helm."
+
+
+https://docs.cilium.io/en/latest/installation/k8s-install-helm/#k8s-install-helm
+
+https://isovalent.com/blog/post/tutorial-migrating-to-cilium-part-1/
+
+https://github.com/cilium/cilium
+
+
+
+########################################################################## Helm Install Command for Reference Only###########################################################################
+
+Phase 1: Preparation and Install Cilium (Co-existence Mode)
+1. Document Current State
+Capture network configurations for an eventual rollback plan.
+
+kubectl get nodes -o wide > pre-migration-nodes.log
+kubectl get pods -A -o wide > pre-migration-pods.log
+
+2. Install Cilium in "Secondary CNI" Mode
+This installs Cilium binaries alongside Flannel but lets Flannel maintain control of the network for now.
+
+helm install cilium cilium/cilium --version 1.18.0 \
+  --namespace kube-system \
+  --set cni.exclusive=false \
+  --set cni.migration.enabled=true \
+  --set bgpControlPlane.enabled=true \
+  --set k8sServiceHost=192.168.1.139 \
+  --set k8sServicePort=6443 \
+  --set kubeProxyReplacement=true \
+  --set l2announcements.enabled=true \
+  --set externalIPs.enabled=true \
+  --set ingressController.enabled=true \
+  --set bpf.lbExternalClusterIP=true \
+  --set ingressController.loadbalancerMode=shared \
+  --set operator.prometheus.enabled=true \
+  --set gatewayAPI.enabled=true \
+  --set devices=enp0s3 
+
+Phase 2: Node-by-Node Migration (WAF: Reliability)
+This is the safest method for production. Migrate one node at a time to minimize the "blast radius" of any potential failure.
+1. Migrate the First Node
+
+NODE="{node-name}"
+
+# 1. Safely drain all application pods (respects PDBs)
+kubectl drain $NODE --ignore-daemonsets --delete-emptydir-data
+
+# 2. Label the node to signal Cilium to take ownership of CNI configuration
+kubectl label node $NODE --overwrite "io.cilium.migration/cilium-default=true"
+
+# 3. Restart Cilium pods on that specific node to pick up the new configuration
+kubectl -n kube-system delete pod -l k8s-app=cilium --field-selector spec.nodeName=$NODE
+
+# 4. Uncordon the node once Cilium is "Healthy"
+# Monitor with: watch -n 1 "cilium status"
+kubectl uncordon $NODE
+
+2. Repeat for all Remaining Nodes
+Repeat Step 1 for every other node in your cluster. Do not proceed to the next node until the current one is confirmed 100% healthy.
+Phase 3: Finalization and Cleanup
+Once all nodes are running Cilium successfully, you can remove Flannel entirely.
+1. Remove Flannel Resources
+
+# This removes the DaemonSet that managed Flannel pods
+kubectl delete daemonset kube-flannel-ds -n kube-flannel 
+# Remove configuration maps
+kubectl delete cm kube-flannel-cfg -n kube-flannel
+
+2. Final Validation
+
+# Verify all connectivity is working through Cilium now
+cilium status --wait
+cilium connectivity test
+
+Documentation 
+"I executed a Well-Architected, Zero-Downtime CNI migration on our production cluster. 
+By migrating node-by-node, I ensured maximum reliability and minimized risk. 
+We are now running on a high-performance eBPF fabric that natively supports BGP peering with Bird2. 
 
 
 https://docs.cilium.io/en/latest/installation/k8s-install-helm/#k8s-install-helm
