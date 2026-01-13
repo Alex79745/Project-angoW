@@ -58,9 +58,9 @@ output "kubeconfig" {
 }
 ```
 
-Technical Migration Plan: Flannel to Cilium (eBPF)
+ Technical Migration Plan: Flannel to Cilium (eBPF)
 Target Environment: Talos Linux / Proxmox Cluster
- Architect: Alexandre
+Architect: Alexandre
 Date: January 2026
 Status: Implementation Ready
 1. Executive Summary (For Management)
@@ -78,7 +78,6 @@ kubectl get pods -A -o wide > pre-migration-pods.log
 # Verify Cilium compatibility on Talos nodes
 cilium preflight check
 
-
 3. Phase 2: Phased Migration (Best Practice)
 We use a Hybrid Mode to prevent total cluster blackout.
 Step 3.1: Install Cilium in "Secondary" Mode
@@ -90,7 +89,6 @@ helm install cilium cilium/cilium --version 1.18.0 \
   --set cni.exclusive=false \
   --set cni.migration.enabled=true \
   --set bgpControlPlane.enabled=true
-
 
 Step 3.2: Deactivate Flannel (Per Node)
 Best Practice: Do not delete Flannel globally. Migrate one node at a time to minimize blast radius.
@@ -106,8 +104,8 @@ kubectl label node $NODE --overwrite "io.cilium.migration/cilium-default=true"
 
 # 3. Restart Cilium on that node
 kubectl -n kube-system delete pod -l k8s-app=cilium --field-selector spec.nodeName=$NODE
-Use o código com cuidado.
-
+# 4. Verify Cilium is managing pod networking on that node
+cilium status --node $NODE
 4. Phase 3: Infrastructure Integration (Bird2 & Omni)
 Since you are the Lead Architect, use the Omni API to apply the final state.
 Step 4.1: Talos Omni Config Patch
@@ -151,15 +149,21 @@ cluster:
         gatewayAPI:
           enabled: true
         devices: enp0s3
-Use o código com cuidado.
 
+Step 4.1.1: Apply the Patch
+bash
+# Apply the patch using Omni API
+omni apply -f cilium-final-patch.yaml
+Step 4.1.2: Verify Cilium is Fully Active
+bash
+# Verify Cilium is fully active
+cilium status
 Step 4.2: Verify BGP Peering
 bash
 # Check if Cilium is advertising to Bird2
 cilium bgp peers
 # On Bird2 Node:
 birdc show protocols | grep cilium
-Use o código com cuidado.
 
 5. Phase 4: Post-Migration Cleanup
 Only run this after all nodes are confirmed "Healthy".
@@ -170,7 +174,6 @@ kubectl delete cm kube-flannel-cfg -n kube-flannel
 
 # Final connectivity test
 cilium connectivity test
-Use o código com cuidado.
 
 6. Architecture Scorecard
 Feature	Flannel (Legacy)	Cilium (Well-Architected)
@@ -178,10 +181,11 @@ Logic Layer	Layer 2 (Bridge)	Layer 3-7 (eBPF)
 BGP Support	None (Static)	Native Control Plane
 Security	None	Identity-Aware Policies
 Visibility	Simple Pings	Hubble (Deep Flow Logs)
-Manager/Colleague Pitch:
-"I have executed a Well-Architected Migration from Flannel to Cilium. This wasn't a simple 'delete and replace'; it was a phased rollout using Cilium Migration Mode to ensure zero downtime. We have moved from a basic L2 network to a high-performance eBPF fabric that natively peers with our Bird2 BGP infrastructure, alinhando-se com a estratégia definida no comando helm."
-
-https://docs.cilium.io/en/latest/installation/k8s-install-migration/
+Note:
+"I have executed a Well-Architected Migration from Flannel to Cilium.
+ This wasn't a simple 'delete and replace'; it was a phased rollout using Cilium 
+ Migration Mode to ensure zero downtime. We have moved from a basic L2 network to a high-performance eBPF fabric
+that natively peers with our Bird2 BGP infrastructure, alinhando-se com a estratégia definida no comando helm."
 
 https://docs.cilium.io/en/latest/installation/k8s-install-helm/#k8s-install-helm
 
