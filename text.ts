@@ -11,4 +11,9 @@ helm install cilium cilium/cilium --version 1.18.6 \
   --set bgpControlPlane.enabled=true \
   --set l2announcements.enabled=true \
   --set externalIPs.enabled=true \
+  --set bpf.hostLegacyRouting=true
   --set gatewayAPI.enabled=true
+
+https://docs.cilium.io/en/stable/installation/k8s-install-helm/
+https://docs.siderolabs.com/kubernetes-guides/cni/deploying-cilium
+https://docs.cilium.io/en/stable/helm-reference/
