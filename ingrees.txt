@@ -1,0 +1,118 @@
+This uses Cilium's internal Envoy proxy to route traffic based on the Host Header (e.g., grafana.example.com), which saves your IP pool and centralizes security.
+1. The Shared IP Pool
+First, define the unique IP pool for your Infra cluster. This prevents "IP bombing" and ensures this specific IP is reserved.
+yaml
+# infra-ip-pool.yaml
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "infra-central-pool"
+spec:
+  blocks:
+    - cidr: "10.0.10.50/32" # This is your ONE dedicated LB IP
+  serviceSelector:
+    matchLabels:
+      io.cilium/ingress: "true" # Only Cilium Ingress will use this IP
+2. The Shared Ingress Controller
+This configuration tells Cilium to provision a single LoadBalancer and use it for all Ingress resources.
+yaml
+# shared-ingress-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cilium-ingress
+  namespace: kube-system
+  annotations:
+    # This ensures it pulls from your specific pool
+    io.cilium/lb-ipam-ips: "10.0.10.50" 
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      name: http
+    - port: 443
+      name: https
+  selector:
+    app.kubernetes.io/name: cilium-ingress
+3. The Multi-Service Routing File
+This single file routes traffic to all your tools based on the domain name. Because they share the ingressClassName: cilium, they will all live on 10.0.10.50.
+yaml
+# infra-tools-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: central-infra-ingress
+  namespace: infra-system # Assuming your tools are here
+  annotations:
+    # KEY: This forces all rules to share the same IP
+    cilium.io/ingress-loadbalancer-mode: "shared"
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: rancher.corp.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rancher
+                port:
+                  number: 80
+    - host: grafana.corp.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000
+    - host: prometheus.corp.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: prometheus
+                port:
+                  number: 9090
+    - host: consul.corp.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: consul-ui
+                port:
+                  number: 8500
+4. BGP Peering (BIRD2 Integration)
+To make sure your network sees this 10.0.10.50 IP, you need the BGP policy.
+yaml
+# bgp-policy.yaml
+apiVersion: cilium.io/v2alpha1
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: infra-bgp-policy
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: linux
+  virtualRouters:
+    - localASN: 64512
+      exportPodCIDR: false # NO overlapping pod CIDRs advertised!
+      neighbors:
+        - peerAddress: "10.0.0.1/32" # Your BIRD2 / Upstream Switch IP
+          peerASN: 64512
+      serviceSelector:
+        matchLabels:
+          io.cilium/ingress: "true" # Only advertise the Ingress LB IP
+Why this supports your Tuesday Review:
+• Efficiency: You are using one IP for four major enterprise tools.
+• Senior Logic: You are using Host-based routing (L7) instead of just opening random ports on L3/L4.
+• Scalability: If you add a new tool (e.g., Loki or Jaeger), you just add 5 lines to the Ingress file. You don't need a new IP, a new LB, or a new BGP config.
+
+
