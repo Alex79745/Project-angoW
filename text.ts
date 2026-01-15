@@ -117,4 +117,12 @@ metadata:
   name: envoy-gateway
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
+###################################################################
 
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "management-pool"
+spec:
+  blocks:
+    - cidr: "192.168.1.240/29" # Assigns IPs .200 through .207
