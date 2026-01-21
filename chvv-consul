@@ -1,0 +1,107 @@
+# complete version 
+# cat consul-prod.yaml
+global:
+  name: consul
+  datacenter: central-primary-infra
+
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    httpsOnly: true
+
+  acls:
+    manageSystemACLs: true
+  authMethod:
+     enable: true
+     name: consul-k8s-component-auth-method
+   # bootstrapToken:
+   #   secretName: consul-bootstrap-acl-token
+   #   secretKey: token
+
+  peering:
+    enabled: true
+
+  meshGateway:
+    enabled: true
+
+ui:
+  enabled: true
+
+controller:
+  enabled: true
+
+dataplane:
+  enabled: true
+
+server:
+  enabled: true
+  replicas: 3
+  exposeGossipAndRPC:
+    enabled: true
+  bootstrapExpect: 3
+  exposeService:
+    type: LoadBalancer
+  annotations: 
+      io.cilium/lb-ipam-ips: "192.168.1.82"
+    # REQUIRED: Label for the Cilium IP Pool selector
+  labels:
+      io.cilium/lb-ipam-ips: "true"
+  extraConfig: |
+    {
+      "acl": {
+        "enabled": true,
+        "default_policy": "allow",
+        "enable_token_persistence": true
+      }
+    }
+
+client:
+  enabled: true
+  grpc: true
+  extraConfig: |
+    {
+      "verify_incoming": false,
+      "verify_outgoing": true,
+      "verify_server_hostname": true
+    }
+
+connectInject:
+  enabled: true
+  apiGateway:
+    managedGatewayClass:
+      serviceType: LoadBalancer
+      annotations:
+        io.cilium/lb-ipam-ips: "192.168.1.74"
+      # REQUIRED: Label for the Cilium IP Pool selector
+      labels:
+        io.cilium/lb-ipam-ips: "true"
+  default: true
+  k8sAllowNamespaces: ["cattle-system","kube-system","consul"]
+  tls:
+    enabled: true
+
+syncCatalog:
+  enabled: true
+  toConsul: true
+  toK8S: false
+  consulNodeName: "omni-infra"
+  k8sAllowNamespaces: ["cattle-system","kube-system","consul"]
+  k8sDenyNamespaces: ["default"]
+  addK8SNamespaceSuffix: false
+  tls:
+    enabled: true
+
+meshGateway:
+  enabled: true
+  replicas: 2
+  service:
+    type: LoadBalancer
+    # chart 1.9.x expects a STRING here, not a map
+    annotations: |
+      service.cilium.io/global: "true"
+      io.cilium/lb-ipam-ips: "10.19.143.100"
+      consul.hashicorp.com/connect-inject: "true"
+      consul.hashicorp.com/mesh-inject: "true"
+    labels:
+        io.cilium/lb-ipam-ips: "true"  
+  hostNetwork: false
