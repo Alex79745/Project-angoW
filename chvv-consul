@@ -232,3 +232,4 @@ helm upgrade consul hashicorp/consul \
   --values consul-prod.yaml \
   --rollback-on-failure \
   --timeout 10m
+helm template consul hashicorp/consul -f consul-prod.yaml --version 1.9.2 | grep -E "kind: Service|name: consul-server-expose|name: consul-mesh-gateway"
