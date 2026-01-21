@@ -232,4 +232,10 @@ helm upgrade consul hashicorp/consul \
   --values consul-prod.yaml \
   --rollback-on-failure \
   --timeout 10m
+
 helm template consul hashicorp/consul -f consul-prod.yaml --version 1.9.2 | grep -E "kind: Service|name: consul-server-expose|name: consul-mesh-gateway"
+# Check that all 3 LBs have their IPs
+kubectl get svc -n consul -l io.cilium/lb-ipam-ips=true
+
+# Check that the Sync process is using your cluster name
+kubectl logs -n consul -l app=consul,component=sync-catalog | grep "omni-infra"
