@@ -239,3 +239,8 @@ kubectl get svc -n consul -l io.cilium/lb-ipam-ips=true
 
 # Check that the Sync process is using your cluster name
 kubectl logs -n consul -l app=consul,component=sync-catalog | grep "omni-infra"
+
+
+kubectl label svc consul-server io.cilium/lb-ipam-ips=true -n consul
+kubectl label svc consul-mesh-gateway io.cilium/lb-ipam-ips=true -n consul
+
