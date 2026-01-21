@@ -247,4 +247,18 @@ kubectl label svc consul-mesh-gateway io.cilium/lb-ipam-ips=true -n consul
 ##
 gateway api 
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml
+kubectl rollout restart deployment consul-connect-injector -n consul
+
+
+
+apiVersion: ://api-gateway.consul.hashicorp.com
+kind: GatewayClassConfig
+metadata:
+  name: consul-api-gateway # This matches the name in your parametersRef
+  namespace: consul
+spec:
+  # This tells the controller to use your .74 IP
+  serviceType: LoadBalancer
+  serviceAnnotations:
+    lbipam.cilium.io/ips: "192.168.1.74"
 
