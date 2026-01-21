@@ -244,3 +244,7 @@ kubectl logs -n consul -l app=consul,component=sync-catalog | grep "omni-infra"
 kubectl label svc consul-server io.cilium/lb-ipam-ips=true -n consul
 kubectl label svc consul-mesh-gateway io.cilium/lb-ipam-ips=true -n consul
 
+##
+gateway api 
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml
+
