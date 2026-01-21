@@ -105,3 +105,123 @@ meshGateway:
     labels:
         io.cilium/lb-ipam-ips: "true"  
   hostNetwork: false
+
+
+
+---
+helm upgrade consul hashicorp/consul --namespace consul --values consul-prod.yaml --atomic --timeout 10m
+Flag --atomic has been deprecated, use --rollback-on-failure instead
+level=WARN msg="unable to find exact version; falling back to closest available version" chart=consul requested="" selected=1.9.2
+Error: UPGRADE FAILED: could not get server version from Kubernetes: an error on the server ("<html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body>\r\n<center><h1>502 Bad Gateway</h1></center>\r\n<hr><center>nginx/1.24.0 (Ubuntu)</center>\r\n</body>\r\n</html>") has prevented the request from succeeding
+
+$ cat consul-prod.yaml
+global:
+  name: consul
+  datacenter: central-primary-infra
+
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    httpsOnly: true
+
+  acls:
+    manageSystemACLs: true
+  authMethod:
+     enable: true
+     name: consul-k8s-component-auth-method
+   # bootstrapToken:
+   #   secretName: consul-bootstrap-acl-token
+   #   secretKey: token
+
+  peering:
+    enabled: true
+
+  meshGateway:
+    enabled: true
+
+ui:
+  enabled: true
+
+controller:
+  enabled: true
+
+dataplane:
+  enabled: true
+
+server:
+  enabled: true
+  replicas: 3
+  bootstrapExpect: 3
+  exposeGossipAndRPC:
+    enabled: true
+    type: LoadBalancer
+    service:
+      annotations: |
+        lbipam.cilium.io/ips: "192.168.1.82"
+     # REQUIRED: Label for the Cilium IP Pool selector
+      labels:
+        io.cilium/lb-ipam-ips: "true"
+
+
+ # exposeService:
+ #   type: LoadBalancer
+
+  extraConfig: |
+    {
+      "acl": {
+        "enabled": true,
+        "default_policy": "allow",
+        "enable_token_persistence": true
+      }
+    }
+
+client:
+  enabled: true
+  grpc: true
+  extraConfig: |
+    {
+      "verify_incoming": false,
+      "verify_outgoing": true,
+      "verify_server_hostname": true
+    }
+
+connectInject:
+  enabled: true
+  apiGateway:
+    managedGatewayClass:
+      serviceType: LoadBalancer
+      annotations: |
+        lbipam.cilium.io/ips: "192.168.1.74"
+      # REQUIRED: Label for the Cilium IP Pool selector
+      labels:
+          io.cilium/lb-ipam-ips: "true"
+  default: true
+  k8sAllowNamespaces: ["cattle-system","kube-system","consul"]
+  tls:
+    enabled: true
+
+syncCatalog:
+  enabled: true
+  toConsul: true
+  toK8S: false
+  consulNodeName: "omni-infra"
+  k8sAllowNamespaces: ["cattle-system","kube-system","consul"]
+  k8sDenyNamespaces: ["default"]
+  addK8SNamespaceSuffix: false
+  tls:
+    enabled: true
+
+meshGateway:
+  enabled: true
+  replicas: 2
+  service:
+    type: LoadBalancer
+    # chart 1.9.x expects a STRING here, not a map
+    annotations: |
+      service.cilium.io/global: "true"
+      lbipam.cilium.io/ips: "10.19.143.100"
+      consul.hashicorp.com/connect-inject: "true"
+      consul.hashicorp.com/mesh-inject: "true"
+    labels:
+        io.cilium/lb-ipam-ips: "true"
+  hostNetwork: false
