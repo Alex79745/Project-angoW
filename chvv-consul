@@ -531,8 +531,83 @@ spec:
         - name: consul-server
           port: 8502
 
+#########################################################################################################################################################
 
-
+ helm upgrade consul hashicorp/consul --namespace consul --values consul-prod.yaml --rollback-on-failure --timeout 10m
+level=WARN msg="unable to find exact version; falling back to closest available version" chart=consul requested="" selected=1.9.2
+I0122 15:51:45.280530   35788 warnings.go:110] "Warning: spec.SessionAffinity is ignored for headless services"
+level=WARN msg="upgrade failed" name=consul error="conflict occurred while applying object /gatewayclasses.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /gateways.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /grpcroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /httproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /referencegrants.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /tcproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /tlsroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /udproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions"
+I0122 15:52:08.145041   35788 warnings.go:110] "Warning: spec.SessionAffinity is ignored for headless services"
+level=WARN msg="Rollback \"consul\" failed: conflict occurred while applying object /gatewayclasses.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /gateways.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /grpcroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /httproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /referencegrants.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /tcproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /tlsroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions && conflict occurred while applying object /udproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with \"kubectl\":\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .spec.versions"
+Error: UPGRADE FAILED: an error occurred while rolling back the release. original upgrade error: conflict occurred while applying object /gatewayclasses.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /gateways.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /grpcroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /httproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /referencegrants.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /tcproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /tlsroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /udproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions: conflict occurred while applying object /gatewayclasses.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /gateways.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /grpcroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /httproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /referencegrants.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /tcproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /tlsroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions && conflict occurred while applying object /udproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 3 conflicts: conflicts with "kubectl":
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .spec.versions
+connectInject:
+  enabled: true
+  apiGateway:
+    #enabled: true
+   #manageCRDs: false
+    manageExternalCRDS: false
+    managedGatewayClass:
+      enabled: true
+      name: consul
+      serviceType: LoadBalancer
+      annotations: |
+        lbipam.cilium.io/ips: "10.19.143.74"
+        service.cilium.io/global: "true"
+      # REQUIRED: Label for the Cilium IP Pool selector
+      labels:
+          io.cilium/lb-ipam-ips: "true"
+  default: true
+  k8sAllowNamespaces: ["cattle-system","kube-system","consul","infra-system"]
+  tls:
+    enabled: true
 
 
 
