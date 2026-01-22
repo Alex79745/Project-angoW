@@ -486,3 +486,53 @@ time=2026-01-22T15:17:10.296093949Z level=info msg="Setting up Secret synchroniz
 
 
 
+
+
+
+# Save as gateway-class.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy-gateway
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+
+# gateway.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: cilium-ingress
+  namespace: envoy-gateway-system
+spec:
+  gatewayClassName: envoy-gateway
+  listeners:
+    - name: grpc
+      protocol: HTTP # Or HTTP if testing without certs
+      port: 8502
+      allowedRoutes:
+        namespaces:
+          from: All
+
+
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: consul-grpc-route
+  namespace: consul
+spec:
+  parentRefs:
+    - name: cilium-ingress # Points to your Cilium Gateway
+  rules:
+    - matches:
+        - method:
+            service: "consul.v1.ConfigEntryService" # Or relevant Consul gRPC service
+      backendRefs:
+        - name: consul-server
+          port: 8502
+
+
+
+
+
+
