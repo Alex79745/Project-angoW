@@ -610,4 +610,22 @@ connectInject:
     enabled: true
 
 
-
+2026-01-22T16:05:03.247Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul se ││ 2026-01-22T16:05:03.346Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addre │
+│ 2026-01-22T16:05:03.346Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of know ││ 2026-01-22T16:05:03.458Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: ACL auth method login succeeded: │
+│ 2026-01-22T16:05:03.459Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: connected to Consul server: addr ││ 2026-01-22T16:05:03.460Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: updated known Consul servers fro │
+│ 2026-01-22T16:05:03.462Z    INFO    setup    Config file present and deserialized    {"file": "/consul/config/config.json", "config" ││ 2026-01-22T16:05:03.466Z    ERROR    setup    unable to register field indexes    {"error": "failed to get API group resources: unab │
+│ github.com/hashicorp/consul-k8s/control-plane/subcommand/inject-connect.(*Command).configureControllers                              ││     /home/runner/work/consul-k8s/consul-k8s/control-plane/subcommand/inject-connect/v1controllers.go:110                             │
+│ github.com/hashicorp/consul-k8s/control-plane/subcommand/inject-connect.(*Command).Run                                               ││     /home/runner/work/consul-k8s/consul-k8s/control-plane/subcommand/inject-connect/command.go:420                                   │
+│ github.com/mitchellh/cli.(*CLI).Run                                                                                                  ││     /home/runner/go/pkg/mod/github.com/mitchellh/cli@v1.1.5/cli.go:262                                                               │
+│ main.main                                                                                                                            ││     /home/runner/work/consul-k8s/consul-k8s/control-plane/main.go:21                                                                 │
+│ runtime.main                                                                                                                         ││     /opt/hostedtoolcache/go/1.25.5/x64/src/runtime/proc.go:285                                                                       │
+│ 2026-01-22T16:05:03.466Z    ERROR    setup    could not configure controllers: failed to get API group resources: unable to retrieve ││ github.com/hashicorp/consul-k8s/control-plane/subcommand/inject-connect.(*Command).Run                                               │
+│     /home/runner/work/consul-k8s/consul-k8s/control-plane/subcommand/inject-connect/command.go:422                                   ││ github.com/mitchellh/cli.(*CLI).Run                                                                                                  │
+│     /home/runner/go/pkg/mod/github.com/mitchellh/cli@v1.1.5/cli.go:262                                                               │
+│ main.main                                                                                                                            │
+│     /home/runner/work/consul-k8s/consul-k8s/control-plane/main.go:21                                                                 │
+│ runtime.main                                                                                                                         │
+│     /opt/hostedtoolcache/go/1.25.5/x64/src/runtime/proc.go:285                                                                       │
+│ 2026-01-22T16:05:03.466Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: stopping                         │
+│ 2026-01-22T16:05:03.470Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: ACL auth method logout succeeded │
+│ stream closed: EOF for consul/cons
