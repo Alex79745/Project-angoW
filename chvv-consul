@@ -437,3 +437,8 @@ time=2026-01-22T14:55:11.257789285Z level=info msg="Checking for required and op
 time=2026-01-22T14:55:11.292883898Z level=error msg="Required GatewayAPI resources are not found, please refer to docs for installation instructions" module=operator.operator-controlplane.leader-lifecycle.gateway-api error="customresourcedefinitions.apiextensions.k8s.io \"httproutes.gateway.networking.k8s.io\" not found"
 time=2026-01-22T14:55:20.503896762Z level=info msg="CRD (CustomResourceDefinition) is installed and up-to-date" module=operator.operator-controlplane.leader-lifecycle.create-crds name=ciliumgatewayclassconfigs.cilium.io
 
+
+
+
+kubectl delete crd gateways.gateway.networking.k8s.io httproutes.gateway.networking.k8s.io gatewayclasses.gateway.networking.k8s.io grpcroutes.gateway.networking.k8s.io referencegrants.gateway.networking.k8s.io
+
