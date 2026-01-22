@@ -372,4 +372,6 @@ kubectl get crd gateways.gateway.networking.k8s.io -o jsonpath='{.spec.versions[
 │     /home/runner/go/pkg/mod/k8s.io/apimachinery@v0.29.8/pkg/util/wait/wait.go:72                                                     │
 │ 2026-01-22T11:53:45.540Z    INFO    pkg/mod/k8s.io/client-go@v0.29.8/tools/cache/reflector.go:229: failed to list *v1beta1.Reference │
 │ 2026-01-22T11:53:45.541Z    ERROR    pkg/mod/k8s.io/client-go@v0.29.8/tools/cache/reflector.go:229: Failed to watch *v1beta1.Referen │
-│ k8s.io/client-go/tools/cache.DefaultWatchErrorHandler                               
+│ k8s.io/client-go/tools/cache.DefaultWatchErrorHandler    
+
+kubectl logs -n kube-system -l io.cilium.k8s.operator.partof=cilium-operator | grep -i "gateway"
