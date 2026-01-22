@@ -458,3 +458,10 @@ customresourcedefinition.apiextensions.k8s.io/xmeshes.gateway.networking.x-k8s.i
 The CustomResourceDefinition "httproutes.gateway.networking.k8s.io" is invalid: metadata.annotations: Too long: may not be more than 262144 bytes
 
 
+# Get the CRD name
+CRD_NAME="gateways.gateway.networking.k8s.io"
+
+# Remove the managedFields metadata that tracks previous ownership
+kubectl patch crd $CRD_NAME --type=json -p='[{"op": "remove", "path": "/metadata/managedFields"}]'
+
+
