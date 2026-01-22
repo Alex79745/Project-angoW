@@ -375,3 +375,21 @@ kubectl get crd gateways.gateway.networking.k8s.io -o jsonpath='{.spec.versions[
 │ k8s.io/client-go/tools/cache.DefaultWatchErrorHandler    
 
 kubectl logs -n kube-system -l io.cilium.k8s.operator.partof=cilium-operator | grep -i "gateway"
+
+$ kubectl logs -n kube-system cilium-operator-5dd7d68d75-dm5vw  | grep -i "gateway"
+time=2026-01-22T14:39:28.782875737Z level=info msg="  --egress-gateway-reconciliation-trigger-interval='1s'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.78292522Z level=info msg="  --enable-egress-gateway='false'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.782939171Z level=info msg="  --enable-gateway-api='true'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.782942526Z level=info msg="  --enable-gateway-api-alpn='false'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.782946182Z level=info msg="  --enable-gateway-api-app-protocol='false'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.782949827Z level=info msg="  --enable-gateway-api-proxy-protocol='false'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.782953422Z level=info msg="  --enable-gateway-api-secrets-sync='true'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.783009166Z level=info msg="  --enable-ipv4-egress-gateway='false'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.783146763Z level=info msg="  --gateway-api-hostnetwork-enabled='false'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.783151139Z level=info msg="  --gateway-api-hostnetwork-nodelabelselector=''" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.783154815Z level=info msg="  --gateway-api-secrets-namespace='cilium-secrets'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.78315855Z level=info msg="  --gateway-api-service-externaltrafficpolicy='Cluster'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.783162256Z level=info msg="  --gateway-api-xff-num-trusted-hops='0'" subsys=cilium-operator-generic
+time=2026-01-22T14:39:28.79905652Z level=info msg="Checking for required and optional GatewayAPI resources" module=operator.operator-controlplane.leader-lifecycle.gateway-api requiredGVK="[gateway.networking.k8s.io/v1, Kind=gatewayclasses gateway.networking.k8s.io/v1, Kind=gateways gateway.networking.k8s.io/v1, Kind=httproutes gateway.networking.k8s.io/v1, Kind=grpcroutes gateway.networking.k8s.io/v1beta1, Kind=referencegrants]" optionalGVK="[gateway.networking.k8s.io/v1alpha2, Kind=tlsroutes multicluster.x-k8s.io/v1alpha1, Kind=serviceimports]"
+time=2026-01-22T14:39:28.825922783Z level=error msg="Required GatewayAPI resources are not found, please refer to docs for installation instructions" module=operator.operator-controlplane.leader-lifecycle.gateway-api error="CRD \"gatewayclasses.gateway.networking.k8s.io\" does not have version \"v1\"\nCRD \"gateways.gateway.networking.k8s.io\" does not have version \"v1\"\nCRD \"httproutes.gateway.networking.k8s.io\" does not have version \"v1\"\nCRD \"grpcroutes.gateway.networking.k8s.io\" does not have version \"v1\""
+time=2026-01-22T14:39:38.025105123Z level=info msg="CRD (CustomResourceDefinition) is installed and up-to-date" module=operator.operator-controlplane.leader-lifecycle.create-crds name=ciliumgatewayclassconfigs.cilium.io
