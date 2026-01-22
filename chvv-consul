@@ -324,4 +324,8 @@ spec:
 │     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:329                                                             │
 │ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).processNextWorkItem                                                                                 │
 │     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:266                                                             │
-│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).Start.func2.2                          
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).Start.func2.2  
+
+
+kubectl label namespace infra-system pod-security.kubernetes.io/enforce=privileged --overwrite=true
+kubectl label namespace infra-system pod-security.kubernetes.io/warn=privileged --overwrite=true
