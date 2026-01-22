@@ -262,3 +262,31 @@ spec:
   serviceAnnotations:
     lbipam.cilium.io/ips: "192.168.1.74"
 
+
+
+2026-01-22T09:55:29.583Z    ERROR    error updating status    {"gateway": {"name":"shared-hub-gateway","namespace":"infra-system"}, "error": "Gateway.gateway.networking │
+│ github.com/hashicorp/consul-k8s/control-plane/api-gateway/controllers.(*GatewayController).Reconcile                                                                     │
+│     /home/runner/work/consul-k8s/consul-k8s/control-plane/api-gateway/controllers/gateway_controller.go:322                                                              │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).Reconcile                                                                                           │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:119                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).reconcileHandler                                                                                    │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:316                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).processNextWorkItem                                                                                 │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:266                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).Start.func2.2                                                                                       │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:227                                                             │
+│ 2026-01-22T09:55:29.583Z    ERROR    Reconciler error    {"controller": "gateway", "controllerGroup": "gateway.networking.k8s.io", "controllerKind": "Gateway", "Gateway │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).reconcileHandler                                                                                    │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:329                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).processNextWorkItem                                                                                 │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:266                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).Start.func2.2                                                                                       │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:227                                                             │
+│ 2026-01-22T09:55:34.727Z    ERROR    error updating status    {"gateway": {"name":"shared-hub-gateway","namespace":"infra-system"}, "error": "Gateway.gateway.networking │
+│ github.com/hashicorp/consul-k8s/control-plane/api-gateway/controllers.(*GatewayController).Reconcile                                                                     │
+│     /home/runner/work/consul-k8s/consul-k8s/control-plane/api-gateway/controllers/gateway_controller.go:322                                                              │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).Reconcile                                                                                           │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:119                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).reconcileHandler                                                                                    │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:316                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).processNextWorkItem 
