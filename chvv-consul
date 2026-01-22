@@ -290,3 +290,38 @@ spec:
 │ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).reconcileHandler                                                                                    │
 │     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:316                                                             │
 │ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).processNextWorkItem 
+
+
+
+
+│ 2026-01-22T09:55:23.547Z    INFO    Starting workers    {"controller": "gateway", "controllerGroup": "gateway.networking.k8s.io", "controllerKind": "Gateway", "worker c │
+│ 2026-01-22T09:55:23.547Z    INFO    Starting workers    {"controller": "ingressgateway", "controllerGroup": "consul.hashicorp.com", "controllerKind": "IngressGateway",  │
+│ 2026-01-22T09:55:23.547Z    INFO    Starting workers    {"controller": "servicedefaults", "controllerGroup": "consul.hashicorp.com", "controllerKind": "ServiceDefaults" │
+│ 2026-01-22T09:55:23.549Z    INFO    controller.endpoints    retrieved    {"name": "consul-server", "ns": "consul"}                                                       │
+│ 2026-01-22T09:55:23.646Z    INFO    controller.endpoints    retrieved    {"name": "consul-ui", "ns": "consul"}                                                           │
+│ 2026-01-22T09:55:23.647Z    INFO    controller.endpoints    retrieved    {"name": "consul-expose-servers", "ns": "consul"}                                               │
+│ 2026-01-22T09:55:23.648Z    INFO    controller.endpoints    retrieved    {"name": "imperative-api-extension", "ns": "cattle-system"}                                     │
+│ 2026-01-22T09:55:23.649Z    INFO    controller.endpoints    retrieved    {"name": "rancher", "ns": "cattle-system"}                                                      │
+│ 2026-01-22T09:55:23.650Z    INFO    controller.endpoints    retrieved    {"name": "rancher-webhook", "ns": "cattle-system"}                                              │
+│ 2026-01-22T09:55:23.651Z    INFO    controller.endpoints    retrieved    {"name": "consul-connect-injector", "ns": "consul"}                                             │
+│ 2026-01-22T09:55:23.651Z    INFO    controller.endpoints    retrieved    {"name": "consul-mesh-gateway", "ns": "consul"}                                                 │
+│ 2026-01-22T09:55:23.651Z    INFO    controller.endpoints    registering gateway with Consul    {"name": "mesh-gateway", "id": ""}                                        │
+│ 2026-01-22T09:55:23.747Z    INFO    controller.endpoints    registering gateway with Consul    {"name": "mesh-gateway", "id": ""}                                        │
+│ 2026-01-22T09:55:24.060Z    INFO    KubeAPIWarningLogger    would violate PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "shared-hub-gate │
+│ 2026-01-22T09:55:24.069Z    ERROR    error updating status    {"gateway": {"name":"shared-hub-gateway","namespace":"infra-system"}, "error": "Gateway.gateway.networking │
+│ github.com/hashicorp/consul-k8s/control-plane/api-gateway/controllers.(*GatewayController).Reconcile                                                                     │
+│     /home/runner/work/consul-k8s/consul-k8s/control-plane/api-gateway/controllers/gateway_controller.go:322                                                              │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).Reconcile                                                                                           │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:119                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).reconcileHandler                                                                                    │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:316                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).processNextWorkItem                                                                                 │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:266                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).Start.func2.2                                                                                       │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:227                                                             │
+│ 2026-01-22T09:55:24.069Z    ERROR    Reconciler error    {"controller": "gateway", "controllerGroup": "gateway.networking.k8s.io", "controllerKind": "Gateway", "Gateway │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).reconcileHandler                                                                                    │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:329                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).processNextWorkItem                                                                                 │
+│     /home/runner/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.16.5/pkg/internal/controller/controller.go:266                                                             │
+│ sigs.k8s.io/controller-runtime/pkg/internal/controller.(*Controller).Start.func2.2                          
