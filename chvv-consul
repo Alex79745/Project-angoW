@@ -459,13 +459,6 @@ The CustomResourceDefinition "httproutes.gateway.networking.k8s.io" is invalid: 
 
 
 # Get the CRD name
-CRD_NAME="gateways.gateway.networking.k8s.io"
-
-# Remove the managedFields metadata that tracks previous ownership
-kubectl patch crd $CRD_NAME --type=json -p='[{"op": "remove", "path": "/metadata/managedFields"}]'
-
-
-
 
  kubectl logs -n kube-system cilium-operator-8774b76f7-x4vx8   | grep -i "gateway"                                                                                         time=2026-01-22T15:17:10.184189309Z level=info msg="  --egress-gateway-reconciliation-trigger-interval='1s'" subsys=cilium-operator-generic
 time=2026-01-22T15:17:10.184237682Z level=info msg="  --enable-egress-gateway='false'" subsys=cilium-operator-generic
@@ -756,4 +749,16 @@ are the ways you can resolve this warning:
   value; in this case, you'll become the manager if the other manager(s)
   stop managing the field (remove it from their configuration).
 See https://kubernetes.io/docs/reference/using-api/server-side-apply/#conflicts
+
+
+CRD_NAME="gateways.gateway.networking.k8s.io"
+
+# Remove the managedFields metadata that tracks previous ownership
+kubectl patch crd $CRD_NAME --type=json -p='[{"op": "remove", "path": "/metadata/managedFields"}]'
+
+# This removes the "manager: helm" label so they aren't reverted during upgrades
+kubectl patch crd gateways.gateway.networking.k8s.io --type=json -p='[{"op": "remove", "path": "/metadata/managedFields"}]'
+kubectl patch crd httproutes.gateway.networking.k8s.io --type=json -p='[{"op": "remove", "path": "/metadata/managedFields"}]'
+
+
 
