@@ -465,3 +465,24 @@ CRD_NAME="gateways.gateway.networking.k8s.io"
 kubectl patch crd $CRD_NAME --type=json -p='[{"op": "remove", "path": "/metadata/managedFields"}]'
 
 
+
+
+ kubectl logs -n kube-system cilium-operator-8774b76f7-x4vx8   | grep -i "gateway"                                                                                         time=2026-01-22T15:17:10.184189309Z level=info msg="  --egress-gateway-reconciliation-trigger-interval='1s'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184237682Z level=info msg="  --enable-egress-gateway='false'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184254016Z level=info msg="  --enable-gateway-api='true'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184257661Z level=info msg="  --enable-gateway-api-alpn='false'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184261207Z level=info msg="  --enable-gateway-api-app-protocol='false'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184264812Z level=info msg="  --enable-gateway-api-proxy-protocol='false'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184268638Z level=info msg="  --enable-gateway-api-secrets-sync='true'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184340596Z level=info msg="  --enable-ipv4-egress-gateway='false'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184471713Z level=info msg="  --gateway-api-hostnetwork-enabled='false'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184476308Z level=info msg="  --gateway-api-hostnetwork-nodelabelselector=''" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184480294Z level=info msg="  --gateway-api-secrets-namespace='cilium-secrets'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.18448405Z level=info msg="  --gateway-api-service-externaltrafficpolicy='Cluster'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.184487806Z level=info msg="  --gateway-api-xff-num-trusted-hops='0'" subsys=cilium-operator-generic
+time=2026-01-22T15:17:10.19995389Z level=info msg="Checking for required and optional GatewayAPI resources" module=operator.operator-controlplane.leader-lifecycle.gateway-api requiredGVK="[gateway.networking.k8s.io/v1, Kind=gatewayclasses gateway.networking.k8s.io/v1, Kind=gateways gateway.networking.k8s.io/v1, Kind=httproutes gateway.networking.k8s.io/v1, Kind=grpcroutes gateway.networking.k8s.io/v1beta1, Kind=referencegrants]" optionalGVK="[gateway.networking.k8s.io/v1alpha2, Kind=tlsroutes multicluster.x-k8s.io/v1alpha1, Kind=serviceimports]"
+time=2026-01-22T15:17:10.254861776Z level=info msg="TLSRoute CRD is installed, TLSRoute support is enabled" module=operator.operator-controlplane.leader-lifecycle.gateway-api
+time=2026-01-22T15:17:10.296093949Z level=info msg="Setting up Secret synchronization" module=operator.operator-controlplane.leader-lifecycle.secret-sync registrations="[*v2.CiliumClusterwideNetworkPolicy -> \"cilium-secrets\" *v2.CiliumNetworkPolicy -> \"cilium-secrets\" *v1.Gateway -> \"cilium-secrets\"]"
+
+
+
