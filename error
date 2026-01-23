@@ -1,0 +1,48 @@
+ vim cilium-class.yaml
+
+$ kubectl apply -f cilium-class.yaml
+error: resource mapping not found for name: "cilium" namespace: "" from "cilium-class.yaml": no matches for kind "GatewayClass" in version "gateway.networking.k8s.io/v1"
+ensure CRDs are installed first
+
+$ vim cilium-class.yaml
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl get crds | grep gateway.networking
+backendtlspolicies.gateway.networking.k8s.io                      2026-01-22T14:52:02Z
+tcproutes.gateway.networking.k8s.io                               2026-01-22T17:00:28Z
+tlsroutes.gateway.networking.k8s.io                               2026-01-22T17:00:28Z
+udproutes.gateway.networking.k8s.io                               2026-01-22T17:00:29Z
+xbackendtrafficpolicies.gateway.networking.x-k8s.io               2026-01-22T14:52:03Z
+xlistenersets.gateway.networking.x-k8s.io                         2026-01-22T14:52:03Z
+xmeshes.gateway.networking.x-k8s.io                               2026-01-22T14:52:03Z
+
+$ kubectl get gatewayClasses
+error: the server doesn't have a resource type "gatewayClasses"
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl get gatewayclasses
+error: the server doesn't have a resource type "gatewayclasses"
+
+$ kubectl api-resources | grep gateway
+ciliumgatewayclassconfigs                    cgcc                                cilium.io/v2alpha1                     true         CiliumGatewayClassConfig
+gatewayclassconfigs                                                              consul.hashicorp.com/v1alpha1          false        GatewayClassConfig
+gatewaypolicies                                                                  consul.hashicorp.com/v1alpha1          true         GatewayPolicy
+ingressgateways                              ingress-gateway                     consul.hashicorp.com/v1alpha1          true         IngressGateway
+terminatinggateways                          terminating-gateway                 consul.hashicorp.com/v1alpha1          true         TerminatingGateway
+backendtlspolicies                           btlspolicy                          gateway.networking.k8s.io/v1           true         BackendTLSPolicy
+tcproutes                                                                        gateway.networking.k8s.io/v1alpha2     true         TCPRoute
+tlsroutes                                                                        gateway.networking.k8s.io/v1alpha2     true         TLSRoute
+udproutes                                                                        gateway.networking.k8s.io/v1alpha2     true         UDPRoute
+xbackendtrafficpolicies                      xbtrafficpolicy                     gateway.networking.x-k8s.io/v1alpha1   true         XBackendTrafficPolicy
+xlistenersets                                lset                                gateway.networking.x-k8s.io/v1alpha1   true         XListenerSet
+xmeshes                                      mesh                                gateway.networking.x-k8s.io/v1alpha1   false        XMesh
+
+$ kubectl get httproutes -A
+error: the server doesn't have a resource type "httproutes"
+
+$ kubectl api-versions | grep gateway
+gateway.networking.k8s.io/v1
+gateway.networking.k8s.io/v1alpha2
+gateway.networking.k8s.io/v1alpha3
+gateway.networking.x-k8s.io/v1alpha1
+
