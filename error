@@ -472,3 +472,11 @@ xlistenersets                                lset                               
 xmeshes                                      mesh                                gateway.networking.x-k8s.io/v1alpha1   false        XMesh
 
 kubectl get crd gatewayclasses.gateway.networking.k8s.io -o jsonpath='{.spec.versions[*].name}'
+
+
+
+kubectl delete crd \
+  gatewayclassconfigs.consul.hashicorp.com \
+  gatewaypolicies.consul.hashicorp.com \
+  ingressgateways.consul.hashicorp.com \
+  terminatinggateways.consul.hashicorp.com
