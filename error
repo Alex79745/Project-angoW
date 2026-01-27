@@ -530,3 +530,375 @@ Error: UPGRADE FAILED: an error occurred while rolling back the release. origina
 - .metadata.annotations.gateway.networking.k8s.io/bundle-version
 - .metadata.annotations.gateway.networking.k8s.io/channel
 - .spec.versions
+
+
+
+ cat consul-prod.yaml
+global:
+  name: consul
+  datacenter: central-primary-infra
+
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    httpsOnly: true
+
+  acls:
+    manageSystemACLs: true
+  authMethod:
+     enable: true
+     name: consul-k8s-component-auth-method
+   # bootstrapToken:
+   #   secretName: consul-bootstrap-acl-token
+   #   secretKey: token
+
+  peering:
+    enabled: true
+
+  meshGateway:
+    enabled: true
+
+
+gatewayAPI:
+    enabled: false
+
+ui:
+  enabled: true
+
+controller:
+  enabled: false
+  gatewayAPI:
+    enabled: false
+
+dataplane:
+  enabled: true
+
+server:
+  enabled: true
+  replicas: 3
+  bootstrapExpect: 3
+
+  exposeService:
+   enabled: true
+   type: LoadBalancer
+   annotations: |
+        lbipam.cilium.io/ips: "10.19.143.87"
+        service.cilium.io/global: "true"
+     # REQUIRED: Label for the Cilium IP Pool selector
+   labels:
+        io.cilium/lb-ipam-ips: "true"
+
+
+  extraConfig: |
+    {
+      "acl": {
+        "enabled": true,
+        "default_policy": "allow",
+        "enable_token_persistence": true
+      },
+
+       "connect": { "enabled": true },
+       "auto_encrypt": { "allow_tls": true }
+
+    }
+
+client:
+  enabled: true
+  grpc: true
+  extraConfig: |
+    {
+      "verify_incoming": false,
+      "verify_outgoing": true,
+      "verify_server_hostname": true
+    }
+
+connectInject:
+  enabled: true
+  apiGateway:
+    enabled: false
+    manageNonStandardCRDs: false
+    manageExternalCRDs: false
+  default: true
+  k8sAllowNamespaces: ["cattle-system","kube-system","consul","infra-system"]
+  tls:
+    enabled: true
+
+syncCatalog:
+  enabled: true
+  toConsul: true
+  toK8S: false
+  consulNodeName: "omni-infra"
+  k8sAllowNamespaces: ["cattle-system","kube-system","consul","infra-system"]
+  k8sDenyNamespaces: ["default"]
+  addK8SNamespaceSuffix: false
+  tls:
+    enabled: true
+
+meshGateway:
+  enabled: true
+  replicas: 2
+  service:
+    type: LoadBalancer
+    # chart 1.9.x expects a STRING here, not a map
+    annotations: |
+      service.cilium.io/global: "true"
+      lbipam.cilium.io/ips: "10.19.143.100"
+      consul.hashicorp.com/connect-inject: "true"
+      consul.hashicorp.com/mesh-inject: "true"
+    labels:
+        io.cilium/lb-ipam-ips: "true"
+  hostNe
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################################################################################################################################################################3
+
+
+ok now new error on spoke connection to hub   Server: false (Bootstrap: false)                                                                                               │
+│            Client Addr: [0.0.0.0] (HTTP: -1, HTTPS: 8501, gRPC: -1, gRPC-TLS: 8502, DNS: 8600)                                                 │
+│           Cluster Addr: 10.244.1.219 (LAN: 8301, WAN: 8302)                                                                                    │
+│      Gossip Encryption: false                                                                                                                  │
+│       Auto-Encrypt-TLS: true                                                                                                                   │
+│            ACL Enabled: false                                                                                                                  │
+│     ACL Default Policy: allow                                                                                                                  │
+│              HTTPS TLS: Verify Incoming: false, Verify Outgoing: true, Min Version: TLSv1_2                                                    │
+│               gRPC TLS: Verify Incoming: false, Min Version: TLSv1_2                                                                           │
+│       Internal RPC TLS: Verify Incoming: false, Verify Outgoing: true (Verify Hostname: false), Min Version: TLSv1_2                           │
+│                                                                                                                                                │
+│ ==> Log data will now stream in as it occurs:                                                                                                  │
+│                                                                                                                                                │
+│ 2026-01-27T15:26:12.094Z [WARN]  agent: The 'ca_file' field is deprecated. Use the 'tls.defaults.ca_file' field instead.                       │
+│ 2026-01-27T15:26:12.094Z [WARN]  agent: The 'verify_outgoing' field is deprecated. Use the 'tls.defaults.verify_outgoing' field instead.       │
+│ 2026-01-27T15:26:12.195Z [WARN]  agent.auto_config: The 'ca_file' field is deprecated. Use the 'tls.defaults.ca_file' field instead.           │
+│ 2026-01-27T15:26:12.195Z [WARN]  agent.auto_config: The 'verify_outgoing' field is deprecated. Use the 'tls.defaults.verify_outgoing' field in │
+│ 2026-01-27T15:26:12.196Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T15:26:12.196Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T15:26:13.306Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T15:26:15.582Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T15:26:19.788Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T15:26:28.541Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T15:26:44.652Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T15:27:20.233Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│                                                                                                                                                │
+└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────2026-01-27T15:28:20.522Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ 2026-01-27T15:28:21.377Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server       │
+│ 2026-01-27T15:28:21.377Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.1 │
+│ 2026-01-27T15:28:21.377Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul s │
+│ 2026-01-27T15:28:23.594Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ 2026-01-27T15:28:25.821Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server       │
+│ 2026-01-27T15:28:25.821Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.1 │
+│ 2026-01-27T15:28:25.821Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul s │
+│ 2026-01-27T15:28:28.874Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ 2026-01-27T15:28:32.274Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server       │
+│ 2026-01-27T15:28:32.274Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.1 │
+│ 2026-01-27T15:28:32.274Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul s │
+│ 2026-01-27T15:28:35.338Z [ERROR] consul-server-connection-manager.consul-server-connection-mana-27T15:29:00.714Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ unable to start Consul server watcher: context canceled                                                                                        │
+│ 2026-01-27T15:29:07.140Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: stopping                                   │
+│ stream closed: EOF for consul/consul-connect-injector-58b4c6666d-5xcp7 (sidecar-injector)   Controlled By:  DaemonSet/consul-client
+Containers:
+  consul:
+    Container ID:  containerd://2edfa30c3a4024b6fd727211ee41ca070a073b463bac1a6c41b8e83e04976bef
+    Image:         hashicorp/consul:1.22.2
+    Image ID:      docker.io/hashicorp/consul@sha256:adc4045482dec0ced2cacfaa71db1c62653a7f720b3b1698e2be09b3ec115615
+    Ports:         8501/TCP (https), 8502/TCP (grpc), 8301/TCP (serflan-tcp), 8301/UDP (serflan-udp), 8600/TCP (dns-tcp), 8600/UDP (dns-udp)
+    Host Ports:    8501/TCP (https), 8502/TCP (grpc), 0/TCP (serflan-tcp), 0/UDP (serflan-udp), 0/TCP (dns-tcp), 0/UDP (dns-udp)
+    Command:
+      /bin/sh
+      -ec
+      CONSUL_FULLNAME="consul"
+
+      cp /consul/tmp/extra-config/extra-from-values.json /consul/extra-config/extra-from-values.json
+      [ -n "${HOST_IP}" ] && sed -Ei "s|HOST_IP|${HOST_IP?}|g" /consul/extra-config/extra-from-values.json
+      [ -n "${POD_IP}" ] && sed -Ei "s|POD_IP|${POD_IP?}|g" /consul/extra-config/extra-from-values.json
+      [ -n "${HOSTNAME}" ] && sed -Ei "s|HOSTNAME|${HOSTNAME?}|g" /consul/extra-config/extra-from-values.json
+
+      exec /usr/local/bin/docker-entrypoint.sh consul agent \
+        -node="${NODE}" \
+        -advertise="${ADVERTISE_IP}" \
+        -bind=0.0.0.0 \
+        -client=0.0.0.0 \
+        -node-meta=host-ip:${HOST_IP} \
+        -node-meta=pod-name:${HOSTNAME} \
+        -hcl='leave_on_terminate = true' \
+        -hcl='ca_file = "/consul/tls/ca/tls.crt"' \
+        -hcl='auto_encrypt = {tls = true}' \
+        -hcl="auto_encrypt = {ip_san = [\"$HOST_IP\",\"$POD_IP\"]}" \
+        -hcl='verify_outgoing = true' \
+        -hcl='ports { https = 8501 }' \
+        -hcl='ports { http = -1 }' \
+        -hcl='ports { grpc = -1, grpc_tls = 8502 }' \
+        -config-dir=/consul/config \
+        -datacenter=mas-qa \
+        -data-dir=/consul/data \
+        -config-dir=/consul/extra-config \
+        -domain=consul
+
+    State:          Running
+      Started:      Tue, 27 Jan 2026 15:26:10 +0000
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     100m
+      memory:  100Mi
+    Requests:
+      cpu:      100m
+      memory:   100Mi
+    Readiness:  exec [/bin/sh -ec curl \
+  -k \
+  https://127.0.0.1:8501/v1/status/leader \
+2>/dev/null | grep -E '".+"'
+] delay=0s timeout=1s period=10s #success=1 #failure=3
+    Environment:
+      ADVERTISE_IP:               (v1:status.podIP)
+      NAMESPACE:                 consul (v1:metadata.namespace)
+      NODE:                       (v1:spec.nodeName)
+      HOST_IP:                    (v1:status.hostIP)
+      POD_IP:                     (v1:status.podIP)
+      CONSUL_DISABLE_PERM_MGMT:  true
+      CONSUL_HTTP_ADDR:          https://localhost:8501
+      CONSUL_HTTP_SSL_VERIFY:    false
+    Mounts:
+      /consul/config from config (rw)
+      /consul/data from data (rw)
+      /consul/extra-config from extra-config (rw)
+      /consul/login from consul-data (ro)
+      /consul/tls/ca from consul-ca-cert (ro)
+      /consul/tmp/extra-config from tmp-extra-config (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-2zrqv (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 True
+  Ready                       False
+  ContainersReady             False
+  PodScheduled                True
+Volumes:
+  data:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+  config:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      consul-client-config
+    Optional:  false
+  extra-config:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+  consul-data:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     Memory
+    SizeLimit:  <unset>
+  tmp-extra-config:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      consul-client-tmp-extra-config
+    Optional:  false
+  consul-ca-cert:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  consul-ca-cert
+    Optional:    false
+  kube-api-access-2zrqv:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Guaranteed
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/disk-pressure:NoSchedule op=Exists
+                             node.kubernetes.io/memory-pressure:NoSchedule op=Exists
+                             node.kubernetes.io/not-ready:NoExecute op=Exists
+                             node.kubernetes.io/pid-pressure:NoSchedule op=Exists
+                             node.kubernetes.io/unreachable:NoExecute op=Exists
+                             node.kubernetes.io/unschedulable:NoSchedule op=Exists
+Events:
+  Type     Reason     Age                   From               Message
+  ----     ------     ----                  ----               -------
+  Normal   Scheduled  4m52s                 default-scheduler  Successfully assigned consul/consul-client-dwjgz to klusterx-worker-mas-qa-01
+  Normal   Pulled     4m52s                 kubelet            Container image "hashicorp/consul:1.22.2" already present on machine
+  Normal   Created    4m52s                 kubelet            Created container: consul
+  Normal   Started    4m52s                 kubelet            Started container consul
+  Warning  Unhealthy  71s (x25 over 4m51s)  kubelet            Readiness probe failed:  State:          Running
+      Started:      Tue, 27 Jan 2026 15:31:03 +0000
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Tue, 27 Jan 2026 15:30:05 +0000
+      Finished:     Tue, 27 Jan 2026 15:31:03 +0000
+    Ready:          False
+    Restart Count:  5
+    Limits:
+      cpu:     50m
+      memory:  200Mi
+    Requests:
+      cpu:      50m
+      memory:   200Mi
+    Liveness:   http-get http://:9445/readyz/ready delay=1s timeout=5s period=10s #success=1 #failure=2
+    Readiness:  http-get http://:9445/readyz/ready delay=2s timeout=5s period=10s #success=1 #failure=2
+    Startup:    http-get http://:9445/readyz/ready delay=30s timeout=5s period=2s #success=1 #failure=15
+    Environment:
+      NAMESPACE:           consul (v1:metadata.namespace)
+      POD_NAME:            consul-connect-injector-58b4c6666d-5xcp7 (v1:metadata.name)
+      CONSUL_DUAL_STACK:   false
+      CONSUL_ADDRESSES:    10.19.143.87
+      CONSUL_GRPC_PORT:    8502
+      CONSUL_HTTP_PORT:    8501
+      CONSUL_DATACENTER:   mas-qa
+      CONSUL_API_TIMEOUT:  5s
+      CONSUL_USE_TLS:      true
+      CONSUL_CACERT_FILE:  /consul/tls/ca/tls.crt
+    Mounts:
+      /consul/config from config (ro)
+      /consul/tls/ca from consul-ca-cert (ro)
+      /etc/connect-injector/certs from certs (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-pwtnc (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 True
+  Ready                       False
+  ContainersReady             False
+  PodScheduled                True
+Volumes:
+  config:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      consul-connect-inject-config
+    Optional:  false
+  certs:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  consul-connect-inject-webhook-cert
+    Optional:    false
+  consul-ca-cert:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  consul-ca-cert
+    Optional:    false
+  kube-api-access-pwtnc:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Guaranteed
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason       Age                     From               Message
+  ----     ------       ----                    ----               -------
+  Normal   Scheduled    5m23s                   default-scheduler  Successfully assigned consul/consul-connect-injector-58b4c6666d-5xcp7 to klusterx-worker-mas-qa-02
+  Warning  FailedMount  5m22s (x2 over 5m23s)   kubelet            MountVolume.SetUp failed for volume "certs" : secret "consul-connect-inject-webhook-cert" not found
+  Warning  Unhealthy    3m37s (x23 over 4m49s)  kubelet            Startup probe failed: Get "http://10.244.2.44:9445/readyz/ready": dial tcp 10.244.2.44:9445: connect: connection refused
+  Normal   Pulled       29s (x6 over 5m20s)     kubelet            Container image "hashicorp/consul-k8s-control-plane:1.9.2" already present on machine
+  Normal   Created      29s (x6 over 5m20s)     kubelet            Created container: sidecar-injector
+  Normal   Started      29s (x6 over 5m20s)     kubelet            Started container sidecar-injector
+  Normal   Killing      29s (x5 over 4m21s)     kubelet            Container sidecar-injector failed startup probe, will be restarted
