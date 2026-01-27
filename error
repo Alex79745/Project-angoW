@@ -46,3 +46,111 @@ gateway.networking.k8s.io/v1alpha2
 gateway.networking.k8s.io/v1alpha3
 gateway.networking.x-k8s.io/v1alpha1
 
+
+
+########################
+
+consul error critical
+
+yes almost there iam getting  Starting Consul agent...                                                                                                                                             │
+│                Version: '1.22.2'                                                                                                                                         ││             Build Date: '2025-12-17 05:40:06 +0000 UTC'                                                                                                                  │
+│                Node ID: 'd48406be-a2c8-d179-4835-ae5673d619cb'                                                                                                           ││              Node name: 'klusterx-worker-mas-qa-02'                                                                                                                      │
+│             Datacenter: 'mas-qa' (Segment: '')                                                                                                                           ││                 Server: false (Bootstrap: false)                                                                                                                         │
+│            Client Addr: [0.0.0.0] (HTTP: -1, HTTPS: 8501, gRPC: -1, gRPC-TLS: 8502, DNS: 8600)                                                                           │
+│           Cluster Addr: 10.244.2.53 (LAN: 8301, WAN: 8302)                                                                                                               │
+│      Gossip Encryption: false                                                                                                                                            │
+│       Auto-Encrypt-TLS: true                                                                                                                                             │
+│            ACL Enabled: false                                                                                                                                            │
+│     ACL Default Policy: allow                                                                                                                                            │
+│              HTTPS TLS: Verify Incoming: false, Verify Outgoing: true, Min Version: TLSv1_2                                                                              │
+│               gRPC TLS: Verify Incoming: false, Min Version: TLSv1_2                                                                                                     │
+│       Internal RPC TLS: Verify Incoming: false, Verify Outgoing: true (Verify Hostname: false), Min Version: TLSv1_2                                                     │
+│                                                                                                                                                                          │
+│ ==> Log data will now stream in as it occurs:                                                                                                                            │
+│                                                                                                                                                                          │
+│ 2026-01-27T00:30:31.780Z [WARN]  agent: The 'ca_file' field is deprecated. Use the 'tls.defaults.ca_file' field instead.                                                 │
+│ 2026-01-27T00:30:31.780Z [WARN]  agent: The 'verify_outgoing' field is deprecated. Use the 'tls.defaults.verify_outgoing' field instead.                                 │
+│ 2026-01-27T00:30:31.874Z [WARN]  agent.auto_config: The 'ca_file' field is deprecated. Use the 'tls.defaults.ca_file' field instead.                                     │
+│ 2026-01-27T00:30:31.874Z [WARN]  agent.auto_config: The 'verify_outgoing' field is deprecated. Use the 'tls.defaults.verify_outgoing' field instead.                     │
+│ 2026-01-27T00:30:31.876Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:30:31.876Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:30:32.917Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:30:35.057Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:30:39.962Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:30:49.905Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:31:09.795Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:31:44.738Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:32:59.217Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:35:32.959Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:40:40.196Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T00:50:09.150Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                                                   │
+│ 2026-01-27T01:00:39.438Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use      2026-01-27T01:09:01.678Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server                                 │
+│ 2026-01-27T01:09:01.678Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.19.143.87:8502]             ││ 2026-01-27T01:09:01.678Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul servers: addresses=[10.19.1 │
+│ 2026-01-27T01:09:04.739Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supported dataplane features: rpc  ││ 2026-01-27T01:09:05.285Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server                                 │
+│ 2026-01-27T01:09:05.285Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.19.143.87:8502]             ││ 2026-01-27T01:09:05.285Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current pr2026-01-27T01:09:47.726Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul servers: addresses=[10.19.1 │
+│ 2026-01-27T01:09:50.787Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supported dataplane features: rpc  │
+│ unable to start Consul server watcher: context canceled                                                                                                                  │
+│ 2026-01-27T01:09:58.355Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: stopping
+
+
+global:
+  name: "consul"                 # UNIQUE cluster name
+  datacenter: "mas-qa"                # Same DC is OK for OSS
+  #datacenter: "mas-qa"
+
+
+  # IMPORTANT: point ONLY to the HUB CONSUL SERVER VIP
+  retry_join:
+    - "192.168.143.87"               # consul-server LoadBalancer VIP
+
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    verify: true
+    caCert:
+      secretName: consul-ca-cert     # <— name copied from hub
+      secretKey: tls.crt
+
+
+
+
+externalServers:
+  enabled: true
+  hosts:
+    - "192.168.143.87"
+  httpsPort: 8501
+  grpcPort: 8502
+
+
+server:
+  enabled: false                   # SPOKES NEVER RUN SERVERS
+
+client:
+  enabled: true
+  grpc: true                       # REQUIRED for mesh & xDS
+  exposeGossipPorts: false
+
+connectInject:
+  enabled: true
+  default: false                   # opt-in per namespace
+
+meshGateway:
+  enabled: true
+  mode: local                      # spoke-local gateway
+  replicas: 2
+
+ui:
+  enabled: false                   # UI ONLY IN HUB
+
+dns:
+  enabled: true
+  enableRedirection: true
+  requestTimeout: "5s"
+
+syncCatalog:
+  enabled: true
+  toConsul: true
+  fromConsul: false
+
+hostNetwork: false
+
