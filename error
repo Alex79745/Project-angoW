@@ -398,3 +398,50 @@ meshGateway:
         io.cilium/lb-ipam-ips: "true"
   hostNetwork: false
 
+ helm upgrade --install consul hashicorp/consul -n consul -f consul-prod.yaml  --rollback-on-failure --timeout 5m
+level=WARN msg="unable to find exact version; falling back to closest available version" chart=consul requested="" selected=1.9.2
+I0127 09:48:53.682819    8216 warnings.go:110] "Warning: spec.SessionAffinity is ignored for headless services"
+level=WARN msg="upgrade failed" name=consul error="conflict occurred while applying object /gatewayclasses.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions && conflict occurred while applying object /gateways.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions && conflict occurred while applying object /grpcroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions && conflict occurred while applying object /httproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions && conflict occurred while applying object /referencegrants.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions"
+I0127 09:49:17.255238    8216 warnings.go:110] "Warning: spec.SessionAffinity is ignored for headless services"
+level=WARN msg="Rollback \"consul\" failed: conflict occurred while applying object /gatewayclasses.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions && conflict occurred while applying object /gateways.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions && conflict occurred while applying object /grpcroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions && conflict occurred while applying object /httproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions && conflict occurred while applying object /referencegrants.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with \"kubectl-client-side-apply\" using apiextensions.k8s.io/v1:\n- .metadata.annotations.api-approved.kubernetes.io\n- .metadata.annotations.gateway.networking.k8s.io/bundle-version\n- .metadata.annotations.gateway.networking.k8s.io/channel\n- .spec.versions"
+Error: UPGRADE FAILED: an error occurred while rolling back the release. original upgrade error: conflict occurred while applying object /gatewayclasses.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions && conflict occurred while applying object /gateways.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions && conflict occurred while applying object /grpcroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions && conflict occurred while applying object /httproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions && conflict occurred while applying object /referencegrants.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions: conflict occurred while applying object /gatewayclasses.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions && conflict occurred while applying object /gateways.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions && conflict occurred while applying object /grpcroutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions && conflict occurred while applying object /httproutes.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions && conflict occurred while applying object /referencegrants.gateway.networking.k8s.io apiextensions.k8s.io/v1, Kind=CustomResourceDefinition: Apply failed with 4 conflicts: conflicts with "kubectl-client-side-apply" using apiextensions.k8s.io/v1:
+- .metadata.annotations.api-approved.kubernetes.io
+- .metadata.annotations.gateway.networking.k8s.io/bundle-version
+- .metadata.annotations.gateway.networking.k8s.io/channel
+- .spec.versions
