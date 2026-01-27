@@ -207,3 +207,28 @@ hostNetwork: false
 │ unable to start Consul server watcher: context canceled                                                                                        │
 │ 2026-01-27T08:56:42.355Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: stopping                                   │
 │ stream closed: EOF for consul/consul-connect-injector-58b4c6666d-4gzb4 (sidecar-injector)                
+
+
+server
+extraConfig: |
+    {
+      "acl": {
+        "enabled": true,
+        "default_policy": "allow",
+        "enable_token_persistence": true
+      },
+      "connect": { "enabled": true },
+      "ports": { "grpc": 8502 },
+      "auto_encrypt": { "allow_tls": true }
+    }
+client 
+
+
+ {
+      "tls": {
+        "defaults": {
+          "verify_outgoing": true,
+          "min_version": "tls12"
+        }
+      }
+    }
