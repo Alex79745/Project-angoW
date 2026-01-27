@@ -153,4 +153,57 @@ syncCatalog:
   fromConsul: false
 
 hostNetwork: false
+############################
 
+                         Autoscroll:On      FullScreen:Off     Timestamps:Off     Wrap:Off                                        │
+│                 Server: false (Bootstrap: false)                                                                                               │
+│            Client Addr: [0.0.0.0] (HTTP: -1, HTTPS: 8501, gRPC: -1, gRPC-TLS: 8502, DNS: 8600)                                                 │
+│           Cluster Addr: 10.244.2.51 (LAN: 8301, WAN: 8302)                                                                                     │
+│      Gossip Encryption: false                                                                                                                  │
+│       Auto-Encrypt-TLS: true                                                                                                                   │
+│            ACL Enabled: false                                                                                                                  │
+│     ACL Default Policy: allow                                                                                                                  │
+│              HTTPS TLS: Verify Incoming: false, Verify Outgoing: true, Min Version: TLSv1_2                                                    │
+│               gRPC TLS: Verify Incoming: false, Min Version: TLSv1_2                                                                           │
+│       Internal RPC TLS: Verify Incoming: false, Verify Outgoing: true (Verify Hostname: false), Min Version: TLSv1_2                           │
+│                                                                                                                                                │
+│ ==> Log data will now stream in as it occurs:                                                                                                  │
+│                                                                                                                                                │
+│ 2026-01-27T08:53:51.352Z [WARN]  agent: The 'ca_file' field is deprecated. Use the 'tls.defaults.ca_file' field instead.                       │
+│ 2026-01-27T08:53:51.352Z [WARN]  agent: The 'verify_outgoing' field is deprecated. Use the 'tls.defaults.verify_outgoing' field instead.       │
+│ 2026-01-27T08:53:51.652Z [WARN]  agent.auto_config: The 'ca_file' field is deprecated. Use the 'tls.defaults.ca_file' field instead.           │
+│ 2026-01-27T08:53:51.652Z [WARN]  agent.auto_config: The 'verify_outgoing' field is deprecated. Use the 'tls.defaults.verify_outgoing' field in │
+│ 2026-01-27T08:53:51.652Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T08:53:51.652Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T08:53:52.817Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T08:53:55.179Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T08:53:59.968Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T08:54:09.697Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T08:54:27.660Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for use                                         │
+│ 2026-01-27T08:55:07.652Z [ERROR] agent.auto_config: no auto-encrypt server addresses available for 
+                                       Autoscroll:On      FullScreen:Off     Timestamps:Off     Wrap:Off                                        │
+│ 2026-01-27T08:55:58.868Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul s │
+│ 2026-01-27T08:56:01.923Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ 2026-01-27T08:56:05.566Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server       │
+│ 2026-01-27T08:56:05.566Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.1 │
+│ 2026-01-27T08:56:05.566Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul s │
+│ 2026-01-27T08:56:08.643Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ 2026-01-27T08:56:11.616Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server       │
+│ 2026-01-27T08:56:11.616Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.1 │
+│ 2026-01-27T08:56:11.616Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul s │
+│ 2026-01-27T08:56:11.715Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ 2026-01-27T08:56:17.865Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server       │
+│ 2026-01-27T08:56:17.865Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.1 │
+│ 2026-01-27T08:56:17.865Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul s │
+│ 2026-01-27T08:56:20.931Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ 2026-01-27T08:56:25.305Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server       │
+│ 2026-01-27T08:56:25.306Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.1 │
+│ 2026-01-27T08:56:25.306Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul s │
+│ 2026-01-27T08:56:28.355Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ 2026-01-27T08:56:34.951Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: trying to connect to a Consul server       │
+│ 2026-01-27T08:56:34.951Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: discovered Consul servers: addresses=[10.1 │
+│ 2026-01-27T08:56:34.951Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: current prioritized list of known Consul s │
+│ 2026-01-27T08:56:38.019Z [ERROR] consul-server-connection-manager.consul-server-connection-manager: connection error: error="fetching supporte │
+│ unable to start Consul server watcher: context canceled                                                                                        │
+│ 2026-01-27T08:56:42.355Z [INFO]  consul-server-connection-manager.consul-server-connection-manager: stopping                                   │
+│ stream closed: EOF for consul/consul-connect-injector-58b4c6666d-4gzb4 (sidecar-injector)                
