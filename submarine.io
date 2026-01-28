@@ -269,4 +269,52 @@ No Consul changes
 That’s the sign of a good architecture.
 
 https://submariner.io/operations/deployment/helm/
+A valid OIDC token
 
+Or a service account token with cluster-admin
+
+Option A (recommended): Create a Submariner bootstrap ServiceAccount
+
+On EACH cluster (hub + spokes):
+
+kubectl create serviceaccount submariner-bootstrap -n kube-system
+kubectl create clusterrolebinding submariner-bootstrap \
+  --clusterrole=cluster-admin \
+  --serviceaccount=kube-system:submariner-bootstrap
+
+
+Then extract a kubeconfig for it:
+
+SECRET=$(kubectl -n kube-system get sa submariner-bootstrap -o jsonpath='{.secrets[0].name}')
+
+TOKEN=$(kubectl -n kube-system get secret $SECRET -o jsonpath='{.data.token}' | base64 -d)
+
+CA=$(kubectl -n kube-system get secret $SECRET -o jsonpath='{.data.ca\.crt}')
+
+SERVER=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+
+
+Create kubeconfig:
+
+apiVersion: v1
+kind: Config
+clusters:
+- cluster:
+    certificate-authority-data: <BASE64_CA>
+    server: <API_SERVER>
+  name: cluster
+contexts:
+- context:
+    cluster: cluster
+    user: submariner
+  name: submariner
+current-context: submariner
+users:
+- name: submariner
+  user:
+    token: <TOKEN>
+
+
+👉 Use this kubeconfig with subctl join.
+
+This completely bypasses OIDC issues and is CNCF-approved practice.
