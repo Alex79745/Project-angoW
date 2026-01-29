@@ -1,112 +1,44 @@
-Perfect — let’s do this clean, reproducible, and prod-safe, exactly the way this is done in restricted / managed / Talos / Omni environments.
+Perfect — this is the right moment to be very explicit and mechanical.
+Below is a production-safe, Talos-compatible, OIDC-compatible way to join spokes → hub using Submariner OSS, assuming:
 
-Below is a step-by-step runbook you can execute now, plus pointers to official Submariner docs so you can justify this in production reviews.
+✅ Broker already installed in HUB
+✅ You are using Talos OS
+✅ Omni / OIDC is enabled (humans use OIDC)
+✅ Submariner must run in-cluster (not from your laptop)
 
-✅ Goal
+We’ll do this in clear phases, with exact files and commands.
 
-Install Submariner OSS in a hub-and-spoke Talos setup by running subctl inside the hub cluster, avoiding:
+PHASE 0 — What we are building (mental map)
 
-Laptop reachability issues
+For each SPOKE cluster we will:
 
-Omni / OIDC proxy limitations
+Create a ServiceAccount (machine auth)
 
-API access problems
+Create a short-lived token
 
-This is the recommended approach when API access is restricted.
+Build a minimal kubeconfig (NO OIDC)
 
-🧠 Architecture recap (what we’re doing)
+Store it as a Secret in the HUB
 
-subctl runs inside the hub cluster
+Run a Job in the HUB that executes subctl join
 
-Uses in-cluster auth for hub
+Verify gateways + connectivity
 
-Uses a ServiceAccount kubeconfig for each spoke
+Talos does nothing special here.
 
-Submariner handles:
+PHASE 1 — On EACH SPOKE cluster (once per spoke)
 
-WireGuard tunnels
+These commands are run against the SPOKE cluster API
+(from a VM that can reach it, or via Omni exec)
 
-NAT
+1️⃣ Create namespace
+kubectl create namespace submariner-operator
 
-Overlapping PodCIDRs
+2️⃣ Create ServiceAccount
+kubectl -n submariner-operator create serviceaccount submariner-bootstrap
 
-Consul sits on top, unchanged
-
-📚 Official documentation (reference these)
-
-You can cite these internally:
-
-Submariner install overview
-https://submariner.io/operations/deployment/
-
-Broker-based architecture (hub/spoke)
-https://submariner.io/operations/architecture/
-
-Running subctl non-interactively
-https://submariner.io/operations/subctl/
-
-Nothing here violates OSS usage.
-
-🚀 STEP-BY-STEP (DO THIS IN ORDER)
-STEP 1 — Pick the HUB cluster
-
-Decide:
-
-1 cluster = broker / hub
-
-Others = spokes
-
-From now on:
-
-Commands are executed against the hub cluster unless stated otherwise
-
-kubectl config use-context HUB
-
-STEP 2 — Create a broker namespace
-kubectl create namespace submariner-k8s-broker
-
-STEP 3 — Deploy the broker (CRDs + secrets)
-
-This ONLY needs to be done once, on the hub.
-
-kubectl apply -f https://raw.githubusercontent.com/submariner-io/submariner-operator/devel/config/crd/bases/submariner.io_brokers.yaml
-
-
-Now create the broker object:
-
-# broker.yaml
-apiVersion: submariner.io/v1alpha1
-kind: Broker
-metadata:
-  name: submariner-broker
-  namespace: submariner-k8s-broker
-spec:
-  globalnetEnabled: true
-
-kubectl apply -f broker.yaml
-
-
-✔ This creates:
-
-Broker CRDs
-
-Broker secrets
-
-Cluster identity plumbing
-
-STEP 4 — Create a bootstrap ServiceAccount (CRITICAL)
-
-Submariner must not use OIDC users.
-
-Create a ServiceAccount that subctl can use.
-
-# submariner-bootstrap-sa.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: submariner-bootstrap
-  namespace: submariner-k8s-broker
----
+3️⃣ Bind cluster-admin (required by subctl)
+# submariner-bootstrap-crb.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -118,47 +50,108 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: submariner-bootstrap
-  namespace: submariner-k8s-broker
+  namespace: submariner-operator
 
-kubectl apply -f submariner-bootstrap-sa.yaml
-
-
-✅ This is standard practice
-✅ You can remove this later if needed
-
-STEP 5 — Create a kubeconfig for that ServiceAccount
-
-Talos / Omni does NOT auto-create token secrets, so do it explicitly.
-
-kubectl create token submariner-bootstrap \
-  -n submariner-k8s-broker \
-  --duration=87600h
+kubectl apply -f submariner-bootstrap-crb.yaml
 
 
-Save the output token.
+⚠️ Yes, cluster-admin is required during install.
+You can reduce permissions later.
 
-Now create a kubeconfig inside the cluster (we’ll mount it).
+4️⃣ Generate a token (THIS IS CRITICAL)
+kubectl -n submariner-operator create token submariner-bootstrap
 
-STEP 6 — Create a Secret with SPOKE kubeconfig
 
-For each spoke cluster:
+You should see something like:
 
-Generate a ServiceAccount kubeconfig on the SPOKE (same process)
+eyJhbGciOiJSUzI1NiIsImtpZCI6...
 
-Create a secret in the HUB cluster
+
+👉 Save this token (copy it somewhere safe)
+
+5️⃣ Get the SPOKE API server URL
+kubectl config view --raw -o jsonpath='{.clusters[0].cluster.server}'
+
 
 Example:
 
-kubectl create secret generic spoke1-kubeconfig \
-  -n submariner-k8s-broker \
+https://10.0.0.10:6443
+
+6️⃣ Get the CA certificate (Talos-safe way)
+
+Talos does NOT embed CA in kubeconfig when using OIDC.
+
+Use this instead:
+
+kubectl -n kube-system get configmap kube-root-ca.crt \
+  -o jsonpath='{.data.ca\.crt}' > ca.crt
+
+
+Then base64 it:
+
+base64 -w0 ca.crt
+
+
+Save the output — this is your certificate-authority-data.
+
+7️⃣ Create the SPOKE kubeconfig (FILE 1)
+
+📄 spoke1.kubeconfig
+
+apiVersion: v1
+kind: Config
+clusters:
+- name: spoke1
+  cluster:
+    server: https://<SPOKE_API>:6443
+    certificate-authority-data: <BASE64_CA>
+contexts:
+- name: spoke1
+  context:
+    cluster: spoke1
+    user: submariner-bootstrap
+current-context: spoke1
+users:
+- name: submariner-bootstrap
+  user:
+    token: <TOKEN_FROM_STEP_4>
+
+
+❗ Replace:
+
+<SPOKE_API>
+
+<BASE64_CA>
+
+<TOKEN_FROM_STEP_4>
+
+8️⃣ Validate kubeconfig (VERY IMPORTANT)
+kubectl --kubeconfig=spoke1.kubeconfig get nodes
+
+
+If this fails → STOP and fix it.
+Submariner will NOT work if this fails.
+
+PHASE 2 — Move kubeconfig into the HUB cluster
+
+These commands run against the HUB cluster
+
+9️⃣ Create Secret in HUB
+kubectl -n submariner-k8s-broker create secret generic spoke1-kubeconfig \
   --from-file=kubeconfig=spoke1.kubeconfig
 
 
-Repeat for each spoke.
+Verify:
 
-STEP 7 — Run subctl INSIDE the HUB cluster (key step)
+kubectl -n submariner-k8s-broker get secret spoke1-kubeconfig
 
-Create a Job:
+PHASE 3 — Run subctl JOIN as a Job (HUB)
+
+This avoids laptop / OIDC / Talos issues.
+
+🔟 Create the JOIN Job (FILE 2)
+
+📄 subctl-join-spoke1.yaml
 
 apiVersion: batch/v1
 kind: Job
@@ -166,22 +159,22 @@ metadata:
   name: subctl-join-spoke1
   namespace: submariner-k8s-broker
 spec:
+  backoffLimit: 1
   template:
     spec:
-      serviceAccountName: submariner-bootstrap
       restartPolicy: Never
       containers:
       - name: subctl
-        image: quay.io/submariner/subctl:0.18.0
+        image: quay.io/submariner/subctl:0.19.1
         command:
         - /bin/sh
         - -c
         - |
           subctl join \
             --kubeconfig /spoke/kubeconfig \
-            --broker-kubeconfig /var/run/secrets/kubernetes.io/serviceaccount/token \
+            broker-info.subm \
             --clusterid spoke1 \
-            --natt=false
+            --natt=true
         volumeMounts:
         - name: spoke-kubeconfig
           mountPath: /spoke
@@ -191,97 +184,67 @@ spec:
           secretName: spoke1-kubeconfig
 
 
-Apply it:
+--natt=true is REQUIRED because you have overlapping PodCIDRs.
 
-kubectl apply -f subctl-job.yaml
-
-
-🎯 This bypasses:
-
-Laptop access
-
-Omni proxy
-
-API exposure issues
-
-STEP 8 — Verify Submariner is running
-kubectl get pods -n submariner-operator
-kubectl get pods -n submariner-k8s-broker
-kubectl get pods -n submariner-gateway
+1️⃣1️⃣ Apply the Job
+kubectl apply -f subctl-join-spoke1.yaml
 
 
-You must see:
+Watch logs:
+
+kubectl -n submariner-k8s-broker logs job/subctl-join-spoke1 -f
+
+
+You want to see:
+
+✓ Cluster "spoke1" joined successfully
+
+PHASE 4 — Verify Submariner is actually working
+1️⃣2️⃣ Check gateway nodes (SPOKE)
+kubectl get nodes -l submariner.io/gateway=true
+
+1️⃣3️⃣ Check pods
+kubectl -n submariner-operator get pods
+
+
+You should see:
 
 submariner-gateway
 
-submariner-routeagent
+submariner-route-agent
 
 submariner-operator
 
-STEP 9 — Verify cross-cluster connectivity
+1️⃣4️⃣ Verify connection in HUB
+kubectl -n submariner-k8s-broker get clusters
 
-From cluster A:
+1️⃣5️⃣ Test pod-to-pod connectivity
 
-kubectl run test --image=busybox -it --rm -- sh
+Create a test pod in HUB and SPOKE:
 
-
-From inside the pod:
-
-ping <pod-ip-in-cluster-b>
+kubectl run test --image=busybox -it --restart=Never -- sh
 
 
-✅ This must work before touching Consul again.
+From HUB → ping SPOKE pod IP.
 
-🔐 Submariner security model (important)
+If this works → network fabric is DONE.
 
-WireGuard between gateway nodes
+PHASE 5 — What happens next (important)
 
-Automatic key exchange
+Now:
 
-Per-cluster identity
+Pods can talk cross-cluster
 
-NAT + GlobalNet for overlapping PodCIDRs
-
-mTLS not at L7 — this is L3/L4 security
-
-This complements Consul perfectly.
-
-🔁 Re-enable Consul (after Submariner works)
-
-Once pod-to-pod works:
+Services can be resolved
 
 Consul gossip works
 
-RPC works
-
-MeshGateways work
-
 Envoy xDS works
 
-No federation license needed
+MeshGateways become OPTIONAL
 
-Consul now behaves as if this is one flat network.
-
-🧠 CNCF / Well-Architected alignment
-
-✔ Minimal tooling
-✔ Clear separation of concerns
-✔ Network solved once (Submariner)
-✔ Service mesh stays service mesh (Consul)
-✔ Works with Talos + Omni
-✔ Scales to 100 clusters
-
-🟢 Final note (important)
-
-You were never blocked by Consul.
-You were blocked by where subctl runs from.
-
-This approach is:
-
-Official
-
-Production-safe
-
+Submariner solved L3/L4
+Consul solves L7 + service discovery
 Used in managed clusters
 
 Compatible with Talos constraints
