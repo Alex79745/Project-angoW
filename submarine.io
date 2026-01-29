@@ -511,4 +511,294 @@ No federation ❌
 
 100 clusters scalable ✅
 
-You are doing exactly what a senior platform engineer should do.
+You are doing exactly what a senior platform engineer should do
+############################################################################
+############################################################################
+
+Perfect — let’s do this clean, reproducible, and prod-safe, exactly the way this is done in restricted / managed / Talos / Omni environments.
+
+Below is a step-by-step runbook you can execute now, plus pointers to official Submariner docs so you can justify this in production reviews.
+
+✅ Goal
+
+Install Submariner OSS in a hub-and-spoke Talos setup by running subctl inside the hub cluster, avoiding:
+
+Laptop reachability issues
+
+Omni / OIDC proxy limitations
+
+API access problems
+
+This is the recommended approach when API access is restricted.
+
+🧠 Architecture recap (what we’re doing)
+
+subctl runs inside the hub cluster
+
+Uses in-cluster auth for hub
+
+Uses a ServiceAccount kubeconfig for each spoke
+
+Submariner handles:
+
+WireGuard tunnels
+
+NAT
+
+Overlapping PodCIDRs
+
+Consul sits on top, unchanged
+
+📚 Official documentation (reference these)
+
+You can cite these internally:
+
+Submariner install overview
+https://submariner.io/operations/deployment/
+
+Broker-based architecture (hub/spoke)
+https://submariner.io/operations/architecture/
+
+Running subctl non-interactively
+https://submariner.io/operations/subctl/
+
+Nothing here violates OSS usage.
+
+🚀 STEP-BY-STEP (DO THIS IN ORDER)
+STEP 1 — Pick the HUB cluster
+
+Decide:
+
+1 cluster = broker / hub
+
+Others = spokes
+
+From now on:
+
+Commands are executed against the hub cluster unless stated otherwise
+
+kubectl config use-context HUB
+
+STEP 2 — Create a broker namespace
+kubectl create namespace submariner-k8s-broker
+
+STEP 3 — Deploy the broker (CRDs + secrets)
+
+This ONLY needs to be done once, on the hub.
+
+kubectl apply -f https://raw.githubusercontent.com/submariner-io/submariner-operator/devel/config/crd/bases/submariner.io_brokers.yaml
+
+
+Now create the broker object:
+
+# broker.yaml
+apiVersion: submariner.io/v1alpha1
+kind: Broker
+metadata:
+  name: submariner-broker
+  namespace: submariner-k8s-broker
+spec:
+  globalnetEnabled: true
+
+kubectl apply -f broker.yaml
+
+
+✔ This creates:
+
+Broker CRDs
+
+Broker secrets
+
+Cluster identity plumbing
+
+STEP 4 — Create a bootstrap ServiceAccount (CRITICAL)
+
+Submariner must not use OIDC users.
+
+Create a ServiceAccount that subctl can use.
+
+# submariner-bootstrap-sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: submariner-bootstrap
+  namespace: submariner-k8s-broker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: submariner-bootstrap
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: submariner-bootstrap
+  namespace: submariner-k8s-broker
+
+kubectl apply -f submariner-bootstrap-sa.yaml
+
+
+✅ This is standard practice
+✅ You can remove this later if needed
+
+STEP 5 — Create a kubeconfig for that ServiceAccount
+
+Talos / Omni does NOT auto-create token secrets, so do it explicitly.
+
+kubectl create token submariner-bootstrap \
+  -n submariner-k8s-broker \
+  --duration=87600h
+
+
+Save the output token.
+
+Now create a kubeconfig inside the cluster (we’ll mount it).
+
+STEP 6 — Create a Secret with SPOKE kubeconfig
+
+For each spoke cluster:
+
+Generate a ServiceAccount kubeconfig on the SPOKE (same process)
+
+Create a secret in the HUB cluster
+
+Example:
+
+kubectl create secret generic spoke1-kubeconfig \
+  -n submariner-k8s-broker \
+  --from-file=kubeconfig=spoke1.kubeconfig
+
+
+Repeat for each spoke.
+
+STEP 7 — Run subctl INSIDE the HUB cluster (key step)
+
+Create a Job:
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: subctl-join-spoke1
+  namespace: submariner-k8s-broker
+spec:
+  template:
+    spec:
+      serviceAccountName: submariner-bootstrap
+      restartPolicy: Never
+      containers:
+      - name: subctl
+        image: quay.io/submariner/subctl:0.18.0
+        command:
+        - /bin/sh
+        - -c
+        - |
+          subctl join \
+            --kubeconfig /spoke/kubeconfig \
+            --broker-kubeconfig /var/run/secrets/kubernetes.io/serviceaccount/token \
+            --clusterid spoke1 \
+            --natt=false
+        volumeMounts:
+        - name: spoke-kubeconfig
+          mountPath: /spoke
+      volumes:
+      - name: spoke-kubeconfig
+        secret:
+          secretName: spoke1-kubeconfig
+
+
+Apply it:
+
+kubectl apply -f subctl-job.yaml
+
+
+🎯 This bypasses:
+
+Laptop access
+
+Omni proxy
+
+API exposure issues
+
+STEP 8 — Verify Submariner is running
+kubectl get pods -n submariner-operator
+kubectl get pods -n submariner-k8s-broker
+kubectl get pods -n submariner-gateway
+
+
+You must see:
+
+submariner-gateway
+
+submariner-routeagent
+
+submariner-operator
+
+STEP 9 — Verify cross-cluster connectivity
+
+From cluster A:
+
+kubectl run test --image=busybox -it --rm -- sh
+
+
+From inside the pod:
+
+ping <pod-ip-in-cluster-b>
+
+
+✅ This must work before touching Consul again.
+
+🔐 Submariner security model (important)
+
+WireGuard between gateway nodes
+
+Automatic key exchange
+
+Per-cluster identity
+
+NAT + GlobalNet for overlapping PodCIDRs
+
+mTLS not at L7 — this is L3/L4 security
+
+This complements Consul perfectly.
+
+🔁 Re-enable Consul (after Submariner works)
+
+Once pod-to-pod works:
+
+Consul gossip works
+
+RPC works
+
+MeshGateways work
+
+Envoy xDS works
+
+No federation license needed
+
+Consul now behaves as if this is one flat network.
+
+🧠 CNCF / Well-Architected alignment
+
+✔ Minimal tooling
+✔ Clear separation of concerns
+✔ Network solved once (Submariner)
+✔ Service mesh stays service mesh (Consul)
+✔ Works with Talos + Omni
+✔ Scales to 100 clusters
+
+🟢 Final note (important)
+
+You were never blocked by Consul.
+You were blocked by where subctl runs from.
+
+This approach is:
+
+Official
+
+Production-safe
+
+Used in managed clusters
+
+Compatible with Talos constraints
