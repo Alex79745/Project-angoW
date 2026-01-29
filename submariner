@@ -248,3 +248,36 @@ Consul solves L7 + service discovery
 Used in managed clusters
 
 Compatible with Talos constraints
+###################################################
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: subctl-join
+  namespace: submariner-operator
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: submariner-bootstrap
+      containers:
+      - name: subctl
+        image: quay.io/submariner/subctl:0.19.1
+        command:
+        - /bin/sh
+        - -c
+        - |
+          subctl join \
+            broker-info.subm \
+            --clusterid spoke1 \
+            --natt=true \
+            --kubeconfig /var/run/secrets/kubernetes.io/serviceaccount/kubeconfig
+        volumeMounts:
+        - name: broker
+          mountPath: /broker
+      volumes:
+      - name: broker
+        secret:
+          secretName: broker-info
