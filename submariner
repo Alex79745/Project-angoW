@@ -521,3 +521,101 @@ spec:
           # must include a key named "broker-info.subm"
       - name: work
         emptyDir: {}
+
+
+
+
+
+#####################################################
+                     TEST
+#####################################################
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: subctl-join
+  namespace: submariner-operator
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      annotations:
+        consul.hashicorp.com/connect-inject: "false"
+    spec:
+      restartPolicy: Never
+      serviceAccountName: submariner-bootstrap
+
+      initContainers:
+      - name: make-kubeconfig
+        image: busybox:1.36
+        command: ["sh","-c"]
+        args:
+        - |
+          set -eu
+          TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+          CA_DATA="$(base64 -w0 /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)"
+          API="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+
+          cat > /work/kubeconfig <<EOF
+          apiVersion: v1
+          kind: Config
+          clusters:
+          - name: incluster
+            cluster:
+              server: ${API}
+              certificate-authority-data: ${CA_DATA}
+          contexts:
+          - name: incluster
+            context:
+              cluster: incluster
+              user: sa-user
+          current-context: incluster
+          users:
+          - name: sa-user
+            user:
+              token: ${TOKEN}
+          EOF
+
+          chmod 0600 /work/kubeconfig
+          echo "kubeconfig written for ${API}"
+        volumeMounts:
+        - name: work
+          mountPath: /work
+
+      containers:
+      - name: subctl
+        image: quay.io/submariner/subctl:0.19.1
+        env:
+        - name: SUBMARINER_CLUSTERID
+          value: mas-qa
+        command: ["subctl"]
+        args:
+          - "join"
+          - "/broker/broker-info.subm"
+          - "--kubeconfig"
+          - "/work/kubeconfig"
+          - "--clusterid"
+          - "mas-qa"
+          - "--cable-driver"
+          - "wireguard"
+          - "--natt=true"
+          - "--clustercidr"
+          - "10.244.0.0/16"
+          - "--servicecidr"
+          - "10.96.0.0/12"
+        volumeMounts:
+        - name: broker
+          mountPath: /broker
+          readOnly: true
+        - name: work
+          mountPath: /work
+
+      volumes:
+      - name: broker
+        secret:
+          secretName: broker-info
+      - name: work
+        emptyDir: {}
+
+
+
