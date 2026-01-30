@@ -617,5 +617,57 @@ spec:
       - name: work
         emptyDir: {}
 
+#########################################################
+
+
+###################################################
+
+curl -sSvk --fail \
+  --cacert ./omni-ca.crt \
+  -H "Authorization: Bearer ${TOKEN}" \
+  "https://kube-omni-klusterx.de.corp.com/apis/submariner.io/v1/namespaces/submariner-k8s-broker/clusters" | head
+* Uses proxy env variable no_proxy == 'rb-omscloudasl4.server.corp.com,127.0.0.*,localhost'
+* Uses proxy env variable https_proxy == 'http://127.0.0.1:3128'
+*   Trying 127.0.0.1:3128...
+* CONNECT: no ALPN negotiated
+* allocate connect buffer
+* Establish HTTP proxy tunnel to kube-omni-klusterx.de.corp.com:443
+> CONNECT kube-omni-klusterx.de.bosch.com:443 HTTP/1.1
+> Host: kube-omni-klusterx.de.bosch.com:443
+> User-Agent: curl/8.17.0
+> Proxy-Connection: Keep-Alive
+>
+< HTTP/1.1 200 Connection established
+<
+* CONNECT phase completed
+* CONNECT tunnel established, response 200
+* schannel: disabled automatic use of client certificate
+* ALPN: curl offers http/1.1
+* ALPN: server accepted http/1.1
+* Established connection to 127.0.0.1 (127.0.0.1 port 3128) from 127.0.0.1 port 63119
+* using HTTP/1.x
+> GET /apis/submariner.io/v1/namespaces/submariner-k8s-broker/clusters HTTP/1.1
+> Host: kube-omni-klusterx.de.bosch.com
+> User-Agent: curl/8.17.0
+> Accept: */*
+> Authorization: Bearer ZXlKaGJHY2lPaUpTVXpJMU5pSXNJbXRwWkNJNkltWTViamhoZUVGTGNWWjRkSGhvWjFKUmRHcEVSa3A2ZDFkQlVHZGphakV6T0VScFZWSllRVU5zU0c4aWZRLmV5SnBjM01pT2lKcmRXSmxjbTVsZEdWekwzTmxjblpwWTJWaFkyTnZkVzUwSWl3aWEzVmlaWEp1WlhSbGN5NXBieTl6WlhKMmFXTmxZV05qYjNWdWRDOXVZVzFsYzNCaFkyVWlPaUp6ZFdKdFlYSnBibVZ5TFdzNGN5MWljbTlyWlhJaUxDSnJkV0psY201bGRHVnpMbWx2TDNObGNuWnBZMlZoWTJOdmRXNTBMM05sWTNKbGRDNXVZVzFsSWpvaWMzVmliV0Z5YVc1bGNpMXJPSE10WW5KdmEyVnlMV0ZrYldsdUxYUnZhMlZ1TFdSM2NHUmlJaXdpYTNWaVpYSnVaWFJsY3k1cGJ5OXpaWEoyYVdObFlXTmpiM1Z1ZEM5elpYSjJhV05sTFdGalkyOTFiblF1Ym1GdFpTSTZJbk4xWW0xaGNtbHVaWEl0YXpoekxXSnliMnRsY2kxaFpHMXBiaUlzSW10MVltVnlibVYwWlhNdWFXOHZjMlZ5ZG1salpXRmpZMjkxYm5RdmMyVnlkbWxqWlMxaFkyTnZkVzUwTG5WcFpDSTZJamxtWVRjeU4yUXdMVE0xTjJZdE5HTTRNQzFpTldFMkxUUXlaRGRrTjJKak9HVmlOaUlzSW5OMVlpSTZJbk41YzNSbGJUcHpaWEoyYVdObFlXTmpiM1Z1ZERwemRXSnRZWEpwYm1WeUxXczRjeTFpY205clpYSTZjM1ZpYldGeWFXNWxjaTFyT0hNdFluSnZhMlZ5TFdGa2JXbHVJbjAuWUV4SmZYazNwOXFCT1FKQ1oyOXNncFBXaXR0WkFPWXp5TG02OUVZc2ZKdFFreWlwUnZVM2ViZS1mUUtSQlFUTzJVRXRpVVVRTkZOdWkwX2RUdW1XVzljSlg0U2tXU1o1VmVBQU5WUkhvazZIWXdUcFlQb2tmYkV5cl91d3hCQUhRaE4xZFdpUThfdEJINkd1LVVNdzRjRlhXdUVLcUhMWHA4dXFUYTF1d2RMaDFTLXhQZ0U5cVhBakRFVjN1QWFsS3FPQWdiOWl4VmNfYktvc1VwTGdtcjBrTVZKM0NmQW9PQ3JuUFVtYktBMFVOZ2RpMUJpeV9DczlWOWpkQXJZRkxCbXl5SkZkMVdNV2VQck54VFZOak5oc3dKcEVjZFJMVTFhM0hMYzBzdUF0WjJENk9rS01YZkdvZ0Z5SHJaMFYxRXc3LWJTdFNCQ2t0NWhyT0ltU3lQSmNhMUo5U2hCSVFEX2EtT1JKaFNsVVpjYTAzbUhXaklkeTduVGFWRXVrd1hndnlNeW5zUlNNNUhjR0huN0xtTmNkOF9FQXB2ckM3aWVBVUkwNE0xVmRqbXFDWFlZYVFjdnB6c3lENkpkV2RHM05wOGlrd180Q29Ubk5pSkhQOEZCaUpmZlBXT3h2NllBSER6d3EtV2w5cXRtOTJQSlV1VWFrSHFSM2hTWHlNMHUtUThGNWs1cktwZGVpS0ZXa1ZnZ3BFbGJmV2RkY2hta2NfeVg5VjFlTTYxVUI0ZDJJRFlxVFR1cDlRbXN2Ylo5bTVqYzV6N1hMUDIzZlg0VE9QUGF2SnBMU1Jvc3FVX1dFQnlRSHVfNDdQR0dGLUdPN084LWpEZF9YUjloV1FIdXVjQ2ttWV9xRHJwemJueFVfQWtVWkZsX000Q1A0LW14MHdhRDh0T3c=
+>
+* Request completely sent off
+* schannel: remote party requests renegotiation
+* schannel: renegotiating SSL/TLS connection
+* schannel: SSL/TLS connection renegotiated
+* schannel: remote party requests renegotiation
+* schannel: renegotiating SSL/TLS connection
+* schannel: SSL/TLS connection renegotiated
+< HTTP/1.1 401 Unauthorized
+< Server: nginx/1.24.0 (Ubuntu)
+< Date: Fri, 30 Jan 2026 11:06:34 GMT
+< Content-Type: text/plain; charset=utf-8
+< Content-Length: 44
+< Connection: keep-alive
+* The requested URL returned error: 401
+<
+* closing connection #0
+curl: (22) The requested URL returned error: 401
 
 
