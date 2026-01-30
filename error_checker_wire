@@ -1,0 +1,195 @@
+$ kubectl -n submariner-k8s-broker get pods
+NAME                             READY   STATUS   RESTARTS   AGE
+deploy-submariner-broker-lhxxq   0/1     Error    0          7s
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n submariner-k8s-broker describe pods
+Name:             deploy-submariner-broker-lhxxq
+Namespace:        submariner-k8s-broker
+Priority:         0
+Service Account:  submariner-broker-installer
+Node:             klusterx-worker-infra-04/10.19.143.70
+Start Time:       Fri, 30 Jan 2026 18:49:24 +0000
+Labels:           batch.kubernetes.io/controller-uid=c29f8e9a-f26e-418b-a596-36526fa1f405
+                  batch.kubernetes.io/job-name=deploy-submariner-broker
+                  controller-uid=c29f8e9a-f26e-418b-a596-36526fa1f405
+                  job-name=deploy-submariner-broker
+Annotations:      <none>
+Status:           Failed
+IP:               10.244.5.242
+IPs:
+  IP:           10.244.5.242
+Controlled By:  Job/deploy-submariner-broker
+Containers:
+  subctl:
+    Container ID:  containerd://239b132323bbf4f66ff846a37d28579b159c8f0a24559221c7bab258e931cabd
+    Image:         quay.io/submariner/subctl:0.22.0
+    Image ID:      quay.io/submariner/subctl@sha256:3f78777149921cacee8a2200f8e39113f176c1637160b4ba02bbe704e9c4372f
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      subctl
+    Args:
+      deploy-broker
+      --namespace
+      submariner-k8s-broker
+      --broker-url
+      https://kubernetes.default.svc:443
+      --globalnet
+    State:          Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Fri, 30 Jan 2026 18:49:25 +0000
+      Finished:     Fri, 30 Jan 2026 18:49:25 +0000
+    Ready:          False
+    Restart Count:  0
+    Environment:
+      KUBECONFIG:
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-8fzrz (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False
+  Initialized                 True
+  Ready                       False
+  ContainersReady             False
+  PodScheduled                True
+Volumes:
+  kube-api-access-8fzrz:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  16s   default-scheduler  Successfully assigned submariner-k8s-broker/deploy-submariner-broker-lhxxq to klusterx-worker-infra-04
+  Normal  Pulled     16s   kubelet            Container image "quay.io/submariner/subctl:0.22.0" already present on machine
+  Normal  Created    16s   kubelet            Created container: subctl
+  Normal  Started    15s   kubelet            Started container subctl
+
+
+Name:             deploy-submariner-broker-rgcql
+Namespace:        submariner-k8s-broker
+Priority:         0
+Service Account:  submariner-broker-installer
+Node:             klusterx-worker-infra-04/10.19.143.70
+Start Time:       Fri, 30 Jan 2026 18:49:35 +0000
+Labels:           batch.kubernetes.io/controller-uid=c29f8e9a-f26e-418b-a596-36526fa1f405
+                  batch.kubernetes.io/job-name=deploy-submariner-broker
+                  controller-uid=c29f8e9a-f26e-418b-a596-36526fa1f405
+                  job-name=deploy-submariner-broker
+Annotations:      <none>
+Status:           Failed
+IP:               10.244.5.109
+IPs:
+  IP:           10.244.5.109
+Controlled By:  Job/deploy-submariner-broker
+Containers:
+  subctl:
+    Container ID:  containerd://ba14ac6857115f03348a6be4c493433e2db58604d8e6d95aa5697a5f065ec6e6
+    Image:         quay.io/submariner/subctl:0.22.0
+    Image ID:      quay.io/submariner/subctl@sha256:3f78777149921cacee8a2200f8e39113f176c1637160b4ba02bbe704e9c4372f
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      subctl
+    Args:
+      deploy-broker
+      --namespace
+      submariner-k8s-broker
+      --broker-url
+      https://kubernetes.default.svc:443
+      --globalnet
+    State:          Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Fri, 30 Jan 2026 18:49:35 +0000
+      Finished:     Fri, 30 Jan 2026 18:49:35 +0000
+    Ready:          False
+    Restart Count:  0
+    Environment:
+      KUBECONFIG:
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-lxfvg (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False
+  Initialized                 True
+  Ready                       False
+  ContainersReady             False
+  PodScheduled                True
+Volumes:
+  kube-api-access-lxfvg:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  6s    default-scheduler  Successfully assigned submariner-k8s-broker/deploy-submariner-broker-rgcql to klusterx-worker-infra-04
+  Normal  Pulled     6s    kubelet            Container image "quay.io/submariner/subctl:0.22.0" already present on machine
+  Normal  Created    6s    kubelet            Created container: subctl
+  Normal  Started    6s    kubelet            Started container subctl
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n submariner-k8s-broker logs deploy-submariner-broker-rgcql
+ ✗ Error building the cluster.Info for the default configuration: could not obtain the cluster name from kube config: {
+  "clusters": {},
+  "users": {},
+  "contexts": {},
+  "current-context": ""
+}
+
+subctl version: release-0.22-6820f0d17e2b
+
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ cat  broke_job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-submariner-broker
+  namespace: submariner-k8s-broker
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: submariner-broker-installer
+
+      # Talos: must run as root
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+
+      containers:
+      - name: subctl
+        image: quay.io/submariner/subctl:0.22.0
+        command: ["subctl"]
+        args:
+          - "deploy-broker"
+          - "--namespace"
+          - "submariner-k8s-broker"
+          - "--broker-url"
+          - "https://kubernetes.default.svc:443"
+          - "--globalnet"
+        env:
+        # Forces in-cluster config, avoids Omni kubeconfig
+        - name: KUBECONFIG
+          value: ""
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
