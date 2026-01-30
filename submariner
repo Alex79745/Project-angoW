@@ -281,3 +281,25 @@ spec:
       - name: broker
         secret:
           secretName: broker-info
+
+
+#############################################################
+
+$ # Fetch logs from all pods for the job
+for p in $(kubectl -n submariner-operator get pods -l job-name=subctl-join -o name); do
+  echo "===== LOGS for $p ====="
+  kubectl -n submariner-operator logs "$p" --previous || kubectl -n submariner-operator logs "$p"
+done
+===== LOGS for pod/subctl-join-h29zl =====
+Error from server (BadRequest): previous terminated container "subctl" in pod "subctl-join-h29zl" not found
+ ✓ /broker/broker-info.subm indicates broker is at https://kube-omni-klusterx.de.bosch.com/
+ ✗ Error retrieving the default configuration: could not obtain the cluster name from kube config: api.Config{Kind:"", APIVersion:"", Preferences:api.Preferences{Colors:false, Extensions:map[string]runtime.Object{}}, Clusters:map[string]*api.Cluster{}, AuthInfos:map[string]*api.AuthInfo{}, Contexts:map[string]*api.Context{}, CurrentContext:"", Extensions:map[string]runtime.Object{}}
+
+subctl version: release-0.19-260d4934ea54
+
+===== LOGS for pod/subctl-join-l87bn =====
+Error from server (BadRequest): previous terminated container "subctl" in pod "subctl-join-l87bn" not found
+ ✓ /broker/broker-info.subm indicates broker is at https://kube-omni-klusterx.de.bosch.com/
+ ✗ Error retrieving the default configuration: could not obtain the cluster name from kube config: api.Config{Kind:"", APIVersion:"", Preferences:api.Preferences{Colors:false, Extensions:map[string]runtime.Object{}}, Clusters:map[string]*api.Cluster{}, AuthInfos:map[string]*api.AuthInfo{}, Contexts:map[string]*api.Context{}, CurrentContext:"", Extensions:map[string]runtime.Object{}}
+
+subctl version: release-0.19-260d4934ea54
