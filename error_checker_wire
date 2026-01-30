@@ -1,3 +1,7 @@
+this is not good as omni is managins all cluster it seems omni api is ok, but the cluster own api dones exist as was not bootrap using talos but using omni so all of htem have the same api thats the omni one and omni dont accept the token, since it waws not bootrapp by talos no api exists, just the omni exist i see now why, i need a way to connecte cluster or else no svcs in other cluster can be reoslveed or a will$ kubectl apply -f  broke_job.yaml
+job.batch/deploy-submariner-broker created have to use an ip for each cluster each ius not ideial 
+
+
 $ kubectl -n submariner-k8s-broker get pods
 NAME                             READY   STATUS   RESTARTS   AGE
 deploy-submariner-broker-lhxxq   0/1     Error    0          7s
