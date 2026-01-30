@@ -300,6 +300,64 @@ subctl version: release-0.19-260d4934ea54
 ===== LOGS for pod/subctl-join-l87bn =====
 Error from server (BadRequest): previous terminated container "subctl" in pod "subctl-join-l87bn" not found
  ✓ /broker/broker-info.subm indicates broker is at https://kube-omni-klusterx.de.bosch.com/
+
+############################################################################################
+
+
  ✗ Error retrieving the default configuration: could not obtain the cluster name from kube config: api.Config{Kind:"", APIVersion:"", Preferences:api.Preferences{Colors:false, Extensions:map[string]runtime.Object{}}, Clusters:map[string]*api.Cluster{}, AuthInfos:map[string]*api.AuthInfo{}, Contexts:map[string]*api.Context{}, CurrentContext:"", Extensions:map[string]runtime.Object{}}
 
 subctl version: release-0.19-260d4934ea54
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: subctl-join
+  namespace: submariner-operator
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      annotations:
+        # Keep Consul injection disabled for this pod
+        consul.hashicorp.com/connect-inject: "false"
+    spec:
+      restartPolicy: Never
+      serviceAccountName: submariner-bootstrap
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+      - name: subctl
+        image: quay.io/submariner/subctl:0.19.1
+        # Call the binary directly — no /bin/sh here
+        command: ["subctl"]
+        args:
+          - "join"
+          - "/broker/broker-info.subm"
+          - "--clusterid"
+          - "mas-qa"
+          - "--cable-driver"
+          - "wireguard"
+          - "--natt=true"
+          - "--clustercidr"
+          - "10.244.0.0/16"
+          - "--servicecidr"
+          - "10.96.0.0/12"
+          # Remove this flag if you DON'T use Globalnet on the broker
+          - "--globalnet-cidr"
+          - "242.0.2.0/24"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+        - name: broker
+          mountPath: /broker
+          readOnly: true
+      volumes:
+      - name: broker
+        secret:
+          secretName: broker-info
+          # Must contain a key named: broker-info.subm
