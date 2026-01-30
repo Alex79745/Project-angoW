@@ -669,5 +669,53 @@ curl -sSvk --fail \
 <
 * closing connection #0
 curl: (22) The requested URL returned error: 401
+_______________________________________________________________
 
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: regenerate-brokerinfo
+  namespace: submariner-k8s-broker
+spec:
+  restartPolicy: Never
+  # This SA must already exist (created by subctl deploy-broker)
+  serviceAccountName: submariner-k8s-broker-admin
+  containers:
+  - name: generate
+    image: busybox:1.36
+    command: ["sh","-c"]
+    args:
+      - |
+        set -eu
+        TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+        NS="$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)"
+        CA_B64="$(base64 /var/run/secrets/kubernetes.io/serviceaccount/ca.crt | tr -d '\n')"
+        NS_B64="$(printf "%s" "$NS" | base64 | tr -d '\n')"
+
+        # NOTE: If you need IPsec PSK and the secret exists, uncomment the kubectl line below and use a kubectl image.
+        # For now we leave PSK empty (not needed for WireGuard).
+        PSK_B64=""
+
+        mkdir -p /work
+
+        # Build a minimal, valid broker-info bundle that uses in-cluster API
+        cat > /work/broker-info.subm <<EOF
+{"brokerURL":"https://kubernetes.default.svc:443",
+ "clientToken":{"metadata":{"name":"submariner-k8s-broker-admin-token","namespace":"${NS}","annotations":{"kubernetes.io/created-by":"regenerate-brokerinfo","kubernetes.io/service-account.name":"submariner-k8s-broker-admin"}},
+               "data":{"ca.crt":"${CA_B64}","namespace":"${NS_B64}","token":"${TOKEN}"},
+               "type":"kubernetes.io/service-account-token"},
+ "ipsecPSK":{"metadata":{"name":"submariner-ipsec-psk"},"data":{"psk":"${PSK_B64}"}},
+ "serviceDiscovery":true,
+ "Components":["connectivity","service-discovery"]}
+EOF
+        echo "Wrote /work/broker-info.subm"
+        sleep 3600
+    volumeMounts:
+    - name: work
+      mountPath: /work
+  volumes:
+  - name: work
+    emptyDir: {}
 
