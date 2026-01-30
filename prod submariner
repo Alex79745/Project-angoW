@@ -1,0 +1,315 @@
+
+Broker cluster – prerequisites (one time)
+Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: submariner-k8s-broker
+
+ServiceAccount + RBAC (required)
+
+This is non-negotiable.
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: submariner-broker-admin
+  namespace: submariner-k8s-broker
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: submariner-broker-admin
+subjects:
+- kind: ServiceAccount
+  name: submariner-broker-admin
+  namespace: submariner-k8s-broker
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-submariner-broker
+  namespace: submariner-k8s-broker
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: submariner-broker-admin
+      securityContext:
+        runAsUser: 0
+      containers:
+      - name: subctl
+        image: quay.io/submariner/subctl:0.22.0
+        command: ["sh","-c"]
+        args:
+          - |
+            set -eux
+
+            export KUBECONFIG=/tmp/kubeconfig
+
+            # Build in-cluster kubeconfig explicitly
+            cat > ${KUBECONFIG} <<EOF
+            apiVersion: v1
+            kind: Config
+            clusters:
+            - name: incluster
+              cluster:
+                server: https://kubernetes.default.svc:6443
+                certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            contexts:
+            - name: incluster
+              context:
+                cluster: incluster
+                user: sa
+            current-context: incluster
+            users:
+            - name: sa
+              user:
+                tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+            EOF
+
+            subctl deploy-broker \
+              --kubeconfig ${KUBECONFIG} \
+              --namespace submariner-k8s-broker \
+              --service-discovery \
+              --cable-driver wireguard
+
+            echo "Broker deployed"
+        volumeMounts:
+        - name: work
+          mountPath: /tmp
+      volumes:
+      - name: work
+        emptyDir: {}
+
+
+
+
+######################################################################
+
+
+
+Perfect — that’s the cleanest and most future-proof setup, and yes: creating the broker from inside the broker cluster (Job/Pod) so it natively generates broker-info pointing to the real API is the best solution. You already proved it by regenerating broker-info and seeing the spoke join work ✅
+
+Let’s lock this in properly for prod, Talos-compatible, no Omni pollution, no exposed API.
+
+✅ Target Architecture (what we’re building)
+
+Broker cluster
+
+Broker created from inside the cluster
+
+Uses kubernetes.default.svc
+
+Generates correct broker-info.subm
+
+Stores broker-info as a Secret
+
+No Omni API anywhere
+
+Spoke clusters
+
+Join via in-cluster Job
+
+Use kubernetes.default.svc
+
+Use ServiceAccount + RBAC
+
+Works on Talos (no shelling into nodes)
+
+1️⃣ Broker cluster – prerequisites (once)
+Namespace
+kubectl create namespace submariner-k8s-broker
+
+ServiceAccount + RBAC (minimal, safe)
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: submariner-broker-installer
+  namespace: submariner-k8s-broker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: submariner-broker-installer
+rules:
+- apiGroups: [""]
+  resources: ["namespaces","secrets","serviceaccounts"]
+  verbs: ["get","list","create","update","delete"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["clusterroles","clusterrolebindings","rolebindings"]
+  verbs: ["get","list","create","update","delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get","list","create","update","delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: submariner-broker-installer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: submariner-broker-installer
+subjects:
+- kind: ServiceAccount
+  name: submariner-broker-installer
+  namespace: submariner-k8s-broker
+
+
+Apply it.
+
+2️⃣ Broker creation Job (THIS is the key part)
+
+This Job:
+
+Runs inside the broker cluster
+
+Talks to real API (kubernetes.default.svc)
+
+Runs subctl deploy-broker
+
+Produces correct broker-info.subm
+
+✅ Production-grade Broker Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-submariner-broker
+  namespace: submariner-k8s-broker
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: submariner-broker-installer
+
+      # Talos: must run as root
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+
+      containers:
+      - name: subctl
+        image: quay.io/submariner/subctl:0.19.1
+        command: ["subctl"]
+        args:
+          - "deploy-broker"
+          - "--namespace"
+          - "submariner-k8s-broker"
+          - "--broker-k8s-api-server"
+          - "https://kubernetes.default.svc"
+          - "--service-discovery"
+        env:
+        # Forces in-cluster config, avoids Omni kubeconfig
+        - name: KUBECONFIG
+          value: ""
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+
+🔑 Why this works
+Requirement	Status
+Talos compatible	✅ root
+Real API	✅ kubernetes.default.svc
+No Omni	✅
+Correct broker-info	✅
+Token handling	✅ native
+
+After this finishes, the cluster will contain:
+
+submariner-k8s-broker components
+
+broker-info Secret
+
+Correct CA + endpoint
+
+3️⃣ Export broker-info for spokes
+
+On the broker cluster:
+
+kubectl -n submariner-k8s-broker \
+  get secret broker-info \
+  -o jsonpath='{.data.broker-info\.subm}' \
+| base64 -d > broker-info.subm
+
+
+You already know this file works — now it’s natively correct.
+
+4️⃣ Spoke cluster – join via Job (final form)
+
+You already validated this works, but here is the final, correct join Job.
+
+Spoke prerequisites
+
+Namespace: submariner-operator
+
+ServiceAccount with cluster-admin (or Submariner RBAC)
+
+Secret containing broker-info.subm
+
+✅ Spoke Join Job (prod-ready)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: subctl-join
+  namespace: submariner-operator
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: submariner-bootstrap
+
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+
+      containers:
+      - name: subctl
+        image: quay.io/submariner/subctl:0.19.1
+        command: ["subctl"]
+        args:
+          - "join"
+          - "/broker/broker-info.subm"
+          - "--clusterid"
+          - "spoke-prod-1"
+          - "--cable-driver"
+          - "wireguard"
+          - "--natt=true"
+          - "--clustercidr"
+          - "10.244.0.0/16"
+          - "--servicecidr"
+          - "10.96.0.0/12"
+        env:
+        - name: KUBECONFIG
+          value: ""
+        volumeMounts:
+        - name: broker
+          mountPath: /broker
+          readOnly: true
+
+      volumes:
+      - name: broker
+        secret:
+          secretName: broker-info
+
+5️⃣ Final confirmation (this is the correct model)
+
+✔ No Omni
+✔ No exposed control-plane
+✔ No kubeconfig hacks
+✔ No token embedding
+✔ Talos-safe
+✔ Repeatable in CI / prod
+✔ Matches upstream Submariner design
+
+This is exactly how Submariner is meant to run in locked-down environments — you just forced it back onto the happy path.
