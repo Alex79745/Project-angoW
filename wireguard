@@ -249,3 +249,11 @@ Show Omni labels + patches for auto-enrollment
 Provide a Submariner health validation checklist
 
 Draw the exact packet flow (who can talk to whom)
+
+
+
+wget -O- http://10.250.0.1:6443         # hangs (no response)
+wget -O- http://10.19.143.66:6443       # 400 Bad Request (HTTP to HTTPS)
+wget -O- https://10.19.143.66:6443      # 401 Unauthorized (expected for kube-apiserver)
+telnet 10.19.143.66 6443                # connects, then server closes (also ok)
+ip route                                # shows only CNI default route
