@@ -665,4 +665,29 @@ Defaulted container "subctl" out of: subctl, secret-writer, write-kubeconfig (in
  ✓ Saving broker info to file "broker-info.subm"
 
 -------------------------------------------------------------------
+-----------------------------------------------------------------
+
+
+  subctl join broker-info.subm \
+  --clusterid "mas-qa" \
+  --cable-driver wireguard \
+  --natt=true \
+  --clustercidr "10.244.0.0/16" \
+  --servicecidr "10.96.0.0/12" \
+  --globalnet-cidr "242.0.2.0/24"
+ ✓ broker-info.subm indicates broker is at https://10.19.143.66:6443
+ • Discovering network details  ...
+ ✓ Discovering network details
+        Network plugin:  generic
+        Service CIDRs:   [10.96.0.0/12]
+        Cluster CIDRs:   [10.244.0.0/16]
+ • Retrieving the gateway nodes  ...
+   There are 1 node(s) labeled as gateways:
+    - klusterx-worker-mas-qa-01
+ ✓ Retrieving the gateway nodes
+ • Gathering relevant information from Broker  ...
+ ✗ Gathering relevant information from Broker
+ ✗ Error retrieving broker admin config: Get "https://10.19.143.66:6443/apis/submariner.io/v1/namespaces/submariner-k8s-broker/clusters": Bad Gateway
+
+subctl version: v0.22.0
 
