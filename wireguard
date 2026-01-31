@@ -257,3 +257,412 @@ wget -O- http://10.19.143.66:6443       # 400 Bad Request (HTTP to HTTPS)
 wget -O- https://10.19.143.66:6443      # 401 Unauthorized (expected for kube-apiserver)
 telnet 10.19.143.66 6443                # connects, then server closes (also ok)
 ip route                                # shows only CNI default route
+
+--------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------$ kubectl apply -f  broke_job.yaml
+job.batch/deploy-submariner-broker created
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$  kubectl -n submariner-k8s-broker get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+deploy-submariner-broker-pbjbz   2/2     Running   0          4s
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$  kubectl -n submariner-k8s-broker get pods
+NAME                             READY   STATUS   RESTARTS   AGE
+deploy-submariner-broker-8ll2q   0/2     Error    0          31s
+deploy-submariner-broker-pbjbz   0/2     Error    0          56s
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n submariner-k8s-broker describe pod deploy-submariner-broker-8ll2q
+Name:             deploy-submariner-broker-8ll2q
+Namespace:        submariner-k8s-broker
+Priority:         0
+Service Account:  submariner-broker-installer
+Node:             klusterx-worker-infra-04/10.19.143.70
+Start Time:       Sat, 31 Jan 2026 21:09:33 +0000
+Labels:           batch.kubernetes.io/controller-uid=8e30d3d3-81f9-4690-a32c-500999268064
+                  batch.kubernetes.io/job-name=deploy-submariner-broker
+                  controller-uid=8e30d3d3-81f9-4690-a32c-500999268064
+                  job-name=deploy-submariner-broker
+Annotations:      <none>
+Status:           Failed
+IP:               10.244.5.99
+IPs:
+  IP:           10.244.5.99
+Controlled By:  Job/deploy-submariner-broker
+Init Containers:
+  write-kubeconfig:
+    Container ID:  containerd://54de99a8a381b1fefeea42acfbdce2e01535fe70588755db6367827622b5aecf
+    Image:         busybox:1.36
+    Image ID:      docker.io/library/busybox@sha256:851281100cc5f93d8a8f8e1a8976a57ec40a9bc9edd66ad3a621e4aa63326915
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      sh
+      -c
+    Args:
+      set -eu
+      SVC_HOST="${KUBERNETES_SERVICE_HOST:-10.10.143.66}"
+      SVC_PORT="${KUBERNETES_SERVICE_PORT:-443}"
+      TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+      CA_PATH="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+      CA_B64="$(base64 "$CA_PATH" | tr -d '\n')"
+      mkdir -p /work
+      printf 'apiVersion: v1\n'                                   >  /work/kubeconfig
+      printf 'kind: Config\n'                                     >> /work/kubeconfig
+      printf 'clusters:\n'                                        >> /work/kubeconfig
+      printf '- name: incluster\n'                                >> /work/kubeconfig
+      printf '  cluster:\n'                                       >> /work/kubeconfig
+      printf '    server: https://%s:%s\n' "$SVC_HOST" "$SVC_PORT" >> /work/kubeconfig
+      printf '    certificate-authority-data: %s\n' "$CA_B64"     >> /work/kubeconfig
+      printf 'contexts:\n'                                        >> /work/kubeconfig
+      printf '- name: incluster\n'                                >> /work/kubeconfig
+      printf '  context:\n'                                       >> /work/kubeconfig
+      printf '    cluster: incluster\n'                           >> /work/kubeconfig
+      printf '    user: sa\n'                                     >> /work/kubeconfig
+      printf 'current-context: incluster\n'                       >> /work/kubeconfig
+      printf 'users:\n'                                           >> /work/kubeconfig
+      printf '- name: sa\n'                                       >> /work/kubeconfig
+      printf '  user:\n'                                          >> /work/kubeconfig
+      printf '    token: %s\n' "$TOKEN"                           >> /work/kubeconfig
+      echo "Wrote kubeconfig at /work/kubeconfig"
+
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Sat, 31 Jan 2026 21:09:33 +0000
+      Finished:     Sat, 31 Jan 2026 21:09:33 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-dn7xk (ro)
+      /work from work (rw)
+Containers:
+  subctl:
+    Container ID:  containerd://fa012e79539b6519caa21191a0365894476e0addbf597b1402b27be726f9d00c
+    Image:         quay.io/submariner/subctl:0.22.0
+    Image ID:      quay.io/submariner/subctl@sha256:3f78777149921cacee8a2200f8e39113f176c1637160b4ba02bbe704e9c4372f
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      subctl
+    Args:
+      deploy-broker
+      --kubeconfig
+      /work/kubeconfig
+      --namespace
+      submariner-k8s-broker
+      --broker-url
+      https://10.19.143.66:443
+      --globalnet
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Sat, 31 Jan 2026 21:09:34 +0000
+      Finished:     Sat, 31 Jan 2026 21:09:47 +0000
+    Ready:          False
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-dn7xk (ro)
+      /work from work (rw)
+  secret-writer:
+    Container ID:  containerd://5404eaaba1db53ff216c040c630a9c2e4a16afe5b73ed04b65535b1f66129760
+    Image:         curlimages/curl:8.5.0
+    Image ID:      docker.io/curlimages/curl@sha256:08e466006f0860e54fc299378de998935333e0e130a15f6f98482e9f8dab3058
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      sh
+      -c
+    Args:
+      set -eu
+      NS="submariner-k8s-broker"
+      API="https://10.19.143.66:443"
+      TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+      CACERT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+      # wait for subctl to generate file in /work
+      for i in $(seq 1 120); do
+        [ -s /work/broker-info.subm ] && break
+        sleep 1
+      done
+      [ -s /work/broker-info.subm ] || { echo "broker-info.subm not found"; exit 1; }
+
+      FILE_B64="$(base64 /work/broker-info.subm | tr -d '\n')"
+
+      cat > /work/secret.json <<EOF
+      {
+        "apiVersion": "v1",
+        "kind": "Secret",
+        "metadata": {
+          "name": "broker-info",
+          "namespace": "${NS}"
+        },
+        "type": "Opaque",
+        "data": {
+          "broker-info.subm": "${FILE_B64}"
+        }
+      }
+      EOF
+
+      # Upsert logic: GET; if 404 → POST, else → PUT
+      HTTP_CODE="$(curl -skw '%{http_code}' -o /dev/null \
+        -H "Authorization: Bearer ${TOKEN}" \
+        --cacert "${CACERT}" \
+        "${API}/api/v1/namespaces/${NS}/secrets/broker-info")"
+
+      if [ "${HTTP_CODE}" = "404" ]; then
+        echo "Creating Secret broker-info"
+        curl -sk \
+          -H "Authorization: Bearer ${TOKEN}" \
+          -H "Content-Type: application/json" \
+          --cacert "${CACERT}" \
+          -X POST \
+          -d @/work/secret.json \
+          "${API}/api/v1/namespaces/${NS}/secrets"
+      else
+        echo "Updating Secret broker-info"
+        curl -sk \
+          -H "Authorization: Bearer ${TOKEN}" \
+          -H "Content-Type: application/json" \
+          --cacert "${CACERT}" \
+          -X PUT \
+          -d @/work/secret.json \
+          "${API}/api/v1/namespaces/${NS}/secrets/broker-info"
+      fi
+
+      echo "Secret ${NS}/broker-info upserted."
+
+    State:          Terminated
+      Reason:       Error
+      Exit Code:    7
+      Started:      Sat, 31 Jan 2026 21:09:34 +0000
+      Finished:     Sat, 31 Jan 2026 21:09:47 +0000
+    Ready:          False
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-dn7xk (ro)
+      /work from work (rw)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False
+  Initialized                 True
+  Ready                       False
+  ContainersReady             False
+  PodScheduled                True
+Volumes:
+  work:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+  kube-api-access-dn7xk:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  54s   default-scheduler  Successfully assigned submariner-k8s-broker/deploy-submariner-broker-8ll2q to klusterx-worker-infra-04
+  Normal  Pulled     55s   kubelet            Container image "busybox:1.36" already present on machine
+  Normal  Created    55s   kubelet            Created container: write-kubeconfig
+  Normal  Started    55s   kubelet            Started container write-kubeconfig
+  Normal  Pulled     54s   kubelet            Container image "quay.io/submariner/subctl:0.22.0" already present on machine
+  Normal  Created    54s   kubelet            Created container: subctl
+  Normal  Started    54s   kubelet            Started container subctl
+  Normal  Pulled     54s   kubelet            Container image "curlimages/curl:8.5.0" already present on machine
+  Normal  Created    54s   kubelet            Created container: secret-writer
+  Normal  Started    54s   kubelet            Started container secret-writer
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ cat broke_job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-submariner-broker
+  namespace: submariner-k8s-broker
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: submariner-broker-installer
+
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+
+      volumes:
+      - name: work
+        emptyDir: {}
+
+      initContainers:
+      - name: write-kubeconfig
+        image: busybox:1.36
+        volumeMounts:
+        - name: work
+          mountPath: /work
+        command: ["sh", "-c"]
+        args:
+        - |
+          set -eu
+          SVC_HOST="${KUBERNETES_SERVICE_HOST:-10.10.143.66}"
+          SVC_PORT="${KUBERNETES_SERVICE_PORT:-443}"
+          TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+          CA_PATH="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+          CA_B64="$(base64 "$CA_PATH" | tr -d '\n')"
+          mkdir -p /work
+          printf 'apiVersion: v1\n'                                   >  /work/kubeconfig
+          printf 'kind: Config\n'                                     >> /work/kubeconfig
+          printf 'clusters:\n'                                        >> /work/kubeconfig
+          printf '- name: incluster\n'                                >> /work/kubeconfig
+          printf '  cluster:\n'                                       >> /work/kubeconfig
+          printf '    server: https://%s:%s\n' "$SVC_HOST" "$SVC_PORT" >> /work/kubeconfig
+          printf '    certificate-authority-data: %s\n' "$CA_B64"     >> /work/kubeconfig
+          printf 'contexts:\n'                                        >> /work/kubeconfig
+          printf '- name: incluster\n'                                >> /work/kubeconfig
+          printf '  context:\n'                                       >> /work/kubeconfig
+          printf '    cluster: incluster\n'                           >> /work/kubeconfig
+          printf '    user: sa\n'                                     >> /work/kubeconfig
+          printf 'current-context: incluster\n'                       >> /work/kubeconfig
+          printf 'users:\n'                                           >> /work/kubeconfig
+          printf '- name: sa\n'                                       >> /work/kubeconfig
+          printf '  user:\n'                                          >> /work/kubeconfig
+          printf '    token: %s\n' "$TOKEN"                           >> /work/kubeconfig
+          echo "Wrote kubeconfig at /work/kubeconfig"
+
+      containers:
+      - name: subctl
+        image: quay.io/submariner/subctl:0.22.0
+        imagePullPolicy: IfNotPresent
+        workingDir: /work
+        volumeMounts:
+        - name: work
+          mountPath: /work
+        command: ["subctl"]
+        args:
+          - deploy-broker
+          - --kubeconfig
+          - /work/kubeconfig
+          - --namespace
+          - submariner-k8s-broker
+          - --broker-url
+          - https://10.19.143.66:443
+          # On 0.22, defaults install both components; add if you want explicitness:
+          # - --components
+          # - service-discovery,connectivity
+          # Keep ONLY if you enabled Globalnet intentionally:
+          - --globalnet
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+
+      - name: secret-writer
+        image: curlimages/curl:8.5.0   # <-- has /bin/sh and curl
+        volumeMounts:
+        - name: work
+          mountPath: /work
+        command: ["sh","-c"]
+        args:
+        - |
+          set -eu
+          NS="submariner-k8s-broker"
+          API="https://10.19.143.66:443"
+          TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+          CACERT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+          # wait for subctl to generate file in /work
+          for i in $(seq 1 120); do
+            [ -s /work/broker-info.subm ] && break
+            sleep 1
+          done
+          [ -s /work/broker-info.subm ] || { echo "broker-info.subm not found"; exit 1; }
+
+          FILE_B64="$(base64 /work/broker-info.subm | tr -d '\n')"
+
+          cat > /work/secret.json <<EOF
+          {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+              "name": "broker-info",
+              "namespace": "${NS}"
+            },
+            "type": "Opaque",
+            "data": {
+              "broker-info.subm": "${FILE_B64}"
+            }
+          }
+          EOF
+
+          # Upsert logic: GET; if 404 → POST, else → PUT
+          HTTP_CODE="$(curl -skw '%{http_code}' -o /dev/null \
+            -H "Authorization: Bearer ${TOKEN}" \
+            --cacert "${CACERT}" \
+            "${API}/api/v1/namespaces/${NS}/secrets/broker-info")"
+
+          if [ "${HTTP_CODE}" = "404" ]; then
+            echo "Creating Secret broker-info"
+            curl -sk \
+              -H "Authorization: Bearer ${TOKEN}" \
+              -H "Content-Type: application/json" \
+              --cacert "${CACERT}" \
+              -X POST \
+              -d @/work/secret.json \
+              "${API}/api/v1/namespaces/${NS}/secrets"
+          else
+            echo "Updating Secret broker-info"
+            curl -sk \
+              -H "Authorization: Bearer ${TOKEN}" \
+              -H "Content-Type: application/json" \
+              --cacert "${CACERT}" \
+              -X PUT \
+              -d @/work/secret.json \
+              "${API}/api/v1/namespaces/${NS}/secrets/broker-info"
+          fi
+
+          echo "Secret ${NS}/broker-info upserted."
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$  kubectl -n submariner-k8s-broker get pods
+NAME                             READY   STATUS   RESTARTS   AGE
+deploy-submariner-broker-8ll2q   0/2     Error    0          2m28s
+deploy-submariner-broker-pbjbz   0/2     Error    0          2m53s
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n submariner-k8s-broker logs deploy-submariner-broker-8ll2q
+Defaulted container "subctl" out of: subctl, secret-writer, write-kubeconfig (init)
+ • Setting up broker RBAC  ...
+ ✓ Setting up broker RBAC
+ • Deploying the Submariner operator  ...
+ ✓ Deploying the Submariner operator
+ • Deploying the broker  ...
+ ✓ Deploying the broker
+ • Saving broker info to file "broker-info.subm"  ...
+ ✓ Saving broker info to file "broker-info.subm"
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n submariner-k8s-broker logs deploy-submariner-broker-pbjbz
+Defaulted container "subctl" out of: subctl, secret-writer, write-kubeconfig (init)
+ • Setting up broker RBAC  ...
+ ✓ Setting up broker RBAC
+ • Deploying the Submariner operator  ...
+ ✓ Deploying the Submariner operator
+ • Deploying the broker  ...
+ ✓ Deploying the broker
+ • Saving broker info to file "broker-info.subm"  ...
+ ✓ Saving broker info to file "broker-info.subm"
+
+-------------------------------------------------------------------
+
