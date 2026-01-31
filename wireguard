@@ -760,4 +760,35 @@ Defaulted container "subctl" out of: subctl, make-kubeconfig (init)
  • Deploying submariner  ...
  ✓ Deploying submariner
  ✓ Submariner is up and running
+-----------------------------------------------------------------------
+
+Events:
+  Type     Reason     Age                    From               Message
+  ----     ------     ----                   ----               -------
+  Normal   Scheduled  7m28s                  default-scheduler  Successfully assigned submariner-operator/submariner-gateway-g425b to klusterx-worker-mas-qa-01
+  Normal   Pulling    7m27s                  kubelet            Pulling image "quay.io/submariner/submariner-gateway:release-0.22"
+  Normal   Pulled     7m9s                   kubelet            Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 18.386s (18.386s including waiting). Image size: 76252382 bytes.
+  Normal   Created    7m9s                   kubelet            Created container: submariner-gateway-init
+  Normal   Started    7m9s                   kubelet            Started container submariner-gateway-init
+  Normal   Pulled     7m8s                   kubelet            Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 402ms (402ms including waiting). Image size: 76252382 bytes.
+  Warning  Failed     7m8s                   kubelet            Error: failed to generate container "f42713d9afd03f31cf683f312a7359e3a2e43073100c7dcee3531f10e044a7be" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+  Normal   Pulled     7m7s                   kubelet            Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 359ms (359ms including waiting). Image size: 76252382 bytes.
+  Warning  Failed     7m7s                   kubelet            Error: failed to generate container "74dd89295b274f4956a77ab7c819c424558ebabada0dc0ec0c9d4b05d8da6f01" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+  Warning  Failed     6m52s                  kubelet            Error: failed to generate container "10f2e7d277dfcf5a782b7fbe138f40070723baa395ac25b30464170de8204ac6" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+  Normal   Pulled     6m52s                  kubelet            Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 351ms (351ms including waiting). Image size: 76252382 bytes.
+  Normal   Pulled     6m40s                  kubelet            Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 350ms (350ms including waiting). Image size: 76252382 bytes.
+  Warning  Failed     6m40s                  kubelet            Error: failed to generate container "c7961b8383d555fcfda90e7b23acfdbbef3262b71d8a8110f1af738d52d1a60c" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+  Normal   Pulled     6m27s                  kubelet            Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 485ms (485ms including waiting). Image size: 76252382 bytes.
+  Warning  Failed     6m27s                  kubelet            Error: failed to generate container "1bb2d3426ce949e69492b9a087d99c7e6ca3af737568f47322d2a40f529041d8" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+  Warning  Failed     6m12s                  kubelet            Error: failed to generate container "441642fb2d84ef699c24864ec77f6b28c6f0c2e56e85d9ff71a0de3d6fb8c846" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+  Normal   Pulled     6m12s                  kubelet            Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 376ms (376ms including waiting). Image size: 76252382 bytes.
+  Normal   Pulled     6m1s                   kubelet            Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 451ms (451ms including waiting). Image size: 76252382 bytes.
+  Warning  Failed     6m1s                   kubelet            Error: failed to generate container "57e180c85144c4bd92e008aed96d68320120218b77cd90fce208d1b568f8d215" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+  Normal   Pulled     5m50s                  kubelet            Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 347ms (347ms including waiting). Image size: 76252382 bytes.
+  Warning  Failed     5m50s                  kubelet            Error: failed to generate container "0b7771a324b5256ac545c8ee050dee578703610d4b631d4d8e52d0cb7d9ae504" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+  Warning  Failed     5m36s                  kubelet            Error: failed to generate container "dda88610f6789e1e44a67d807d20451e8afc4834160702e2c887d59299747013" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+  Normal   Pulled     5m21s (x2 over 5m36s)  kubelet            (combined from similar events): Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 389ms (389ms including waiting). Image size: 76252382 bytes.
+  Normal   Pulling    2m12s (x24 over 7m9s)  kubelet            Pulling image "quay.io/submariner/submariner-gateway:release-0.22"
+  Warning  Failed     108s (x17 over 5m21s)  kubelet            (combined from similar events): Error: failed to generate container "3397c96d1ce3ebc01b980a32df46aa86ebab3b45320e5aa4996665e8cc00d217" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+
 
