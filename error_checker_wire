@@ -197,3 +197,55 @@ spec:
           allowPrivilegeEscalation: false
           capabilities:
             drop: ["ALL"]
+
+
+
+
+
+
+
+
+
+
+
+I hear you. If Omni is the ONLY control-plane endpoint for every cluster, and cluster-local apiservers are not reachable directly, then:
+
+A pod in a spoke cannot reach the broker’s apiserver at kubernetes.default.svc in the broker cluster (that DNS resolves to the spoke’s apiserver).
+And Omni’s API won’t accept cluster ServiceAccount (SA) tokens from either side.
+
+Under those constraints, a standard subctl join must talk to the broker API, but there is no network + auth path from the spoke to the broker unless you either:
+
+use Omni (as the broker URL and with an Omni-issued token), or
+provide a temporary out-of-band TCP path to the broker apiserver (tunnel/VIP) that the spokes can reach and that matches the broker’s apiserver cert.
+
+There isn’t a third way—subctl join needs to reach the broker’s API to write the broker-side cluster records.
+Below are two pragmatic, working paths. Pick whichever is acceptable in your environment.
+
+✅ Path A — Bootstrap via Omni (minimal, temporary Omni usage)
+Idea: Use Omni only during bootstrap to let spokes reach the broker’s API. You regenerate broker-info.subm with:
+
+brokerURL: Omni API URL (the only reachable endpoint)
+clientToken: an Omni-issued bearer token (NOT a cluster SA token) that has read/write only in the broker namespace for Submariner broker objects (least privilege)
+
+After all spokes join and Submariner connectivity is up, you can later rotate the broker URL to an internal endpoint reachable over Submariner (optional).
+Steps
+
+
+Create a dedicated Omni credential with minimum RBAC against the broker cluster namespace submariner-k8s-broker:
+
+Permissions needed: CRUD on Secrets/ConfigMaps in that namespace, reads on Submariner CRDs under submariner.io in the broker namespace; often simpler to allow the broker namespace broadly during bootstrap.
+This is an Omni-side action (create a user/token or service account in Omni with those permissions).
+
+
+
+Regenerate broker-info.subm on the broker cluster with:
+
+brokerURL: the Omni API URL (e.g., https://omni.example.com:PORT)
+clientToken.data["token"]: the Omni bearer token, base64-encoded
+clientToken.data["ca.crt"]: the Omni API CA, base64-encoded (NOT the in-cluster CA)
+clientToken.data["namespace"]: base64(submariner-k8s-broker)
+
+
+
+Here’s a broker-side Job that writes and upserts the broker-info Secret to use Omni (you must paste the Omni CA and Omni token into a Secret first, or inject via env; example below uses a Secret so no secrets in clear YAML):
+1 error occurred: * overriding "cluster.controlPlane.endpoint" is not allowed in the config patch
