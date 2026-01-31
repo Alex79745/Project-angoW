@@ -690,4 +690,74 @@ Defaulted container "subctl" out of: subctl, secret-writer, write-kubeconfig (in
  ✗ Error retrieving broker admin config: Get "https://10.19.143.66:6443/apis/submariner.io/v1/namespaces/submariner-k8s-broker/clusters": Bad Gateway
 
 subctl version: v0.22.0
+---------------------------------------------------
+
+
+NAME          STATUS     COMPLETIONS   DURATION   AGE
+subctl-join   Complete   1/1           24s        45s
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n submariner-operator get pod
+NAME                                             READY   STATUS                 RESTARTS   AGE
+subctl-join-ldjzx                                0/1     Completed              0          52s
+submariner-gateway-g425b                         0/1     CreateContainerError   0          31s
+submariner-globalnet-hvr57                       1/1     Running                0          31s
+submariner-lighthouse-agent-6d8bb8975f-gc8gj     1/1     Running                0          31s
+submariner-lighthouse-coredns-74db8b9f9f-44pns   1/1     Running                0          31s
+submariner-lighthouse-coredns-74db8b9f9f-6mzxv   1/1     Running                0          30s
+submariner-metrics-proxy-fch46                   2/2     Running                0          31s
+submariner-operator-75bfb7668c-hncnp             1/1     Running                0          41s
+submariner-routeagent-9vws9                      1/1     Running                0          31s
+submariner-routeagent-s9h96                      1/1     Running                0          31s
+submariner-routeagent-x668h                      1/1     Running                0          31s
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$  for p in $(kubectl -n submariner-operator get pods -l job-name=subctl-join -o name); do   echo "===== LOGS for $p =====";   kubectl -n submariner-operator logs "$p" --previous || kubectl -n submariner-operator logs "$p"; done
+===== LOGS for pod/subctl-join-ldjzx =====
+Defaulted container "subctl" out of: subctl, make-kubeconfig (init)
+Error from server (BadRequest): previous terminated container "subctl" in pod "subctl-join-ldjzx" not found
+Defaulted container "subctl" out of: subctl, make-kubeconfig (init)
+ ✓ /broker/broker-info.subm indicates broker is at https://10.19.143.66:6443
+ • Discovering network details  ...
+ ✓ Discovering network details
+ • Retrieving the gateway nodes  ...
+        Network plugin:  generic
+        Service CIDRs:   [10.96.0.0/12]
+        Cluster CIDRs:   [10.244.0.0/16]
+   There are 1 node(s) labeled as gateways:
+    - klusterx-worker-mas-qa-01
+ ✓ Retrieving the gateway nodes
+ • Gathering relevant information from Broker  ...
+ ✓ Gathering relevant information from Broker
+ • Retrieving Globalnet information from the Broker  ...
+ ✓ Retrieving Globalnet information from the Broker
+ • Validating Globalnet configuration  ...
+ ✓ Validating Globalnet configuration
+ • Assigning Globalnet IPs  ...
+ ✓ Assigning Globalnet IPs
+ ✓ Using specified global CIDR 242.0.2.0/24
+ • Updating the Globalnet information on the Broker  ...
+ ✓ Updating the Globalnet information on the Broker
+ • Retrieving ClustersetIP information from the Broker  ...
+ ✓ Retrieving ClustersetIP information from the Broker
+ • Validating ClustersetIP configuration  ...
+ ✓ Validating ClustersetIP configuration
+ • Assigning ClustersetIP IPs  ...
+ ✓ Assigning ClustersetIP IPs
+ ✓ Allocated clustersetip CIDR 243.0.0.0/20
+ • Updating the ClustersetIP information on the Broker  ...
+ ✓ Updating the ClustersetIP information on the Broker
+ • Deploying the Submariner operator  ...
+ ✓ Deploying the Submariner operator
+ ✓ Created operator service account and role
+ ✓ Created submariner service account and role
+ ✓ Created lighthouse service account and role
+ ✓ Deployed the operator successfully
+ • Creating SA for cluster  ...
+ ✓ Creating SA for cluster
+ • Connecting to Broker  ...
+ ✓ Connecting to Broker
+ • Deploying submariner  ...
+ ✓ Deploying submariner
+ ✓ Submariner is up and running
 
