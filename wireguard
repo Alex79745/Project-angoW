@@ -790,5 +790,109 @@ Events:
   Normal   Pulled     5m21s (x2 over 5m36s)  kubelet            (combined from similar events): Successfully pulled image "quay.io/submariner/submariner-gateway:release-0.22" in 389ms (389ms including waiting). Image size: 76252382 bytes.
   Normal   Pulling    2m12s (x24 over 7m9s)  kubelet            Pulling image "quay.io/submariner/submariner-gateway:release-0.22"
   Warning  Failed     108s (x17 over 5m21s)  kubelet            (combined from similar events): Error: failed to generate container "3397c96d1ce3ebc01b980a32df46aa86ebab3b45320e5aa4996665e8cc00d217" spec: failed to apply OCI options: failed to mkdir "/etc/ipsec.d": mkdir /etc/ipsec.d: read-only file system
+-----------------------------------------------------------------------------------------------
 
+
+--------------------------------------------------------------------------------------------
+
+
+Create a Service exposing 8301:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul-gossip
+  namespace: consul
+spec:
+  ports:
+  - name: gossip-tcp
+    port: 8301
+    protocol: TCP
+  - name: gossip-udp
+    port: 8301
+    protocol: UDP
+  selector:
+    app: consul
+
+Step 2: Export the service via Submariner
+
+This is the missing piece most people forget.
+
+apiVersion: submariner.io/v1alpha1
+kind: ServiceExport
+metadata:
+  name: consul-gossip
+  namespace: consul
+
+
+What this does:
+
+Lighthouse creates a global DNS name
+
+Traffic routes through Submariner gateway
+
+No firewall rules needed
+
+Step 3: Verify export (from HUB)
+kubectl get serviceexports -n consul
+kubectl get servicediscovery -n submariner-operator
+
+How spokes reach it (the correct way)
+
+From a spoke pod:
+
+nslookup consul-gossip.consul.svc.clusterset.local
+
+
+You should get a clusterset IP (243.x.x.x).
+
+Then test connectivity:
+
+# TCP
+nc -zv consul-gossip.consul.svc.clusterset.local 8301
+
+# UDP (basic check)
+nc -u -zv consul-gossip.consul.svc.clusterset.local 8301
+
+
+If TCP works and UDP works → Submariner routing is correct
+
+How Consul clients join the hub
+
+On spoke Consul agents:
+
+retry_join = ["consul-gossip.consul.svc.clusterset.local"]
+
+
+That’s it.
+No IPs. No WireGuard config. No Omni hacks.
+
+Submariner handles the routing.
+
+How to prove NO spoke↔spoke traffic (iptables)
+
+On spoke gateway node:
+
+iptables -A FORWARD -d 242.0.0.0/24 -s 242.0.0.0/24 -j DROP
+
+
+This blocks:
+
+Globalnet → Globalnet traffic
+
+Allows spoke → hub only (because hub IP is NOT in same CIDR)
+
+You can tighten later, but this is enough to prove isolation.
+
+Do you need to “open broker ports”?
+
+No, and this is important.
+
+The broker:
+
+Uses Kubernetes API (already reachable)
+
+Is NOT in the data path
+
+Never needs Consul ports
 
