@@ -895,4 +895,21 @@ Uses Kubernetes API (already reachable)
 Is NOT in the data path
 
 Never needs Consul ports
+-------------------------------------------------------------------------------
 
+
+extraServices:
+  gossip:
+    enabled: true
+    name: consul-gossip
+    type: ClusterIP
+    clusterIP: None       # headless → best for gossip
+    ports:
+      - name: gossip-tcp
+        port: 8301
+        targetPort: 8301
+        protocol: TCP
+      - name: gossip-udp
+        port: 8301
+        targetPort: 8301
+        protocol: UDP
