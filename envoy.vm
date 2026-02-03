@@ -72,4 +72,140 @@ consul-server             ClusterIP      None            <none>          8501/TC
 consul-ui                 ClusterIP      10.98.155.166   <none>          443/TCP                                                                             
 kubectl -n consul get pods -o wide
 kubectl -n consul exec -it consul-server-0 -- ss -lunp | grep 8301
+-----------------------------------
+
+
+global:
+  name: consul
+  datacenter: central-primary-infra
+
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    httpsOnly: true
+  gossipEncryption:
+    enabled: true
+
+  acls:
+    manageSystemACLs: true
+  authMethod:
+     enable: true
+     name: consul-k8s-component-auth-method
+   # bootstrapToken:
+   #   secretName: consul-bootstrap-acl-token
+   #   secretKey: token
+
+  peering:
+    enabled: true
+
+  meshGateway:
+    enabled: true
+
+
+#gatewayAPI:
+ #   enabled: false
+
+ui:
+  enabled: true
+
+controller:
+  enabled: controller
+  #gatewayAPI:
+   # enabled: false
+
+dataplane:
+  enabled: true
+
+server:
+  enabled: true
+  replicas: 3
+  bootstrapExpect: 3
+
+  exposeService:
+   enabled: true
+   type: LoadBalancer
+   annotations: |
+        lbipam.cilium.io/ips: "10.19.143.87"
+        service.cilium.io/global: "true"
+     # REQUIRED: Label for the Cilium IP Pool selector
+   labels:
+        io.cilium/lb-ipam-ips: "true"
+
+
+  extraConfig: |
+    {
+      "acl": {
+        "enabled": true,
+        "default_policy": "allow",
+        "enable_token_persistence": true
+      },
+
+       "connect": { "enabled": true },
+       "auto_encrypt": { "allow_tls": true }
+
+    }
+
+client:
+  enabled: true
+  grpc: true
+  extraConfig: |
+    {
+      "verify_incoming": false,
+      "verify_outgoing": true,
+      "verify_server_hostname": true
+    }
+
+connectInject:
+  enabled: true
+  #apiGateway:
+   # enabled: false
+   # manageNonStandardCRDs: false
+  #  manageExternalCRDs: false
+  default: true
+  k8sAllowNamespaces: ["cattle-system","kube-system","consul","infra-system","submariner-operator","submariner-k8s-broker"]
+  tls:
+    enabled: true
+
+syncCatalog:
+  enabled: true
+  toConsul: true
+  toK8S: false
+  consulNodeName: "omni-infra"
+  k8sAllowNamespaces: ["cattle-system","kube-system","consul","infra-system","submariner-operator","submariner-k8s-broker"]
+  k8sDenyNamespaces: ["default"]
+  addK8SNamespaceSuffix: false
+  tls:
+    enabled: true
+
+meshGateway:
+  enabled: true
+  replicas: 2
+  service:
+    type: LoadBalancer
+    # chart 1.9.x expects a STRING here, not a map
+    annotations: |
+      service.cilium.io/global: "true"
+      lbipam.cilium.io/ips: "10.19.143.100"
+      consul.hashicorp.com/connect-inject: "true"
+      consul.hashicorp.com/mesh-inject: "true"
+    labels:
+        io.cilium/lb-ipam-ips: "true"
+  hostNetwork: false
+
+extraServices:
+  gossip:
+    enabled: true
+    name: consul-gossip
+    type: ClusterIP
+    clusterIP: None       # headless → best for gossip
+    ports:
+      - name: gossip-tcp
+        port: 8301
+        targetPort: 8301
+        protocol: TCP
+      - name: gossip-udp
+        port: 8301
+        targetPort: 8301
+        protocol: UDP
+
 
