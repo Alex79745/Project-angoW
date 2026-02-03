@@ -64,4 +64,9 @@ Feb 03 17:40:51 klusterx-envoyingress-01 envoy[209697]: [2026-02-03 17:40:51.570
 
 this is not the connect or envoy connect i told him he needs to do envoy connect he says he dint do that 
 
-  
+consul-connect-injector   ClusterIP      10.98.231.216   <none>          443/TCP                                                                            18d
+consul-dns                ClusterIP      10.101.163.68   <none>          53/TCP,53/UDP                                                                      18d
+consul-expose-servers     LoadBalancer   10.104.65.116   10.19.143.87    8501:30648/TCP,8301:31760/TCP,8300:31104/TCP,8502:32215/TCP,8301:31894/UDP         13d
+consul-mesh-gateway       LoadBalancer   10.106.225.33   10.19.143.100   443:30691/TCP                                                                      13d
+consul-server             ClusterIP      None            <none>          8501/TCP,8502/TCP,8301/TCP,8301/UDP,8302/TCP,8302/UDP,8300/TCP,8600/TCP,8600/UDP   18d
+consul-ui                 ClusterIP      10.98.155.166   <none>          443/TCP                                                                             
