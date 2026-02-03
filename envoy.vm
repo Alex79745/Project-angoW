@@ -207,5 +207,51 @@ extraServices:
         port: 8301
         targetPort: 8301
         protocol: UDP
+-------------------------------------------------------------
 
 
+datacenter = "central-primary-infra"
+node_name  = "envoy-edge-01"
+data_dir   = "/opt/consul"
+ 
+client_addr = "0.0.0.0"
+ 
+ 
+ports {
+  http  = 8500
+  grpc = 8502          # <--- ESSENCIAL (xDS)
+  https = 8501         # se estiver usando HTTPS (ACL/TLS)
+}
+ 
+retry_join = ["10.19.143.87"]
+ 
+connect {
+  enabled = true
+}
+ 
+auto_encrypt = {
+  tls = true
+}
+ 
+tls {
+  defaults {
+    ca_file = "/etc/envoy/tls/consul-ca-cert.crt"
+    verify_incoming = true
+    verify_outgoing = true
+    verify_server_hostname = true
+  }
+ 
+  internal_rpc {
+    verify_server_hostname = true
+  }
+}
+
+------------------
+
+error with this Feb 03 18:53:01 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:01.934Z [ERROR] agent.auto_config: No servers successfully responded to the auto-encrypt request
+Feb 03 18:53:01 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:01.939Z [ERROR] agent.auto_config: AutoEncrypt.Sign RPC failed: addr=10.19.143.87:8300 error="rpcinsecure: er>
+Feb 03 18:53:01 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:01.939Z [ERROR] agent.auto_config: No servers successfully responded to the auto-encrypt request
+Feb 03 18:53:03 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:03.222Z [ERROR] agent.auto_config: AutoEncrypt.Sign RPC failed: addr=10.19.143.87:8300 error="rpcinsecure: er>
+Feb 03 18:53:03 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:03.222Z [ERROR] agent.auto_config: No servers successfully responded to the auto-encrypt request
+Feb 03 18:53:05 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:05.273Z [ERROR] agent.auto_config: AutoEncrypt.Sign RPC failed: addr=10.19.143.87:8300 error="rpcinsecure: er>
+Feb 03 18:53:05 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:05.273Z [ERROR] agent.auto_config: No servers successfully responded to the auto-encrypt request
