@@ -313,3 +313,24 @@ spec:
 ✔ Matches upstream Submariner design
 
 This is exactly how Submariner is meant to run in locked-down environments — you just forced it back onto the happy path.
+
+
+-------
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul-gossip
+  namespace: consul
+spec:
+  selector:
+    app: consul
+    component: server  # Garante que aponta para os SERVERS
+  ports:
+    - name: gossip-tcp
+      port: 8301
+      protocol: TCP
+    - name: gossip-udp
+      port: 8301
+      protocol: UDP
+
