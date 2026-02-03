@@ -70,3 +70,6 @@ consul-expose-servers     LoadBalancer   10.104.65.116   10.19.143.87    8501:30
 consul-mesh-gateway       LoadBalancer   10.106.225.33   10.19.143.100   443:30691/TCP                                                                      13d
 consul-server             ClusterIP      None            <none>          8501/TCP,8502/TCP,8301/TCP,8301/UDP,8302/TCP,8302/UDP,8300/TCP,8600/TCP,8600/UDP   18d
 consul-ui                 ClusterIP      10.98.155.166   <none>          443/TCP                                                                             
+kubectl -n consul get pods -o wide
+kubectl -n consul exec -it consul-server-0 -- ss -lunp | grep 8301
+
