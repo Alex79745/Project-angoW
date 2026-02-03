@@ -1,0 +1,67 @@
+cat envoy.yaml
+# envoy-bootstrap.yaml
+# Minimal ADS bootstrap to Consul agent gRPC (xDS v3)
+ 
+node:
+  id: envoy-edge-01-gw
+  cluster: central-primary-infra
+ 
+dynamic_resources:
+  lds_config:
+    resource_api_version: V3
+    ads: {}
+  cds_config:
+    resource_api_version: V3
+    ads: {}
+  ads_config:
+    api_type: GRPC
+    transport_api_version: V3
+    grpc_services:
+    - envoy_grpc:
+        cluster_name: consul_xds
+ 
+static_resources:
+  clusters:
+  - name: consul_xds
+    type: STATIC
+    connect_timeout: 5s
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: consul_xds
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 10.19.143.87
+                port_value: 8502              # Consul agent gRPC port
+#    tls_context:
+#      common_tls_context:
+#        tls_params:
+#          tls_minimum_protocol_version: TLSv1_2
+        # If your Consul agent requires mTLS for xDS, you must supply certs or use SDS.
+        # In the auto bootstrap, Consul wires SDS; manually you must mount certs here.
+ 
+admin:
+  access_log_path: /var/log/envoy/admin_access.log
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 19000
+
+
+
+---------------
+
+ailure reason: delayed connect error: Connection refused
+Feb 03 17:39:32 klusterx-envoyingress-01 envoy[209697]: [2026-02-03 17:39:32.534][209697][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:226] StreamAggregatedResources gRPC config stream to consul_xds closed since 1015s ago: 14, upstream connect error or disconnect/reset before headers. reset reason: remote connection failure, transport failure reason: delayed connect error: Connection refused
+Feb 03 17:39:34 klusterx-envoyingress-01 envoy[209697]: [2026-02-03 17:39:34.476][209697][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:226] StreamAggregatedResources gRPC config stream to consul_xds closed since 1017s ago: 14, upstream connect error or disconnect/reset before headers. reset reason: remote connection failure, transport failure reason: delayed connect error: Connection refused
+Feb 03 17:39:59 klusterx-envoyingress-01 envoy[209697]: [2026-02-03 17:39:59.276][209697][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:226] StreamAggregatedResources gRPC config stream to consul_xds closed since 1041s ago: 14, upstream connect error or disconnect/reset before headers. reset reason: remote connection failure, transport failure reason: delayed connect error: Connection refused
+Feb 03 17:40:09 klusterx-envoyingress-01 envoy[209697]: [2026-02-03 17:40:09.912][209697][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:226] StreamAggregatedResources gRPC config stream to consul_xds closed since 1052s ago: 14, upstream connect error or disconnect/reset before headers. reset reason: remote connection failure, transport failure reason: delayed connect error: Connection refused
+Feb 03 17:40:13 klusterx-envoyingress-01 envoy[209697]: [2026-02-03 17:40:13.456][209697][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:226] StreamAggregatedResources gRPC config stream to consul_xds closed since 1055s ago: 14, upstream connect error or disconnect/reset before headers. reset reason: remote connection failure, transport failure reason: delayed connect error: Connection refused
+Feb 03 17:40:26 klusterx-envoyingress-01 envoy[209697]: [2026-02-03 17:40:26.266][209697][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:226] StreamAggregatedResources gRPC config stream to consul_xds closed since 1068s ago: 14, upstream connect error or disconnect/reset before headers. reset reason: remote connection failure, transport failure reason: delayed connect error: Connection refused
+Feb 03 17:40:51 klusterx-envoyingress-01 envoy[209697]: [2026-02-03 17:40:51.570][209697][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:226] StreamAggregatedResources gRPC config stream to consul_xds closed since 1094s ago: 14, upstream connect error or disconnect/reset before headers. reset reason: remote connection failure, transport failure reason: delayed connect error: Connection refused
+
+this is not the connect or envoy connect i told him he needs to do envoy connect he says he dint do that 
+
+  
