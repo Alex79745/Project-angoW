@@ -255,3 +255,12 @@ Feb 03 18:53:03 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:03.222
 Feb 03 18:53:03 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:03.222Z [ERROR] agent.auto_config: No servers successfully responded to the auto-encrypt request
 Feb 03 18:53:05 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:05.273Z [ERROR] agent.auto_config: AutoEncrypt.Sign RPC failed: addr=10.19.143.87:8300 error="rpcinsecure: er>
 Feb 03 18:53:05 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:05.273Z [ERROR] agent.auto_config: No servers successfully responded to the auto-encrypt request
+
+
+  # Exposes the servers' gossip and RPC ports as hostPorts. To enable a client
+  # agent outside of the k8s cluster to join the datacenter, you would need to
+  # enable `server.exposeGossipAndRPCPorts`, `client.exposeGossipPorts`, and
+  # set `server.ports.serflan.port` to a port not being used on the host. Since
+  # `client.exposeGossipPorts` uses the hostPort 8301,
+  # `server.ports.serflan.port` must be set to something other than 8301.
+  exposeGossipAndRPCPorts: false
