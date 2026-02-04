@@ -320,6 +320,47 @@ note that
 
 
 
+
+
+
+datacenter = "central-primary-infra"
+node_name  = "envoy-edge-01"
+data_dir   = "/opt/consul"
+
+client_addr = "0.0.0.0"
+
+
+ports {
+  http  = 8500
+  grpc = 8502          # <--- ESSENCIAL (xDS)
+  https = 8501         # se estiver usando HTTPS (ACL/TLS)
+}
+
+retry_join = ["10.19.143.87"]
+
+#connect {
+#  enabled = true
+#}
+
+#auto_encrypt = {
+ # tls = true
+#}
+tls {
+  defaults {
+    ca_file = "/etc/envoy/tls/consul-ca.pem"
+    verify_incoming = false
+    verify_outgoing = true
+    verify_server_hostname = true
+  }
+
+  internal_rpc {
+    verify_server_hostname = true
+  }
+}
+
+
+
+
 root@klusterx-envoyingress-01:/etc/consul.d# cat  logging
 Feb 04 14:59:34 klusterx-envoyingress-01 consul[4443]: 2026-02-04T14:59:34.694Z [INFO]  agent.client.memberlist.lan: memberlist: Suspect klusterx-worker-infra-05 has failed, no acks received
 Feb 04 14:59:35 klusterx-envoyingress-01 consul[4443]: 2026-02-04T14:59:35.846Z [ERROR] agent.client: RPC failed to server: method=ConfigEntry.ResolveServiceConfig server=10.244.5.248:8300 error="rpc error getting client: failed to get conn: dial tcp <nil>->10.244.5.248:8300: i/o timeout"
