@@ -261,6 +261,56 @@ Feb 03 18:53:05 klusterx-envoyingress-01 consul[210792]: 2026-02-03T18:53:05.273
   # agent outside of the k8s cluster to join the datacenter, you would need to
   # enable `server.exposeGossipAndRPCPorts`, `client.exposeGossipPorts`, and
   # set `server.ports.serflan.port` to a port not being used on the host. Since
-  # `client.exposeGossipPorts` uses the hostPort 8301,
-  # `server.ports.serflan.port` must be set to something other than 8301.
-  exposeGossipAndRPCPorts: false
+
+
+---------------
+
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:08.036Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:08.036Z [ERROR] agent.anti_entropy: failed to sync remote state: error="No known Consul servers"
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:08.603Z [WARN]  agent: (LAN) couldn't join: number_of_nodes=0
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   error=
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   | 1 error occurred:
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   | \t* Failed to join 10.19.143.87:8301: dial tcp 10.19.143.87:8301: connect: no route to host
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   |
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:08.603Z [WARN]  agent: Join cluster failed, will retry: cluster=LAN retry_interval=30s
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   error=
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   | 1 error occurred:
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   | \t* Failed to join 10.19.143.87:8301: dial tcp 10.19.143.87:8301: connect: no route to host
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   |
+Feb 04 10:46:08 klusterx-envoyingress-01 consul[3162]:   
+Feb 04 10:46:10 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:10.403Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:11 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:11.173Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:15 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:15.197Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="dial tcp 127.0.0.1:21000: connect: connection refused"
+Feb 04 10:46:15 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:15.197Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+Feb 04 10:46:15 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:15.266Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:15 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:15.640Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:18 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:18.344Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:23 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:23.959Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:25 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:25.197Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="dial tcp 127.0.0.1:21000: connect: connection refused"
+Feb 04 10:46:25 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:25.197Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+Feb 04 10:46:27 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:27.398Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:30 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:30.005Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:33 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:33.222Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:33 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:33.222Z [ERROR] agent.anti_entropy: failed to sync remote state: error="No known Consul servers"
+Feb 04 10:46:35 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:35.198Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="dial tcp 127.0.0.1:21000: connect: connection refused"
+Feb 04 10:46:35 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:35.198Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+Feb 04 10:46:38 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:38.604Z [INFO]  agent: (LAN) joining: lan_addresses=["10.19.143.87"]
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:41.691Z [WARN]  agent: (LAN) couldn't join: number_of_nodes=0
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   error=
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   | 1 error occurred:
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   | \t* Failed to join 10.19.143.87:8301: dial tcp 10.19.143.87:8301: connect: no route to host
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   |
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:41.691Z [WARN]  agent: Join cluster failed, will retry: cluster=LAN retry_interval=30s
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   error=
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   | 1 error occurred:
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   | \t* Failed to join 10.19.143.87:8301: dial tcp 10.19.143.87:8301: connect: no route to host
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   |
+Feb 04 10:46:41 klusterx-envoyingress-01 consul[3162]:   
+Feb 04 10:46:44 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:44.256Z [WARN]  agent.router.manager: No servers available
+Feb 04 10:46:45 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:45.198Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="dial tcp 127.0.0.1:21000: connect: connection refused"
+Feb 04 10:46:45 klusterx-envoyingress-01 consul[3162]: 2026-02-04T10:46:45.198Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+lines 11-32/50 57%
+
+note that 
