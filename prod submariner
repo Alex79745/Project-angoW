@@ -333,4 +333,42 @@ spec:
     - name: gossip-udp
       port: 8301
       protocol: UDP
+kubectl apply -f serviceexport.yaml
+
+--------------------------------
+kubectl get serviceexports -n consul
+spoke 
+kubectl get serviceimports -n consul
+ consul-gossip.consul.svc.clusterset.local
+kubectl get multiclusterservices -A
+# Primeiro, cria o serviço manualmente se o Helm falhou:
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul-gossip
+  namespace: consul
+spec:
+  selector:
+    app: consul
+    component: server
+  ports:
+  - name: gossip-tcp
+    port: 8301
+    protocol: TCP
+  - name: gossip-udp
+    port: 8301
+    protocol: UDP
+EOF
+
+# Agora exporta para o Submariner:
+kubectl apply -f - <<EOF
+apiVersion: submariner.io/v1alpha1
+kind: ServiceExport
+metadata:
+  name: consul-gossip
+  namespace: consul
+EOF
+
+
 
