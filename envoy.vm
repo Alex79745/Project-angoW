@@ -435,3 +435,57 @@ root@klusterx-envoyingress-01:~# ip route get 10.244.5.128
 root@klusterx-envoyingress-01:~# ip route get 10.244.5.187
 10.244.5.187 via 10.19.143.1 dev enp6s18 src 10.19.143.93 uid 0 
     cache 
+
+
+-------------
+
+cat CiliumBGPAdvertisement.yaml
+
+
+apiVersion: cilium.io/v2
+kind: CiliumBGPClusterConfig
+metadata:
+  name: bgp-config
+spec:
+  nodeSelector:
+    matchLabels:
+      cilium-bgp: "enabled"
+  bgpInstances:
+    - name: "instance-64513"
+      localASN: 64513
+      peers:
+        - name: "proxmox-host"
+          peerASN: 64512
+          peerAddress: "10.19.143.94"
+          peerConfigRef:
+            name: "proxmox-peer-config"
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPPeerConfig
+metadata:
+  name: "proxmox-peer-config"
+spec:
+  families:
+    - afi: ipv4
+      safi: unicast
+      advertisements:
+        matchLabels:
+          advertise: "true"   # selects CiliumBGPAdvertisement below
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPAdvertisement
+metadata:
+  name: "bgp-advertisements"
+  labels:
+    advertise: "true"
+spec:
+  advertisements:
+    - advertisementType: "Service"
+      service:
+        addresses:
+          - "LoadBalancerIP"
+      selector:
+        matchLabels:
+          advertise: "true"
+
+
