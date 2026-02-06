@@ -573,4 +573,21 @@ PAA3LIS@LIS-C-002L2 MINGW64 ~
 $  Kubectl exec -it -n kube-system ds/cilium -- cilium bgp peers
 Local AS   Peer AS   Peer Address       Session       Uptime     Family         Received   Advertised
 64513      64512     10.19.143.94:179   established   47h16m4s   ipv4/unicast   0          2
+----
+
+$ Kubectl exec -it -n kube-system ds/cilium -- ip route | grep default
+default via 10.19.143.1 dev eth0 proto static metric 1024
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ Kubectl exec -it -n kube-system ds/cilium -- ip route replace 10.19.143.94/32 via 10.19.143.1 dev eth0 src 10.12.19.143.66
+Error: inet address is expected rather than "10.12.19.143.66".
+command terminated with exit code 1
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ Kubectl exec -it -n kube-system ds/cilium -- ip route replace 10.19.143.94/32 via 10.19.143.1 dev eth0 src 10.12.19.143.66/32
+Error: inet address is expected rather than "10.12.19.143.66/32".
+command terminated with exit code 1
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ Kubectl exec -it -n kube-system ds/cilium -- ip route replace 10.19.143.94/32 via 10.19.143.1 dev eth0 src 10.12.19.143.66/32
 
