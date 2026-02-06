@@ -509,4 +509,13 @@ klusterx-worker-infra-02 10.244.1.0/24
 klusterx-worker-infra-04 10.244.5.0/24
 klusterx-worker-infra-05 10.244.3.0/24
 Found 5 pods, using pod/cilium-d5jb4
+---
+
+kubectl label nodes \
+  klusterx-control-infra-01 \
+  klusterx-worker-infra-01 \
+  klusterx-worker-infra-02 \
+  klusterx-worker-infra-04 \
+  klusterx-worker-infra-05 \
+  cilium-bgp=enabled
 
