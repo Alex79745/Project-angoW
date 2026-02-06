@@ -500,4 +500,13 @@ The CiliumBGPAdvertisement "bgp-advertisements" is invalid:
 kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.spec.podCIDR}{"\n"}{end}'
 
 kubectl -n kube-system logs ds/cilium | grep -i podcidr
+kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.spec.podCIDR}{"\n"}{end}'
+
+kubectl -n kube-system logs ds/cilium | grep -i podcidr
+klusterx-control-infra-01 10.244.0.0/24
+klusterx-worker-infra-01 10.244.4.0/24
+klusterx-worker-infra-02 10.244.1.0/24
+klusterx-worker-infra-04 10.244.5.0/24
+klusterx-worker-infra-05 10.244.3.0/24
+Found 5 pods, using pod/cilium-d5jb4
 
