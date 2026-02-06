@@ -499,4 +499,5 @@ The CiliumBGPAdvertisement "bgp-advertisements" is invalid:
 
 kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.spec.podCIDR}{"\n"}{end}'
 
+kubectl -n kube-system logs ds/cilium | grep -i podcidr
 
