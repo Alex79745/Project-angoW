@@ -519,3 +519,58 @@ kubectl label nodes \
   klusterx-worker-infra-05 \
   cilium-bgp=enabled
 
+.-----
+ Kubectl exec -it -n kube-system ds/cilium -- cilium bgp routes advertised ipv4 unicast
+VRouter   Peer           Prefix             NextHop        Age         Attrs
+64513     10.19.143.94   10.19.143.100/32   10.19.143.67   331h9m46s   [{Origin: i} {AsPath: 64513} {Nexthop: 10.19.143.67}]
+64513     10.19.143.94   10.244.4.0/24      10.19.143.67   27m52s      [{Origin: i} {AsPath: 64513} {Nexthop: 10.19.143.67}]
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ vim CiliumBGPAdvertisement.yaml
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ Kubectl exec -it -n kube-system ds/cilium -- cilium ip route get 10.19.143.94
+Manage IP addresses and associated information
+
+Usage:
+  cilium-dbg ip [command]
+
+Available Commands:
+  get         Display IP Cache information
+  list        List IP addresses in the userspace IPcache
+
+Flags:
+  -h, --help   help for ip
+
+Global Flags:
+      --config string        Config file (default is $HOME/.cilium.yaml)
+  -D, --debug                Enable debug messages
+  -H, --host string          URI to server-side API
+      --log-driver strings   Logging endpoints to use (example: syslog)
+      --log-opt map          Log driver options (example: format=json)
+
+Use "cilium-dbg ip [command] --help" for more information about a command.
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ Kubectl exec -it -n kube-system ds/cilium -- ip route get 10.19.143.94
+10.19.143.94 dev eth0 src 10.19.143.67 uid 0
+    cache
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ vim CiliumBGPAdvertisement.yaml
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ Kubectl exec -it -n kube-system ds/cilium -- ip route get 10.19.143.66
+10.19.143.66 dev eth0 src 10.19.143.67 uid 0
+    cache
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ Kubectl exec -it -n kube-system ds/cilium -- ip route get 10.19.143.67
+local 10.19.143.67 dev lo table local src 10.19.143.67 uid 0
+    cache <local>
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$  Kubectl exec -it -n kube-system ds/cilium -- cilium bgp peers
+Local AS   Peer AS   Peer Address       Session       Uptime     Family         Received   Advertised
+64513      64512     10.19.143.94:179   established   47h16m4s   ipv4/unicast   0          2
+
