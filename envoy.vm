@@ -487,5 +487,13 @@ spec:
       selector:
         matchLabels:
           advertise: "true"
+----
+ kubectl apply -f  CiliumBGPAdvertisement.yaml
+ciliumbgpclusterconfig.cilium.io/bgp-config unchanged
+ciliumbgppeerconfig.cilium.io/proxmox-peer-config unchanged
+The CiliumBGPAdvertisement "bgp-advertisements" is invalid:
+* spec.advertisements[1].advertisementType: Unsupported value: "podCIDR": supported values: "PodCIDR", "CiliumPodIPPool", "Service"
+* <nil>: Invalid value: null: some validation rules were not checked because the object was invalid; correct the existing errors to complete validation
+
 
 
