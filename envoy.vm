@@ -412,3 +412,26 @@ Feb 04 14:59:55 klusterx-envoyingress-01 consul[4443]: 2026-02-04T14:59:55.863Z 
 Feb 04 14:59:57 klusterx-envoyingress-01 consul[4443]: 2026-02-04T14:59:57.106Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="dial tcp 127.0.0.1:21000: connect: connection refused"
 Feb 04 14:59:57 klusterx-envoyingress-01 consul[4443]: 2026-02-04T14:59:57.106Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
 Feb 04 14:59:58 klusterx-envoyingress-01 consul[4443]: 2026-02-04T14:59:58.696Z [INFO]  agent.client.memberlist.lan: memberlist: Suspect consul-server-2 has failed, no acks received
+--------------------------------------------------
+
+
+
+onsul-server-0           10.244.5.142:8301  alive   server  1.22.2  2         central-primary-infra  default    <all>
+consul-server-1           10.244.1.128:8301  alive   server  1.22.2  2         central-primary-infra  default    <all>
+consul-server-2           10.244.3.187:8301  alive   server  1.22.2  2         central-primary-infra  default    <all>
+envoy-edge-01             10.19.143.93:8301  alive   client  1.22.2  2         central-primary-infra  default    <default>
+klusterx-worker-infra-01  10.244.4.15:8301   failed  client  1.22.2  2         central-primary-infra  default    <default>
+klusterx-worker-infra-02  10.244.1.171:8301  alive   client  1.22.2  2         central-primary-infra  default    <default>
+klusterx-worker-infra-04  10.244.5.236:8301  alive   client  1.22.2  2         central-primary-infra  default    <default>
+klusterx-worker-infra-05  10.244.3.5:8301    alive   client  1.22.2  2         central-primary-infra  default    <default>
+root@klusterx-envoyingress-01:~# ip route 10.244.5.142
+Command "10.244.5.142" is unknown, try "ip route help".
+root@klusterx-envoyingress-01:~# ip route get 10.244.5.142
+10.244.5.142 via 10.19.143.1 dev enp6s18 src 10.19.143.93 uid 0 
+    cache 
+root@klusterx-envoyingress-01:~# ip route get 10.244.5.128
+10.244.5.128 via 10.19.143.1 dev enp6s18 src 10.19.143.93 uid 0 
+    cache 
+root@klusterx-envoyingress-01:~# ip route get 10.244.5.187
+10.244.5.187 via 10.19.143.1 dev enp6s18 src 10.19.143.93 uid 0 
+    cache 
