@@ -495,5 +495,8 @@ The CiliumBGPAdvertisement "bgp-advertisements" is invalid:
 * spec.advertisements[1].advertisementType: Unsupported value: "podCIDR": supported values: "PodCIDR", "CiliumPodIPPool", "Service"
 * <nil>: Invalid value: null: some validation rules were not checked because the object was invalid; correct the existing errors to complete validation
 
+----
+
+kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.spec.podCIDR}{"\n"}{end}'
 
 
