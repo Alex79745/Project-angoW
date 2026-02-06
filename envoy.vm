@@ -587,6 +587,12 @@ PAA3LIS@LIS-C-002L2 MINGW64 ~
 $ Kubectl exec -it -n kube-system ds/cilium -- ip route replace 10.19.143.94/32 via 10.19.143.1 dev eth0 src 10.12.19.143.66/32
 Error: inet address is expected rather than "10.12.19.143.66/32".
 command terminated with exit code 1
+----
+
+ Kubectl exec -it -n kube-system ds/cilium -- ip route replace 10.19.143.94/32 via 10.19.143.1 dev eth0 src 10.19.143.66
+Error: Invalid prefsrc address.
+command terminated with exit code 2
+
 
 PAA3LIS@LIS-C-002L2 MINGW64 ~
 $ Kubectl exec -it -n kube-system ds/cilium -- ip route replace 10.19.143.94/32 via 10.19.143.1 dev eth0 src 10.12.19.143.66/32
