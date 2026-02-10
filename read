@@ -585,3 +585,115 @@ Wildcard	Automated global service documentation.	"The system self-documents ever
 Final Step for You
 When you meet the Azure Architect on the 20th, show the Consul UI on the Central Hub. Switch to the "Peers" tab and show client-01 as Active. Then show that all services from that client are visible in the catalog.
 
+---------------
+
+ cat  gateway-api-rules.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: hub-ui-gateway
+  namespace: kube-system
+  labels:
+      advertise: "true"
+
+  annotations:
+    service.beta.kubernetes.io/cilium-loadbalancer-ipam-ips: "10.19.143.74"
+
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - name: tls
+    port: 443
+    protocol: TLS
+    hostname: "*.de.bosch.com"
+    tls:
+      mode: Passthrough
+
+    allowedRoutes:
+      namespaces:
+        from: All
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: clusters-ui-gateway
+  namespace: kube-system
+  labels:
+      advertise: "true"
+
+  annotations:
+    service.beta.kubernetes.io/cilium-loadbalancer-ipam-ips: "10.19.143.82"
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - name: tls
+    port: 443
+    protocol: TLS
+    hostname: "*.clusters.de.bosch.com"
+    tls:
+      mode: Passthrough
+
+    allowedRoutes:
+      namespaces:
+        from: All
+
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ cat gateway-UI-routes.yaml
+apiVersion: gateway.networking.k8s.io/v1alpha2
+
+kind: TLSRoute
+metadata:
+  name: consul-ui
+  namespace: consul
+spec:
+  parentRefs:
+  - name: hub-ui-gateway
+    namespace: kube-system
+  hostnames:
+  - consul-klusterx.de.bosch.com
+  rules:
+  - backendRefs:
+    - name: consul-ui
+      port: 443
+---
+
+
+apiVersion: gateway.networking.k8s.io/v1alpha2
+
+kind: TLSRoute
+metadata:
+  name: rancher
+  namespace: cattle-system
+spec:
+  parentRefs:
+  - name: hub-ui-gateway
+    namespace: kube-system
+  hostnames:
+  - rancher-klusterx.de.bosch.com
+  rules:
+  - backendRefs:
+    - name: rancher
+      port: 443
+
+---
+
+
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: remote-clusters
+  namespace: consul
+spec:
+  parentRefs:
+  - name: clusters-ui-gateway
+    namespace: kube-system
+  hostnames:
+  - "*.clusters.de.bosch.com"
+  rules:
+  - backendRefs:
+    - name: consul-mesh-gateway
+      port: 8443
+
+
