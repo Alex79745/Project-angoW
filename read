@@ -695,5 +695,36 @@ spec:
   - backendRefs:
     - name: consul-mesh-gateway
       port: 8443
+----
 
+
+                ┌──────────────┐
+DNS ───────────▶│   LB-HUB     │────────────┐
+                └──────────────┘            │
+                                            ▼
+                                    ┌─────────────────┐
+                                    │ Hub Gateway     │
+                                    │ (TLS Passthru)  │
+                                    └─────────────────┘
+                                            │
+                           ┌────────────────┼────────────────┐
+                           ▼                ▼                ▼
+                     Consul UI         Rancher UI      Mesh Gateways
+                     (Hub)             (Hub)           (Hub)
+                                            ▲
+                                            │
+                ┌──────────────┐            │
+DNS ───────────▶│  LB-SPOKES   │────────────┘
+                └──────────────┘
+                        │
+                        ▼
+              ┌─────────────────────┐
+              │ Spoke Gateway       │
+              │ (TLS Passthru)      │
+              └─────────────────────┘
+                        │
+        ┌───────────────┼─────────────────┐
+        ▼               ▼                 ▼
+     GitLab           GitHub          Other Apps
+   (Spoke 1)         (Spoke 2)        (Spoke 3)
 
