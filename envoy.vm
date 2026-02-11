@@ -591,3 +591,46 @@ command terminated with exit code 2
 Error: Invalid prefsrc address.
 command terminated with exit code 2
 
+-----
+
+6-02-11T10:22:06.501Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+6-02-11T10:22:10.789Z [ERROR] agent.client: RPC failed to server: method=ConnectCA.Sign server=10.244.5.218:8300 error>
+6-02-11T10:22:10.789Z [WARN]  agent.leaf-certs: handling error in Manager.Notify: error="rpc error making call: rpc er>
+6-02-11T10:22:16.502Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="d>
+6-02-11T10:22:16.502Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+6-02-11T10:22:26.503Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="d>
+6-02-11T10:22:26.503Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+6-02-11T10:22:36.504Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="d>
+6-02-11T10:22:36.504Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+6-02-11T10:22:46.505Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="d>
+6-02-11T10:22:46.505Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+6-02-11T10:22:47.481Z [ERROR] agent.client: RPC failed to server: method=Catalog.Register server=10.244.3.65:8300 erro>
+6-02-11T10:22:47.483Z [WARN]  agent: Service registration blocked by ACLs: service=edge-proxy-01 accessorID=a18dae1e-b>
+6-02-11T10:22:47.484Z [ERROR] agent.client: RPC failed to server: method=Catalog.Register server=10.244.1.7:8300 error>
+6-02-11T10:22:47.485Z [WARN]  agent: Service registration blocked by ACLs: service=edge-proxy-01-sidecar-proxy accesso>
+6-02-11T10:22:56.506Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="d>
+6-02-11T10:22:56.506Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+6-02-11T10:23:06.507Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="d>
+6-02-11T10:23:06.507Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+6-02-11T10:23:16.508Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="d>
+6-02-11T10:23:16.508Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+6-02-11T10:23:24.987Z [ERROR] agent.client: RPC failed to server: method=ConnectCA.Sign server=10.244.5.218:8300 error>
+6-02-11T10:23:24.987Z [WARN]  agent.leaf-certs: handling error in Manager.Notify: error="rpc error making call: rpc er>
+6-02-11T10:23:26.508Z [WARN]  agent: Check TCP connection failed: check=service:edge-proxy-01-sidecar-proxy:1 error="d>
+6-02-11T10:23:26.508Z [WARN]  agent: Check is now critical: check=service:edge-proxy-01-sidecar-proxy:1
+root@klusterx-envoyingress-01:/etc/consul.d# journalctl -u consul
+enied: token with AccessorID 'a18dae1e-bdc5-7f35-a254-98c5da7adafc' lacks permission 'service:write' on \"edge-proxy\>
+a18dae1e-bdc5-7f35-a254-98c5da7adafc' lacks permission 'service:write' on \"edge-proxy\"" index=1
+
+
+
+
+rID 'a18dae1e-bdc5-7f35-a254-98c5da7adafc' lacks permission 'service:write' on \"edge-proxy\"" index=0
+peering-trust-bundles error="error filling agent cache: rpc error: code = Unknown desc = Permission denied: token with>
+
+
+ denied: token with AccessorID 'a18dae1e-bdc5-7f35-a254-98c5da7adafc' lacks permission 'service:write' on \"edge-proxy>
+
+ssorID 'a18dae1e-bdc5-7f35-a254-98c5da7adafc' lacks permission 'service:write' on \"edge-proxy-sidecar-proxy\""
+
+
