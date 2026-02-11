@@ -725,3 +725,22 @@ root@klusterx-envoyingress-01:/etc/consul.d# sudo consul connect envoy \
   -token 5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2 \
   -admin-bind 127.0.0.1:19000
 Envoy version 1.32.x is not supported. If there is a reason you need to use this version of envoy use the ignore-envoy-compatibility flag. Using an unsupported version of Envoy is not recommended and your experience may vary. For more information on compatibility see https://developer.hashicorp.com/consul/docs/connect/proxies/envoy#envoy-and-consul-client-agent
+----
+
+
+
+              [EDGE ENVOY]  ← single VM (or HA pair)
+                    |
+            Consul xDS (Dynamic config)
+                    |
+   --------------------------------------------------
+   |                     |                          |
+[HUB Consul DC]     [SPOKE1 DC]                [SPOKE2 DC]
+   |                     |                          |
+ Services + LBs    Services + LBs            Services + LBs
+   |                     |                          |
+  registered → Consul Catalog (via Consul K8s sync)
+                    |
+          Consul creates dynamic upstreams
+                    |
+       EDGE ENVOY receives SNI → routes dynamically
