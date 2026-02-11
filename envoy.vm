@@ -744,3 +744,18 @@ Envoy version 1.32.x is not supported. If there is a reason you need to use this
           Consul creates dynamic upstreams
                     |
        EDGE ENVOY receives SNI → routes dynamically
+
+
+
+----------------------------------------------------------------
+
+         Consul OSS Server (hub)
+                  ↗︎         ↑       ↖︎
+    Hub Services (LBs) → Catalog → Config Entries → xDS
+                  ↘︎         ↑       ↙︎ 
+                 Spokes (via mesh gateways)
+
+                             ↓  (ADS/xDS)
+                    External VM Envoy (Ingress)
+                             ↓
+                     Internet / Users
