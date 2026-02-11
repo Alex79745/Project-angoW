@@ -716,3 +716,12 @@ static_resources:
         "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
         sni: www.envoyproxy.io
 
+---
+https://developer.hashicorp.com/consul/docs/connect/proxies/envoy#envoy-and-consul-client-agent
+
+wn fields
+root@klusterx-envoyingress-01:/etc/consul.d# sudo consul connect envoy \
+  -sidecar-for edge-proxy-01 \
+  -token 5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2 \
+  -admin-bind 127.0.0.1:19000
+Envoy version 1.32.x is not supported. If there is a reason you need to use this version of envoy use the ignore-envoy-compatibility flag. Using an unsupported version of Envoy is not recommended and your experience may vary. For more information on compatibility see https://developer.hashicorp.com/consul/docs/connect/proxies/envoy#envoy-and-consul-client-agent
