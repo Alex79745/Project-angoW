@@ -638,5 +638,22 @@ iled: check=service:edge-proxy-01-sidecar-proxy:1 error="dial tcp 127.0.0.1:2100
  check=service:edge-proxy-01-sidecar-proxy:1
 ailed: check=service:edge-proxy-01-sidecar-proxy:1 error="dial tcp 127.0.0.1:21000: connect: connection refused"
  check=service:edge-proxy-01-sidecar-proxy:1
+---
+
+cat >/etc/consul.d/edge-proxy.json <<'EOF'
+{
+  "service": {
+    "name": "edge-proxy",
+    "id": "edge-proxy-01",
+    "connect": { "sidecar_service": {} }
+  }
+}
+EOF
+sudo systemctl restart consul
+
+sudo -E $(command -v consul) connect envoy \
+  -bootstrap=/etc/envoy/envoy-bootstrap.json \
+  -token "5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2" \
+  -sidecar-for=edge-proxy-01
 
 
