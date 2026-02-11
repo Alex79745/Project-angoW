@@ -632,5 +632,11 @@ peering-trust-bundles error="error filling agent cache: rpc error: code = Unknow
  denied: token with AccessorID 'a18dae1e-bdc5-7f35-a254-98c5da7adafc' lacks permission 'service:write' on \"edge-proxy>
 
 ssorID 'a18dae1e-bdc5-7f35-a254-98c5da7adafc' lacks permission 'service:write' on \"edge-proxy-sidecar-proxy\""
+----
+
+iled: check=service:edge-proxy-01-sidecar-proxy:1 error="dial tcp 127.0.0.1:21000: connect: connection refused"
+ check=service:edge-proxy-01-sidecar-proxy:1
+ailed: check=service:edge-proxy-01-sidecar-proxy:1 error="dial tcp 127.0.0.1:21000: connect: connection refused"
+ check=service:edge-proxy-01-sidecar-proxy:1
 
 
