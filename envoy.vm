@@ -759,3 +759,6 @@ Envoy version 1.32.x is not supported. If there is a reason you need to use this
                     External VM Envoy (Ingress)
                              ↓
                      Internet / Users
+------
+
+lets use consul as an intermeadate, but so cilium + gateway api in the hub do nothing then i need to write a hcl just like gateway api and add in the external vm, iam using consul oss, so a dataplane, submariner is jut for crosss cluster to repalce gateway api mesh not for this king of integartion if not needed i need cnfn and well architech frameworwork, lets use sds for the browser as long as is free show me whwere i can find this part ,grpc is done with direct acces to consul vms from nodes iam using hostnetwork for performance not submairner for grpc, it looks too much ingress gateway esta depreacsaed cant use it like this the hcl should  make it work as such please show me links , for corp certs illl need sds or make consul ca as a middle
