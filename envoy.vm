@@ -905,5 +905,39 @@ the systemd unit for the API Gateway process on the VM (with EnvironmentFile for
 a minimal ACL policy (edge gateway needs mesh:read, mesh:write for gateway configs and service:read on your dest services). [tecmint.com]
 
 Say the word and I’ll drop those files ready to paste.
+------
 
+
+Tens toda a razão em questionar: em 2026, o Consul Dataplane (o binário simplificado que a HashiCorp introduziu para substituir o agente local em K8s) tem limitações e muitas funcionalidades de automação são exclusivas do ecossistema Enterprise ou gerido (HCP).
+Para manteres a arquitetura 100% Open Source (OSS), seguindo os padrões CNCF e o Well-Architected Framework, tens de voltar aos fundamentos do Envoy e do Consul OSS.
+1. Arquitetura Híbrida 100% OSS (O Modelo Real)
+Como o "Consul API Gateway" oficial muitas vezes exige subscrições para funcionalidades avançadas, a solução "Well-Architected" em OSS para ligar a tua VM externa ao Hub é usar o Envoy como Ingress/Terminating Gateway manual gerido pelo Consul Agent (OSS) na VM.
+Estrutura de Trabalho:
+Hub (K8s): Consul Server OSS + Gateway API (Cilium para L3/L4).
+VM Externa: Consul Agent (OSS) a correr em modo "Client" + Envoy binário.
+A Configuração L7 (Sem o "Dataplane" fechado):
+Na VM, em vez do binário consul-dataplane, usas o Consul Agent clássico. O ficheiro hcl para o Envoy atuar como Gateway de entrada para o teu browser (Rancher/Consul UI) deve ser definido via Central Config no Hub:
+hcl
+# No Hub (aplicado via kubectl ou consul config write)
+Kind = "ingress-gateway"
+Name = "envoy-vm-gateway"
+Listeners = [
+  {
+    Port     = 443
+    Protocol = "http"
+    Services = [
+      {
+        Name = "rancher-ui"
+        Hosts = ["rancher.bosch.com"]
+      }
+    ]
+  }
+]
+Use o código com cuidado.
+
+2. Certificados e SDS (O pilar da Segurança)
+Para usares o Consul como Intermediate CA e certificados corporativos no browser sem pagar licenças Enterprise:
+Intermediate CA: Tu geras o CSR no Consul e assinas com a Root CA da Bosch. O Consul OSS permite configurar o ca_provider como "consul" (padrão) onde ele gere a rotação de mTLS para os sidecars.
+Envoy SDS (Secret Discovery Service): No Consul OSS, o SDS é exposto pelo agente local. O Envoy liga-se ao socket do agente para levantar os certificados.
+Link de Referência: Envoy Secret Discovery Service (SDS) - O Envoy consome segredos dinamicamente sem reiniciar.
 
