@@ -964,3 +964,17 @@ Edge VM Envoy (API Gateway)
 Consul Servers
   ↓ Config Entries
 Consul Catalog / Mesh
+Browser
+  ↓ HTTPS (corp cert)
+Edge VM Envoy (API Gateway)
+  ↓ xDS subscription (gRPC 8502)
+Consul Servers
+  ↓ Config Entries
+Consul Catalog / Mesh
+Layer	Responsibility
+DNS	Points hostnames to edge VM
+VM Envoy (API Gateway)	Browser TLS + host routing
+Consul Config Entries	Declarative routing intent
+Consul Mesh	mTLS, service identity
+Cilium Gateway API	In-cluster ingress only
+Submariner	East-west pod networking
