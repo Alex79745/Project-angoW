@@ -1354,3 +1354,119 @@ the Node IP + NodePort you want to standardize (for A), and
 the LB IP + hostname you want for SNI (for B),
 
 I’ll ship the exact files ready to paste and a 1‑command verification script.
+
+##################################################
+ote i cant use one lb per cluster for b i have i wild card so the same lb for both svc or all hub ones cat gateway-UI-routes.yaml
+apiVersion: gateway.networking.k8s.io/v1alpha2
+
+kind: TLSRoute
+metadata:
+  name: consul-ui
+  namespace: consul
+spec:
+  parentRefs:
+  - name: hub-ui-gateway
+    namespace: kube-system
+  hostnames:
+  - consul-klusterx.de.bosch.com
+  rules:
+  - backendRefs:
+    - name: consul-ui
+      port: 443
+---
+
+
+apiVersion: gateway.networking.k8s.io/v1alpha2
+
+kind: TLSRoute
+metadata:
+  name: rancher
+  namespace: cattle-system
+spec:
+  parentRefs:
+  - name: hub-ui-gateway
+    namespace: kube-system
+  hostnames:
+  - rancher-klusterx.de.bosch.com
+  rules:
+  - backendRefs:
+    - name: rancher
+      port: 443
+
+---
+
+
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: remote-clusters
+  namespace: consul
+spec:
+  parentRefs:
+  - name: clusters-ui-gateway
+    namespace: kube-system
+  hostnames:
+  - "*.clusters.de.bosch.com"
+  rules:
+  - backendRefs:
+    - name: consul-mesh-gateway
+      port: 8443
+
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ cat gateway-api-rules.yam
+cat: gateway-api-rules.yam: No such file or directory
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ cat gateway-api-rules.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: hub-ui-gateway
+  namespace: kube-system
+  labels:
+      advertise: "true"
+
+  annotations:
+    service.beta.kubernetes.io/cilium-loadbalancer-ipam-ips: "10.19.143.74"
+
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - name: tls
+    port: 443
+    protocol: TLS
+    hostname: "*.de.bosch.com"
+    tls:
+      mode: Passthrough
+
+    allowedRoutes:
+      namespaces:
+        from: All
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: clusters-ui-gateway
+  namespace: kube-system
+  labels:
+      advertise: "true"
+
+  annotations:
+    service.beta.kubernetes.io/cilium-loadbalancer-ipam-ips: "10.19.143.82"
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - name: tls
+    port: 443
+    protocol: TLS
+    hostname: "*.clusters.de.bosch.com"
+    tls:
+      mode: Passthrough
+
+    allowedRoutes:
+      namespaces:
+        from: All
+
+i have a restriction of ips, for B, the issue is nodeport risk as it needs, so i want 2 lb, one for hub url and other 1 for other clusters, since with submariner i can register other spoke in consul i can have there svc , it would be good a way to direclly do it with just this i have lb restiction and nodeport not so good for prod as far as you know is is talos os on prem managed by omni, nodeport is risck when  it comes to security cnfc and well architech framework 
