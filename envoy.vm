@@ -1470,3 +1470,7 @@ spec:
         from: All
 
 i have a restriction of ips, for B, the issue is nodeport risk as it needs, so i want 2 lb, one for hub url and other 1 for other clusters, since with submariner i can register other spoke in consul i can have there svc , it would be good a way to direclly do it with just this i have lb restiction and nodeport not so good for prod as far as you know is is talos os on prem managed by omni, nodeport is risck when  it comes to security cnfc and well architech framework 
+---------------------------
+
+
+https://support.hashicorp.com/hc/en-us/articles/17617061260307-Understanding-Consul-Terminating-Gateway-Configurations-for-L4-L7-Traffic-Routing
