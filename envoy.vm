@@ -1507,5 +1507,114 @@ ExternalSNI = "rancher-klusterx.de.bosch.com"
 
 https://support.hashicorp.com/hc/en-us/articles/17617061260307-Understanding-Consul-Terminating-Gateway-Configurations-for-L4-L7-Traffic-Routing
 
+Kind      = "service-defaults"
+Name      = "<service_name>"
+Namespace = "default"
+Partition = "default"
+Meta = {
+  Key = "value"
+}
+Protocol                  = "tcp"
+BalanceInboundConnections = "exact_balance"
+Mode                      = "<mode for directing traffic>"
+RateLimits = {
+  InstanceLevel = {
+    RequestsPerSecond = <average number of requests allowed to the service per second>
+    RequestsMaxBurst = <max number of concurrent requests allowed to the service>
+    Routes = [      # Configure RequestsPerSecond and one route matching parameter for each member of the list
+      {
+        PathExact = "<limits apply paths that match this value>"
+        PathPrefix = "<limits apply to paths starting with this value>"
+        PathRegex = "<limits apply to paths that match this expression>"
+        RequestsPerSecond = <overrides top-level limit>
+        RequestMaxBurst = <overrides top-level limit>
+      }
+  ]
+}
+UpstreamConfig = {
+  Overrides = {
+    Name             = "<name of upstreams to override>"
+    Namespace        = "<namespace containing upstreams to override>"
+    Peer             = "<peer name of upstream service>"
+    Protocol         = "<protocol for requests to upstream services>"
+    ConnectTimeoutMs = 5000
+    MeshGateway = {
+      mode = "<mode for mesh gateway services>"
+    }
+    BalanceOutboundConnections = "exact_balance"
+    Limits = {
+      MaxConnections        = 0
+      MaxPendingRequests    = 0
+      MaxConcurrentRequests = 0
+    }
+    PassiveHealthCheck = {
+      Interval                = "0s"
+      MaxFailures             = 0
+      EnforcingConsecutive5xx = 100
+      MaxEjectionPercent      = 10
+      BaseEjectionTime        = "30s"
+    }
+  }
+  Defaults = {
+    Protocol         = "<default protocol for upstream traffic>"
+    ConnectTimeoutMs = 5000
+    MeshGateway = {
+      mode = "<default mode for mesh gateway services>"
+    }
+    BalanceOutboundConnections = "exact_balance"
+    Limits = {
+      MaxConnections        = 0
+      MaxPendingRequests    = 0
+      MaxConcurrentRequests = 0
+    }
+    PassiveHealthCheck = {
+      Interval                = "0s"
+      MaxFailures             = 0
+      EnforcingConsecutive5xx = 100
+      MaxEjectionPercent      = 10
+      BaseEjectionTime        = "30s"
+    }
+  }
+}
+TransparentProxy = {
+  OutboundListenerPort = 15001
+  DialedDirectly       = false
+}
+MutualTLSMode = "strict" # only supported when services are in transparent proxy mode
+EnvoyExtensions = [
+  {
+    Name = "<name of the extension>"
+    Required = `false`
+    Arguments = { <specific to each extension> }
+    ConsulVersion = "<Consul version constraint for applying the extension>"
+    EnvoyVersion = "<Envoy version constraint for applying the extension>"
+  }
+]
+Destination = {
+  Addresses = [
+    "<first IP address>",
+    "<second IP address>"
+  ]
+  Port = 0
+}
+MaxInboundConnections = 0
+MaxRequestHeadersKB = 96
+LocalConnectTimeoutMs = 5000
+LocalRequestTimeoutMs = "15s"
+MeshGateway = {
+  Mode = "<default mode for mesh gateway services>"
+}
+ExternalSNI = "<SNI server host>"
+Expose = {
+  Checks = false
+  Paths = [
+    {
+      Path          = "</local/dir>"
+      LocalPathPort = 0
+      LocalListenerPort = 0
+      Protocol      = "http"
+    }
+  ]
+}
 
-
+https://developer.hashicorp.com/consul/docs/reference/config-entry/service-defaults?
