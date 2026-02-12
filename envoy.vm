@@ -978,3 +978,283 @@ Consul Config Entries	Declarative routing intent
 Consul Mesh	mTLS, service identity
 Cilium Gateway API	In-cluster ingress only
 Submariner	East-west pod networking
+------------------------------------------------------------------------------
+#####################################################################
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+Perfect — this is the right direction, and your write-up is already very close to something you can defend technically and organizationally. I’ll do four things now:
+
+Validate and “lock” the architecture (what you proposed is sound, OSS-only, and future-proof)
+
+Correct / tighten the HCL where needed (small but important details)
+
+Clarify exactly how Envoy on the VM resolves URLs dynamically (no static config, 100+ hosts)
+
+Give you a short “defense narrative” you can use internally (why this is the right model)
+
+I’ll stay strictly within Consul OSS + CNCF + Well-Architected principles.
+
+1️⃣ Architecture validation (short answer: ✅ YES)
+
+What you described is exactly the intended Consul OSS north-south model today:
+
+✅ Consul API Gateway (not Ingress Gateway)
+
+✅ VM-based Envoy controlled by Consul xDS (8502)
+
+✅ Browser TLS terminated at the VM edge using file-system certificates
+
+✅ Mesh mTLS handled separately by Consul CA
+
+✅ Cilium Gateway API only for in-cluster traffic (not VM edge)
+
+✅ Submariner only for east-west pod networking
+
+This is:
+
+OSS-only
+
+CNCF-aligned
+
+Scales to 100+ clusters / URLs
+
+Operationally sane
+
+You are not mixing control planes. That’s the key thing many people get wrong.
+
+2️⃣ HCL review — important corrections & best practices
+
+Your HCL is mostly correct, but there are a few must-fix details.
+
+✅ File-system certificate — correct and recommended
+
+This part is perfect and production-ready:
+
+Kind        = "file-system-certificate"
+Name        = "edge-cert"
+
+Certificate = "/etc/consul.d/certs/edge-fullchain.pem"
+PrivateKey  = "/etc/consul.d/certs/edge.key"
+
+
+✔ Hot-reload
+✔ Corp PKI / ACME compatible
+✔ OSS-only
+
+No SDS needed. You’re correct.
+
+⚠️ API Gateway listener — small but important fix
+
+You wrote:
+
+Protocol = "http"
+TLS = { ... }
+
+
+That is correct for Consul API Gateway, but let me explain why, so you can defend it:
+
+In Consul API Gateway, Protocol = "http" + TLS {} means
+HTTPS is terminated at the gateway, and routing is HTTP-aware.
+
+So this is right. Do not change it to "https" — that would be wrong.
+
+✅ Keep:
+
+Kind = "api-gateway"
+Name = "edge-gw"
+
+Listeners = [{
+  Name     = "https443"
+  Port     = 443
+  Protocol = "http"
+
+  TLS = {
+    Certificates = [{
+      Kind = "file-system-certificate"
+      Name = "edge-cert"
+    }]
+  }
+}]
+
+⚠️ Routes — one critical best practice
+
+Your routes are syntactically fine, but best practice at scale is:
+
+Use one service per route
+
+Make sure each service has:
+
+a sidecar
+
+or is a gateway / terminating service
+
+Example (correct):
+
+Kind      = "http-route"
+Name      = "edge-consul-ui"
+
+Parents = [{
+  Kind        = "api-gateway"
+  Name        = "edge-gw"
+  SectionName = "https443"
+}]
+
+Hostnames = ["consul-klusterx.de.bosch.com"]
+
+Rules = [{
+  Services = [{
+    Name = "consul-ui"
+    Port = 443
+  }]
+}]
+
+
+⚠️ Important
+The target service (consul-ui, rancher, clusters-ui) must:
+
+Exist in the Consul catalog
+
+Be reachable from the gateway
+
+Have a sidecar or be a mesh gateway / terminating gateway
+
+If a service has no sidecar, routing will fail silently.
+
+✅ Wildcards for 100+ clusters — you did this right
+
+This is exactly how you scale:
+
+Hostnames = ["*.clusters.de.bosch.com"]
+
+
+DNS:
+
+*.clusters.de.bosch.com → EDGE_VM_IP
+
+
+Consul:
+
+One route
+
+One service
+
+Infinite hosts
+
+✔ This is how large platforms do it.
+
+3️⃣ How Envoy on the VM resolves URLs (no static config)
+
+This is the most important mental model, so I’ll be very explicit.
+
+What Envoy on the VM does NOT do
+
+❌ It does not read Kubernetes Gateway API
+❌ It does not have static listeners
+❌ It does not know about routes at startup
+
+What actually happens (step-by-step)
+Browser
+  ↓ HTTPS (corp cert)
+Edge VM Envoy (API Gateway)
+  ↓ xDS subscription (gRPC 8502)
+Consul Servers
+  ↓ Config Entries
+Consul Catalog / Mesh
+
+
+Envoy starts with a minimal bootstrap:
+
+where Consul is (8502)
+
+Envoy subscribes to xDS
+
+Consul sees:
+
+api-gateway/edge-gw
+
+http-route/*
+
+Consul pushes listeners + routes dynamically
+
+Envoy opens:
+
+:443
+
+routes based on Host header
+
+When you add a new hostname:
+
+consul config write new-route.hcl
+
+
+→ Envoy updates live, no restart
+
+This is exactly why this scales to 100+ URLs.
+
+No static Envoy config.
+No reloads.
+No downtime.
+
+4️⃣ Where each responsibility lives (clean separation)
+
+You can explain it like this internally:
+
+Layer	Responsibility
+DNS	Points hostnames to edge VM
+VM Envoy (API Gateway)	Browser TLS + host routing
+Consul Config Entries	Declarative routing intent
+Consul Mesh	mTLS, service identity
+Cilium Gateway API	In-cluster ingress only
+Submariner	East-west pod networking
+
+No overlap. No duplication. No confusion.
+
+This is Well-Architected by definition.
+
+5️⃣ One thing you should add next (production-safe)
+
+You hinted at it already — I’ll confirm:
+
+🔐 ACL policy for the edge gateway
+
+Your edge VM needs a token with:
+
+service_prefix "" {
+  policy = "read"
+}
+
+node_prefix "" {
+  policy = "read"
+}
+
+agent_prefix "" {
+  policy = "read"
+}
+
+mesh = "read"
+
+
+And write only if it registers itself.
+
+Do not reuse the default token.
+
+Final verdict (clear and honest)
+
+Your approach is correct
+
+You chose the right gateway (API Gateway, not Ingress)
+
+You avoided Kubernetes-VM control-plane mixing
+
+You designed for scale and clarity
+
+This is real platform engineering, not YAML cargo culting
+
+If you want next, I can:
+
+Give you a minimal systemd unit for the VM API Gateway
+
+Draw a one-page architecture diagram you can show management
+
+Help you write a short internal A
