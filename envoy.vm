@@ -793,6 +793,117 @@ Consul CA: Gere o mTLS de todos os clusters e VMs.
 Envoy SDS: Garante que o Browser (Corp Certs) vê a URL como segura sem intervenção manual.
 Submariner: Apenas para o "East-West" traffic entre Pods dos Spokes.
 Dica Prática: Se o Envoy na VM der erro ao ler os certificados via SDS, verifica as permissões do ficheiro /etc/corp-certs. O Consul Dataplane precisa de "ler" o token ACL para pedir esses segredos ao Hub.
+---
 
+Got it. Let’s lock a clean, OSS‑only, well‑architected path that uses:
+
+Consul API Gateway on the external VM (not Ingress Gateway; Ingress is deprecated), driven by Config Entries (HCL). [underconst...onpage.com]
+Your corporate browser TLS served at the edge from the VM via file‑system certificates (or inline), which supports hot reload; SDS for browser TLS exists but is an advanced pattern and not required to meet your goals. [tecmint.com], [docs.frankenlinux.de]
+Consul built‑in CA (or your Corp CA) for mesh mTLS to services; this is separate from the browser TLS at the edge. (Mesh mTLS certs are automatically delivered to sidecars/gateways via xDS; browser TLS must come from a real site certificate.) [deepwiki.com]
+Cilium + Gateway API in the hub does not program your VM Envoy. Keep Cilium for in‑cluster ingress if you want, but the VM edge is controlled by Consul API Gateway HCL, not by Kubernetes routes. [tecmint.com], [github.com]
+Submariner remains for east‑west inter‑cluster pod networking; it’s not needed for Consul’s control‑plane gRPC or for north‑south edge. (Consul’s xDS uses gRPC on 8502; you said you already expose it via hostNetwork.) [github.com]
+
+Below you’ll find: (1) the exact HCL you need (single file), (2) where to find the API Gateway and certificate docs, (3) how to think about SDS, and (4) what to do if you want Consul to act like a CA in your stack.
+
+1) What you will deploy (VM edge, OSS‑only)
+a) One HCL file (apply from the VM) that defines:
+
+a file‑system certificate (edge TLS) → the cert/key files on disk
+the API Gateway listener on :443 (terminates TLS for browsers)
+your HTTP routes (hosts → Consul services)
+
+
+This is the supported VM workflow for API Gateway; Ingress Gateway is deprecated. [tecmint.com], [underconst...onpage.com]
+
+Terraform# /etc/consul.d/edge-gw-all.hcl# 1) Browser TLS at the edge (free choice: corp CA, Let’s Encrypt). Hot-reload on file change.Kind        = "file-system-certificate"Name        = "edge-cert"Certificate = "/etc/consul.d/certs/edge-fullchain.pem"  # leaf + intermediate(s)PrivateKey  = "/etc/consul.d/certs/edge.key"            # private key# 2) API Gateway (VM) — the edge listener that Consul programs via xDS.Kind = "api-gateway"Name = "edge-gw"Listeners = [  {    Name     = "https443"    Port     = 443    Protocol = "http"   # terminate TLS for browsers; route by Hostnames below    TLS = {      Certificates = [        { Kind = "file-system-certificate", Name = "edge-cert" }      ]    }  }]# 3) Host-based routing (put as many hostnames as you want; use wildcards).# 3a) Consul UIKind      = "http-route"Name      = "edge-consul-ui"Parents   = [{ Kind = "api-gateway", Name = "edge-gw", SectionName = "https443" }]Hostnames = ["consul-klusterx.de.bosch.com"]Rules     = [ { Services = [ { Name = "consul-ui" } ] } ]# 3b) RancherKind      = "http-route"Name      = "edge-rancher"Parents   = [{ Kind = "api-gateway", Name = "edge-gw", SectionName = "https443" }]Hostnames = ["rancher-klusterx.de.bosch.com"]Rules     = [ { Services = [ { Name = "rancher" } ] } ]# 3c) Spokes (wildcard = scale to 100+ URLs)Kind      = "http-route"Name      = "edge-clusters"Parents   = [{ Kind = "api-gateway", Name = "edge-gw", SectionName = "https443" }]Hostnames = ["*.clusters.de.bosch.com"]Rules     = [ { Services = [ { Name = "clusters-ui" } ] } ]Show more lines
+Apply it (from the VM that can reach Consul servers):
+Shellconsul config write /etc/consul.d/edge-gw-all.hclShow more lines
+
+The config entries are now in Consul (see Config → Entries in the UI). [tecmint.com]
+The API Gateway process on the VM (Envoy) will subscribe via xDS gRPC 8502 and load the listener and routes dynamically. (You said gRPC over hostNetwork is done; perfect.) [tecmint.com], [github.com]
+
+
+Why this and not Ingress Gateway? Ingress Gateway is deprecated; API Gateway is the recommended north‑south solution and supports VM deployment entirely via Config Entries. [underconst...onpage.com], [tecmint.com]
+
+
+2) Where to find the official pieces (docs you asked for)
+
+
+API Gateway on VMs — deploy listeners (edge) and bind routes
+HashiCorp docs show how to create an api‑gateway entry on VMs and then attach http‑route / tcp‑route resources; this is the exact control‑plane you’re using above.
+– Deploy API gateway listeners to VMs 
+– Define API gateway routes on VMs (http‑route/tcp‑route reference) 
+– API Gateway configuration entry reference (VMs) [tecmint.com] [github.com], [developer....hicorp.com] [github.com], [developer....hicorp.com]
+
+
+Certificates for VM API Gateway (browser TLS)
+File‑system‑certificate (VM‑friendly, free and hot‑reload—point to files on disk, e.g., corp/ACME): 
+Inline‑certificate (embed PEMs in the config; works but less ideal at scale): [docs.frankenlinux.de] [sadikhasan.com]
+
+
+Ingress Gateway deprecation
+– Ingress gateway overview / deprecation note (use API Gateway instead) [underconst...onpage.com]
+
+
+Cilium / K8s Gateway API vs Consul (VM edge)
+The API Gateway VM path is Config Entry‑based and runs on VMs; K8s CRDs don’t program your VM Envoy. If you want the VM edge, you must use Consul Config Entries (like you did). [tecmint.com], [github.com]
+
+
+
+3) SDS (Secret Discovery Service) — what’s real and when to use it
+
+You do not need SDS to serve browser TLS on the VM edge. The file‑system‑certificate (or inline) is the documented, supported, and free way for API Gateway on VMs, with automatic file‑watch / hot‑reload of cert/key. It’s the simplest way to integrate Corp PKI or Certbot renewals. [docs.frankenlinux.de]
+There is an advanced SDS pattern for gateways—historically documented for Ingress Gateway—where the gateway fetches TLS secrets from an external SDS gRPC service. This is for custom integrations and is not required for your scenario. The practical/OSS path is file‑system‑certificate (VM) or inline-certificate. [boomi.my.site.com]
+
+
+If your Corp PKI team mandates SDS‑pull for keys from an HSM/KMS, that’s a custom integration. HashiCorp’s standard VM pattern remains file/inline certificates for API Gateway. [tecmint.com]
+
+
+4) Consul CA vs Corporate CA (who signs what?)
+
+Mesh mTLS (service‑to‑service): use Consul’s built‑in CA (default) or integrate with an external CA for mesh only. Consul distributes those mesh certs automatically to sidecars/gateways through the control plane; this is separate from browser TLS at the edge. [deepwiki.com]
+Browser TLS at edge (HTTPS): must come from a certificate browsers trust (Corp PKI or Let’s Encrypt). Consul API Gateway on VMs uses file‑system‑certificate to present that cert to clients. (Consul’s mesh CA is not used for public/browser TLS.) [tecmint.com]
+
+If your Corp CA wants Consul as an intermediate for mesh mTLS, that’s fine (CA‑for‑mesh). But for browser TLS, you still issue a normal site cert for consul‑…, rancher‑…, *.clusters… and drop those PEMs on the VM (or use ACME with DNS‑01 for the wildcard). [deepwiki.com]
+
+5) Next actions (you can execute now)
+
+
+Place your browser TLS certs on the VM (corp PKI or Let’s Encrypt DNS‑01 if wildcard). Use:
+
+/etc/consul.d/certs/edge-fullchain.pem (leaf + intermediate)
+/etc/consul.d/certs/edge.key (private key)
+The file‑system‑certificate will hot‑reload on changes. [docs.frankenlinux.de]
+
+
+
+Write the one HCL (above) and apply:
+Shellconsul config write /etc/consul.d/edge-gw-all.hclShow more lines
+– Confirm in Consul UI: Config → Entries shows api-gateway/edge-gw and your three http-routes. [tecmint.com]
+
+
+Run the gateway Envoy (API Gateway process) on the VM and expose :443.
+(In the next message I’ll give you a systemd unit + ACL policy so it’s production‑safe.)
+
+
+DNS: point consul‑klusterx…, rancher‑klusterx…, and *.clusters… to the edge VM IP; test with:
+Shellcurl -vk https://consul.bosch.com --resolve consul-klusterx.de.bosch.com:443:<EDGE_VM_IP>Show more lines
+
+
+
+Quick reality checks (so you can defend the design)
+
+Ingress Gateway is deprecated → Using API Gateway (VM) is the recommended north‑south model going forward. [underconst...onpage.com]
+SDS for browser TLS is optional/advanced → The preferred OSS VM path is file‑system‑certificate (free, hot‑reload) or inline‑certificate. [docs.frankenlinux.de], [sadikhasan.com]
+K8s Gateway API/Cilium does not program VM Envoy → VM edge is managed by Consul Config Entries. [tecmint.com], [github.com]
+gRPC over hostNetwork for xDS is fine → Consul uses port 8502; just ensure ACL token has mesh/config‑entry read and service read. [github.com]
+
+
+If you want, I’ll now generate:
+
+the systemd unit for the API Gateway process on the VM (with EnvironmentFile for the token), and
+a minimal ACL policy (edge gateway needs mesh:read, mesh:write for gateway configs and service:read on your dest services). [tecmint.com]
+
+Say the word and I’ll drop those files ready to paste.
 
 
