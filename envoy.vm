@@ -940,4 +940,17 @@ Para usares o Consul como Intermediate CA e certificados corporativos no browser
 Intermediate CA: Tu geras o CSR no Consul e assinas com a Root CA da Bosch. O Consul OSS permite configurar o ca_provider como "consul" (padrão) onde ele gere a rotação de mTLS para os sidecars.
 Envoy SDS (Secret Discovery Service): No Consul OSS, o SDS é exposto pelo agente local. O Envoy liga-se ao socket do agente para levantar os certificados.
 Link de Referência: Envoy Secret Discovery Service (SDS) - O Envoy consome segredos dinamicamente sem reiniciar.
+######################################################################################################3
 
+##################################################################################################
+
+
+Gateway → service = "rancher"
+                      |
+                      v
+             service-resolver (rancher)
+            redirects → "rancher-raw"
+                      |
+                      v
+            service-resolver (rancher-raw)
+            static endpoint = 10.103.21.43:80
