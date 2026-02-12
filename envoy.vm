@@ -954,3 +954,13 @@ Gateway → service = "rancher"
                       v
             service-resolver (rancher-raw)
             static endpoint = 10.103.21.43:80
+--------------------------------------------------
+
+
+Browser
+  ↓ HTTPS (corp cert)
+Edge VM Envoy (API Gateway)
+  ↓ xDS subscription (gRPC 8502)
+Consul Servers
+  ↓ Config Entries
+Consul Catalog / Mesh
