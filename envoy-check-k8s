@@ -1447,3 +1447,61 @@ Name      = "edge-hub-route"
 Parents   = [{Kind="api-gateway", Name="edge-gw-tcp", SectionName="tls4443"}]
 Services  = [{Name="cilium-gateway-hub-ui-gateway"}]
 
+-----
+
+root@klusterx-envoyingress-01:/etc/consul.d# vim edge-route-hub.hcl
+root@klusterx-envoyingress-01:/etc/consul.d# consul config write edge-route-hub.hcl
+Failed to decode config entry input: Failed to decode config entry input: At 3:1: expected: IDENT | STRING | ASSIGN | LBRACE got: SUB
+root@klusterx-envoyingress-01:/etc/consul.d# vim edge-route-hub.hcl
+root@klusterx-envoyingress-01:/etc/consul.d# consul config write edge-route-hub.hcl
+Config entry written: tcp-route/edge-hub-route
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9902/clusters   | grep cilium-gateway-hub-ui-gateway
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9903/clusters   | grep cilium-gateway-hub-ui-gateway
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9904/clusters   | grep cilium-gateway-hub-ui-gateway
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9901/clusters   | grep cilium-gateway-hub-ui-gateway
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9903/clusters   | grep cilium-gateway-hub-ui-gateway -A5
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog nodes
+Node                              ID        Address       DC
+consul-server-0                   8f40da3b  10.244.5.218  central-primary-infra
+consul-server-1                   888a42b8  10.244.1.7    central-primary-infra
+consul-server-2                   4d51a7a1  10.244.3.65   central-primary-infra
+envoy-edge-01                     5f0c58a4  10.19.143.93  central-primary-infra
+k8s-sync                                    127.0.0.1     central-primary-infra
+klusterx-worker-infra-01          ec2808ea  10.244.4.125  central-primary-infra
+klusterx-worker-infra-02          85f362d6  10.244.1.188  central-primary-infra
+klusterx-worker-infra-02-virtual            10.19.143.68  central-primary-infra
+klusterx-worker-infra-04          c81be5d0  10.244.5.156  central-primary-infra
+klusterx-worker-infra-05          28c7f361  10.244.3.210  central-primary-infra
+klusterx-worker-infra-05-virtual            10.19.143.71  central-primary-infra
+omni-infra                                  127.0.0.1     central-primary-infra
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog nodes -service cilium-gateway-hub-ui-gateway
+Node           ID        Address       DC
+envoy-edge-01  5f0c58a4  10.19.143.93  central-primary-infra
+omni-infra               127.0.0.1     central-primary-infra
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog services
+api-gateway
+cilium-envoy
+cilium-gateway-clusters-ui-gateway
+cilium-gateway-hub-ui-gateway
+cilium-gateway-hub-ui-gateway-sidecar-proxy
+consul
+consul-connect-injector
+consul-dns
+consul-mesh-gateway
+consul-server
+consul-ui
+edge-gw
+edge-gw-tcp
+edge-proxy
+edge-proxy-sidecar-proxy
+hub-lb
+hubble-peer
+hubble-relay
+imperative-api-extension
+kube-dns
+kubernetes
+mesh-gateway
+rancher
+rancher-webhook
+submariner-operator-metrics
+tg-egress
