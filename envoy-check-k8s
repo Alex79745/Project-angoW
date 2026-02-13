@@ -1267,3 +1267,124 @@ Give a minimal, correct HCL set for Option 2
 Show Submariner-ready evolution
 
 Or draw a clean CNFN-style reference architecture
+
+
+
+##############################################################################################333
+
+##################################################################################################
+
+Got it. Let’s cut through the noise and put you on a clean, OSS‑only, well‑architected track that gives you real xDS service discovery end‑to‑end (VM Envoy ⇄ Consul control plane ⇄ K8s Envoys), with no fake services, no TG detours, and no “LB as a service” illusions.
+Below I’ll:
+
+State the target architecture (what does belong in the mesh and why).
+Show the minimal set of moving parts (and what to delete).
+Give you exact, copy‑paste config to get to green quickly.
+Add a short runbook to verify xDS/EDS are actually working.
+
+
+1) Target architecture (real xDS/EDS, no fake upstreams)
+You want Consul OSS to feed Envoy clusters via xDS, and you want the API Gateway Envoy on your VM to discover actual K8s services through Consul’s EDS (service instances with identities).
+That only happens when the services (or their front Envoys) are in the mesh.
+So the shape must be:
+Client
+  → VM Envoy (Consul API Gateway - north/south)
+     → Mesh service inside K8s (Envoy-backed)
+        → (optional) internal sidecars to real app
+
+Identity = Envoy workload registered in Consul.
+Transport (Cilium LB/BGP) = just how packets move. It’s not a service and it doesn’t appear in EDS, so don’t register LBs as services.
+There are two proven mesh-native patterns that satisfy this:
+Pattern A — Mesh the service (sidecar)
+
+Run Consul on K8s (client agents + connect‑inject).
+Inject sidecar Envoy next to Rancher (or whatever you expose).
+The mesh service name (e.g., rancher) becomes discoverable via EDS.
+VM API Gateway (Envoy) simply routes to rancher (real mesh endpoints).
+
+Pattern B — Mesh an ingress Envoy in the cluster
+
+If you don’t want sidecars on apps, deploy a mesh ingress Envoy (a simple Deployment + Service).
+That Envoy is in the mesh and fronts your cluster (it originates TLS/SNI into K8s Gateway or reaches cluster internal).
+The VM API Gateway Envoy routes to k8s-ingress-gw (mesh service name), not an LB.
+
+Both patterns give you real xDS: Consul pushes EDS (endpoints = K8s Envoys) to the VM. You no longer rely on static LB addresses or TG workarounds.
+
+2) Remove the detours (what to delete)
+You asked to “remove all not needed API svc i created”. Here’s the safe list to delete now:
+
+Terminating‑gateway: Kind = "terminating-gateway" and its Envoy process.
+ServiceDefaults with Destination (the TG egress trick).
+Any service registrations that point to VM IP or LB IP purely to fake an upstream.
+Any TCPRoute that points to a non‑mesh service (e.g., hub-lb catalog registration).
+Any intentions that were only needed because of TG.
+Any 8443 local TG listeners.
+
+We’ll rebuild with only: VM API Gateway + mesh identities in K8s.
+
+3) Minimal, working configuration (Pattern B: mesh ingress Envoy)
+
+If you prefer Pattern A (sidecars on each service), I’ll post that too. This is the quickest to green with the smallest blast radius.
+
+3.1 In K8s: deploy a mesh ingress Envoy
+Create a Deployment that runs Consul dataplane Envoy (or consul-k8s sidecar pattern) as a standalone service in the mesh. It only needs to accept TCP from the VM and forward internally (either to your K8s Gateway LB VIP :443 or straight to Rancher service:port, depending on where you want TLS terminated).
+Option B1 (forward to Gateway LB, preserve SNI)
+
+Ingress Envoy (in the mesh) listens on :8443 and raw‑forwards to your cluster’s Gateway Service (ClusterIP of the Cilium Gateway, :443) or even to the rancher Service/Pod port if you don’t want to involve K8s Gateway for this hop.
+Consul will publish this ingress Envoy as k8s-ingress-gw with its PodIP:8443 as EDS endpoints.
+
+
+You can template this with Helm or a small Deployment/Service where the Envoy bootstrap is provided by consul-dataplane (recommended) or a static bootstrap that points to Consul xDS and declares a single TCP listener :8443 and a cluster rancher-sni that sends to the Gateway’s ClusterIP:443 with SNI = rancher-klusterx.de.bosch.com.
+Important: Because this Envoy is inside the mesh, Consul owns its bootstrap when you use consul-dataplane; you don’t hand‑craft static Envoy config. The service gets registered as k8s-ingress-gw and appears in Consul catalog with envoy endpoints.
+
+3.2 In Consul (VM): keep only the API Gateway and one route to the mesh ingress
+Gateway (VM):
+Terraform# /etc/consul.d/edge-gw.hclKind = "api-gateway"Name = "edge-gw"Listeners = [  {    Name     = "https443"    Port     = 443    Protocol = "http"    TLS = {      Certificates = [{ Kind = "file-system-certificate", Name = "edge-cert" }]    }  }]Show more lines
+Route (VM):
+Terraform# /etc/consul.d/edge-route-rancher.hclKind      = "http-route"Name      = "edge-rancher"Parents   = [{ Kind="api-gateway", Name="edge-gw", SectionName="https443" }]Hostnames = ["rancher-klusterx.de.bosch.com"]Services  = [{ Name = "k8s-ingress-gw" }]Show more lines
+
+If you must keep TLS passthrough (end‑to‑end TLS) and not terminate at the VM, then use a TCP listener on the VM and a tcp-route pointing to k8s-ingress-gw; the ingress Envoy inside K8s then originates SNI to the K8s Gateway (or forwards raw, depending on your setup).
+
+3.3 Make the VM see real xDS/EDS endpoints
+As soon as the K8s ingress Envoy joins the mesh (via consul-dataplane), Consul will advertise endpoints under the service name (e.g., k8s-ingress-gw) and your VM Envoy will get a cluster with host lines = PodIPs:8443. That is “real xDS service discovery” you’re asking for.
+No TG. No LB as service. No fake catalog registrations.
+
+4) If you prefer Pattern A (sidecar on the app service)
+
+Enable connect-inject in K8s, annotate Rancher Deployment for injection.
+Consul will register rancher with Envoy sidecar endpoints.
+VM API Gateway route points to Services=[{Name="rancher"}].
+(For TLS Passthrough: either have sidecar originate SNI to K8s Gateway, or terminate TLS at the VM; both are easy in mesh with config entries.)
+
+This gives the cleanest end state, but it may be politically heavier (injecting into Rancher pods).
+
+5) Verification runbook (proves real xDS/EDS)
+On the VM (API Gateway Envoy admin might be :9902):
+Shell# The route is accepted and boundconsul config read -kind http-route -name edge-rancher# The VM Envoy cluster for k8s-ingress-gw shows endpoints (PodIP:8443, health_flags::healthy)curl -s --noproxy localhost http://localhost:9902/clusters \  | sed -n '/^k8s-ingress-gw\./,/^$/p'# End-to-end test (HTTPS, terminate at VM)curl -vk -x "" \  https://rancher-klusterx.de.bosch.com \  --resolve rancher-klusterx.de.bosch.com:443:<EDGE_VM_IP>Show more lines
+If you choose TCP passthrough at the VM, replace listener https443 by a TCP listener, set tcp-route to k8s-ingress-gw, and test :4443 instead.
+
+6) Why this is “well‑architected” and CFNF‑friendly
+
+Identity is Envoy: every hop you route to is an Envoy-backed service.
+Transport is Cilium/BGP/Submariner: how packets move is orthogonal; Consul doesn’t discover LBs or routes, only identities.
+Consul’s role is control‑plane: push listeners and routes to your VM Envoy; push endpoints for K8s Envoys; manage intentions (if you keep service-to-service auth).
+No fake services: nothing in the catalog points to random IPs; everything is either a mesh sidecar or a mesh ingress Envoy.
+Scales to hub/spoke: each spoke runs its mesh ingress Envoy; the VM API Gateway routes to the correct service name, and EDS gives the right endpoints (Submariner later just changes transport under the hood).
+OSS‑only: no enterprise features required.
+
+
+7) TL;DR migration steps from your current state
+
+Stop & delete: terminating-gateway config and process; TG service-defaults with Destination; any catalog services that point at LB/VM IPs.
+Deploy mesh ingress Envoy on K8s (Pattern B): one Deployment + Service that runs consul-dataplane (or sidecar pattern) and exposes :8443 (mesh).
+Create only two entries on the VM:
+
+api-gateway/edge-gw (HTTPS 443 listener)
+http-route/edge-rancher → Services=[{Name="k8s-ingress-gw"}]
+
+
+(If you keep intentions): add service-intentions allowing edge-gw → k8s-ingress-gw.
+Verify: VM Envoy clusters show k8s-ingress-gw endpoints (PodIPs), curl to rancher‑… hits K8s via the mesh ingress Envoy → K8s Gateway (Passthrough) → Rancher.
+
+
+If you want, I’ll paste one minimal K8s Deployment/Service for the mesh ingress Envoy (Pattern B) using consul-dataplane, and the two VM HCL files (api-gateway + http-route). That’s literally 3 files total to get you to real xDS discovery with zero fake services.
