@@ -1513,3 +1513,355 @@ consul config delete terminating-gateway/tg-egress
 consul config delete service-defaults/hub-egress
 consul config delete tcp-route/old-8443-routes
 consul catalog deregister hub-lb  # optional if you now have mesh sidecar
+
+##########################
+$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+gateway-hub-ui-gateway
+root@klusterx-envoyingress-01:/etc/consul.d# 
+root@klusterx-envoyingress-01:/etc/consul.d# ls
+certs                              edge-certs.hcl    edge-proxy.json         logging
+cilium-gateway-hub-ui-gateway.hcl  edge-gw.hcl       edge-route-rancher.hcl  service-defaults-rancher.hcl
+consul.hcl                         edge-gw-tcp.hcl   edge-routes.hcl
+consul.hcl.bkp                     edge-ingress.hcl  log
+root@klusterx-envoyingress-01:/etc/consul.d# vim edge-route-hub.hcl
+root@klusterx-envoyingress-01:/etc/consul.d# consul config write edge-route-hub.hcl
+Failed to decode config entry input: Failed to decode config entry input: At 3:1: expected: IDENT | STRING | ASSIGN | LBRACE got: SUB
+root@klusterx-envoyingress-01:/etc/consul.d# vim edge-route-hub.hcl
+root@klusterx-envoyingress-01:/etc/consul.d# consul config write edge-route-hub.hcl
+Config entry written: tcp-route/edge-hub-route
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9902/clusters   | grep cilium-gateway-hub-ui-gateway
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9903/clusters   | grep cilium-gateway-hub-ui-gateway
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9904/clusters   | grep cilium-gateway-hub-ui-gateway
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9901/clusters   | grep cilium-gateway-hub-ui-gateway
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9903/clusters   | grep cilium-gateway-hub-ui-gateway -A5
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog nodes
+Node                              ID        Address       DC
+consul-server-0                   8f40da3b  10.244.5.218  central-primary-infra
+consul-server-1                   888a42b8  10.244.1.7    central-primary-infra
+consul-server-2                   4d51a7a1  10.244.3.65   central-primary-infra
+envoy-edge-01                     5f0c58a4  10.19.143.93  central-primary-infra
+k8s-sync                                    127.0.0.1     central-primary-infra
+klusterx-worker-infra-01          ec2808ea  10.244.4.125  central-primary-infra
+klusterx-worker-infra-02          85f362d6  10.244.1.188  central-primary-infra
+klusterx-worker-infra-02-virtual            10.19.143.68  central-primary-infra
+klusterx-worker-infra-04          c81be5d0  10.244.5.156  central-primary-infra
+klusterx-worker-infra-05          28c7f361  10.244.3.210  central-primary-infra
+klusterx-worker-infra-05-virtual            10.19.143.71  central-primary-infra
+omni-infra                                  127.0.0.1     central-primary-infra
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog nodes -service cilium-gateway-hub-ui-gateway
+Node           ID        Address       DC
+envoy-edge-01  5f0c58a4  10.19.143.93  central-primary-infra
+omni-infra               127.0.0.1     central-primary-infra
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog services
+api-gateway
+cilium-envoy
+cilium-gateway-clusters-ui-gateway
+cilium-gateway-hub-ui-gateway
+cilium-gateway-hub-ui-gateway-sidecar-proxy
+consul
+consul-connect-injector
+consul-dns
+consul-mesh-gateway
+consul-server
+consul-ui
+edge-gw
+edge-gw-tcp
+edge-proxy
+edge-proxy-sidecar-proxy
+hub-lb
+hubble-peer
+hubble-relay
+imperative-api-extension
+kube-dns
+kubernetes
+mesh-gateway
+rancher
+rancher-webhook
+submariner-operator-metrics
+tg-egress
+root@klusterx-envoyingress-01:/etc/consul.d# consul config delete terminating-gateway/tg-egress
+consul config delete service-defaults/hub-egress
+consul config delete tcp-route/old-8443-routes
+consul catalog deregister hub-lb
+Must specify the -kind or -filename parameter
+Must specify the -kind or -filename parameter
+Must specify the -kind or -filename parameter
+Usage: consul catalog <subcommand> [options] [args]
+
+  This command has subcommands for interacting with Consul's catalog. The
+  catalog should not be confused with the agent, although the APIs and
+  responses may be similar.
+
+  Here are some simple examples, and more detailed examples are available
+  in the subcommands or the documentation.
+
+  List all datacenters:
+
+      $ consul catalog datacenters
+
+  List all nodes:
+
+      $ consul catalog nodes
+
+  List all services:
+
+      $ consul catalog services
+
+  For more examples, ask for subcommand help or view the documentation.
+
+Subcommands:
+    datacenters    Lists all known datacenters
+    nodes          Lists all nodes in the given datacenter
+    services       Lists all registered services in a datacenter
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog services
+api-gateway
+cilium-envoy
+cilium-gateway-clusters-ui-gateway
+cilium-gateway-hub-ui-gateway
+cilium-gateway-hub-ui-gateway-sidecar-proxy
+consul
+consul-connect-injector
+consul-dns
+consul-mesh-gateway
+consul-server
+consul-ui
+edge-gw
+edge-gw-tcp
+edge-proxy
+edge-proxy-sidecar-proxy
+hub-lb
+hubble-peer
+hubble-relay
+imperative-api-extension
+kube-dns
+kubernetes
+mesh-gateway
+rancher
+rancher-webhook
+submariner-operator-metrics
+tg-egress
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9901/listerner
+invalid path. admin commands are:
+  /: Admin home page
+  /allocprofiler (POST): enable/disable the allocation profiler (if supported)
+      enable: enable/disable the allocation profiler; One of (y, n)
+  /certs: print certs on machine
+  /clusters: upstream cluster status
+  /config_dump: dump current Envoy configs (experimental)
+      resource: The resource to dump
+      mask: The mask to apply. When both resource and mask are specified, the mask is applied to every element in the desired repeated field so that only a subset of fields are returned. The mask is parsed as a ProtobufWkt::FieldMask
+      name_regex: Dump only the currently loaded configurations whose names match the specified regex. Can be used with both resource and mask query parameters.
+      include_eds: Dump currently loaded configuration including EDS. See the response definition for more information
+  /contention: dump current Envoy mutex contention stats (if enabled)
+  /cpuprofiler (POST): enable/disable the CPU profiler
+      enable: enables the CPU profiler; One of (y, n)
+  /drain_listeners (POST): drain listeners
+      graceful: When draining listeners, enter a graceful drain period prior to closing listeners. This behaviour and duration is configurable via server options or CLI
+      skip_exit: When draining listeners, do not exit after the drain period. This must be used with graceful
+      inboundonly: Drains all inbound listeners. traffic_direction field in envoy_v3_api_msg_config.listener.v3.Listener is used to determine whether a listener is inbound or outbound.
+  /healthcheck/fail (POST): cause the server to fail health checks
+  /healthcheck/ok (POST): cause the server to pass health checks
+  /heap_dump: dump current Envoy heap (if supported)
+  /heapprofiler (POST): enable/disable the heap profiler
+      enable: enable/disable the heap profiler; One of (y, n)
+  /help: print out list of admin commands
+  /hot_restart_version: print the hot restart compatibility version
+  /init_dump: dump current Envoy init manager information (experimental)
+      mask: The desired component to dump unready targets. The mask is parsed as a ProtobufWkt::FieldMask. For example, get the unready targets of all listeners with /init_dump?mask=listener`
+  /listeners: print listener info
+      format: File format to use; One of (text, json)
+  /logging (POST): query/change logging levels
+      paths: Change multiple logging levels by setting to <logger_name1>:<desired_level1>,<logger_name2>:<desired_level2>. If fine grain logging is enabled, use __FILE__ or a glob experision as the logger name. For example, source/common*:warning
+      level: desired logging level, this will change all loggers's level; One of (, trace, debug, info, warning, error, critical, off)
+  /memory: print current allocation/heap usage
+  /quitquitquit (POST): exit the server
+  /ready: print server state, return 200 if LIVE, otherwise return 503
+  /reopen_logs (POST): reopen access logs
+  /reset_counters (POST): reset all counters to zero
+  /runtime: print runtime values
+  /runtime_modify (POST): Adds or modifies runtime values as passed in query parameters. To delete a previously added key, use an empty string as the value. Note that deletion only applies to overrides added via this endpoint; values loaded from disk can be modified via override but not deleted. E.g. ?key1=value1&key2=value2...
+  /server_info: print server version/status information
+  /stats: print server stats
+      usedonly: Only include stats that have been written by system since restart
+      filter: Regular expression (Google re2) for filtering stats
+      format: Format to use; One of (html, active-html, text, json)
+      type: Stat types to include.; One of (All, Counters, Histograms, Gauges, TextReadouts)
+      histogram_buckets: Histogram bucket display mode; One of (cumulative, disjoint, detailed, summary)
+  /stats/prometheus: print server stats in prometheus format
+      usedonly: Only include stats that have been written by system since restart
+      text_readouts: Render text_readouts as new gaugues with value 0 (increases Prometheus data size)
+      filter: Regular expression (Google re2) for filtering stats
+      histogram_buckets: Histogram bucket display mode; One of (cumulative, summary)
+  /stats/recentlookups: Show recent stat-name lookups
+  /stats/recentlookups/clear (POST): clear list of stat-name lookups and counter
+  /stats/recentlookups/disable (POST): disable recording of reset stat-name lookup names
+  /stats/recentlookups/enable (POST): enable recording of reset stat-name lookup names
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9901/listeners
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9902/listeners
+http:0.0.0.0:443::0.0.0.0:443
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9903/listeners
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9904/listeners
+default:0.0.0.0:8443::0.0.0.0:8443
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:9900/listeners
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog
+Usage: consul catalog <subcommand> [options] [args]
+
+  This command has subcommands for interacting with Consul's catalog. The
+  catalog should not be confused with the agent, although the APIs and
+  responses may be similar.
+
+  Here are some simple examples, and more detailed examples are available
+  in the subcommands or the documentation.
+
+  List all datacenters:
+
+      $ consul catalog datacenters
+
+  List all nodes:
+
+      $ consul catalog nodes
+
+  List all services:
+
+      $ consul catalog services
+
+  For more examples, ask for subcommand help or view the documentation.
+
+Subcommands:
+    datacenters    Lists all known datacenters
+    nodes          Lists all nodes in the given datacenter
+    services       Lists all registered services in a datacenter
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog --help | register
+register: command not found
+root@klusterx-envoyingress-01:/etc/consul.d# consul catalog --help | deregister
+deregister: command not found
+root@klusterx-envoyingress-01:/etc/consul.d# ps aux envoy
+error: unknown user-defined format specifier "y"
+
+Usage:
+ ps [options]
+
+ Try 'ps --help <simple|list|output|threads|misc|all>'
+  or 'ps --help <s|l|o|t|m|a>'
+ for additional help text.
+
+For more details see ps(1).
+root@klusterx-envoyingress-01:/etc/consul.d# ps aux | grep envoy
+root       65923  0.0  0.1  17152  7168 ?        S    Feb11   0:00 sudo consul connect envoy -sidecar-for edge-proxy-01 -token 5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2 -admin-bind 127.0.0.1:19000
+root       65924  0.0  0.0  17152  2624 pts/4    Ss+  Feb11   0:00 sudo consul connect envoy -sidecar-for edge-proxy-01 -token 5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2 -admin-bind 127.0.0.1:19000
+root       65925  0.2  1.1 3369500 58240 pts/4   Sl   Feb11   6:10 /usr/local/bin/envoy --config-path /tmp/envoy-18933d016648de04-bootstrap.json --disable-hot-restart
+root      103874  0.0  1.1 3303996 55680 ?       Sl   Feb12   0:57 /usr/local/bin/envoy --config-path /tmp/envoy-18938b7e6306dc23-bootstrap.json --disable-hot-restart
+root      106229  0.2  1.1 3369564 58752 ?       Sl   Feb12   3:06 /usr/local/bin/envoy --config-path /tmp/envoy-18938fe404b2d14d-bootstrap.json --disable-hot-restart
+root      118341  0.1  1.1 3369500 58624 ?       Sl   00:51   1:18 /usr/local/bin/envoy --config-path /tmp/envoy-1893a81b839724f6-bootstrap.json --disable-hot-restart
+root      119195  0.1  1.1 3369500 57600 ?       Sl   01:18   1:14 /usr/local/bin/envoy --config-path /tmp/envoy-1893a98fcf4d36bf-bootstrap.json --disable-hot-restart
+root      140301  0.0  0.1  17148  7040 pts/5    S    14:09   0:00 sudo consul connect envoy -sidecar-for cilium-gateway-hub-ui-gateway -token 5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2 -admin-bind 127.0.0.1:19001
+root      140303  0.0  0.0  17148  2624 pts/6    Ss+  14:09   0:00 sudo consul connect envoy -sidecar-for cilium-gateway-hub-ui-gateway -token 5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2 -admin-bind 127.0.0.1:19001
+root      140304  0.1  1.1 3361304 57472 pts/6   Sl   14:09   0:05 /usr/local/bin/envoy --config-path /tmp/envoy-1893d3a70639041e-bootstrap.json --disable-hot-restart
+root      141843  0.0  0.0   6544  2304 pts/5    S+   15:04   0:00 grep --color=auto envoy
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:19001/listeners
+public_listener:0.0.0.0:21001::0.0.0.0:21001
+root@klusterx-envoyingress-01:/etc/consul.d# curl -s --noproxy localhost http://localhost:19001/clusters
+local_app::observability_name::local_app
+local_app::default_priority::max_connections::1024
+local_app::default_priority::max_pending_requests::1024
+local_app::default_priority::max_requests::1024
+local_app::default_priority::max_retries::3
+local_app::high_priority::max_connections::1024
+local_app::high_priority::max_pending_requests::1024
+local_app::high_priority::max_requests::1024
+local_app::high_priority::max_retries::3
+local_app::added_via_api::true
+local_app::127.0.0.1:443::cx_active::0
+local_app::127.0.0.1:443::cx_connect_fail::0
+local_app::127.0.0.1:443::cx_total::356
+local_app::127.0.0.1:443::rq_active::0
+local_app::127.0.0.1:443::rq_error::0
+local_app::127.0.0.1:443::rq_success::0
+local_app::127.0.0.1:443::rq_timeout::0
+local_app::127.0.0.1:443::rq_total::0
+local_app::127.0.0.1:443::hostname::
+local_app::127.0.0.1:443::health_flags::healthy
+local_app::127.0.0.1:443::weight::1
+local_app::127.0.0.1:443::region::
+local_app::127.0.0.1:443::zone::
+local_app::127.0.0.1:443::sub_zone::
+local_app::127.0.0.1:443::canary::false
+local_app::127.0.0.1:443::priority::0
+local_app::127.0.0.1:443::success_rate::-1
+local_app::127.0.0.1:443::local_origin_success_rate::-1
+local_agent::observability_name::local_agent
+local_agent::default_priority::max_connections::1024
+local_agent::default_priority::max_pending_requests::1024
+local_agent::default_priority::max_requests::1024
+local_agent::default_priority::max_retries::3
+local_agent::high_priority::max_connections::1024
+local_agent::high_priority::max_pending_requests::1024
+local_agent::high_priority::max_requests::1024
+local_agent::high_priority::max_retries::3
+local_agent::added_via_api::false
+local_agent::127.0.0.1:8502::cx_active::1
+local_agent::127.0.0.1:8502::cx_connect_fail::0
+local_agent::127.0.0.1:8502::cx_total::1
+local_agent::127.0.0.1:8502::rq_active::1
+local_agent::127.0.0.1:8502::rq_error::0
+local_agent::127.0.0.1:8502::rq_success::0
+local_agent::127.0.0.1:8502::rq_timeout::0
+local_agent::127.0.0.1:8502::rq_total::1
+local_agent::127.0.0.1:8502::hostname::
+local_agent::127.0.0.1:8502::health_flags::healthy
+local_agent::127.0.0.1:8502::weight::1
+local_agent::127.0.0.1:8502::region::
+local_agent::127.0.0.1:8502::zone::
+local_agent::127.0.0.1:8502::sub_zone::
+local_agent::127.0.0.1:8502::canary::false
+local_agent::127.0.0.1:8502::priority::0
+local_agent::127.0.0.1:8502::success_rate::-1
+local_agent::127.0.0.1:8502::local_origin_success_rate::-1
+root@klusterx-envoyingress-01:/etc/consul.d# ls
+certs                              edge-certs.hcl    edge-proxy.json         log
+cilium-gateway-hub-ui-gateway.hcl  edge-gw.hcl       edge-route-hub.hcl      logging
+consul.hcl                         edge-gw-tcp.hcl   edge-route-rancher.hcl  service-defaults-rancher.hcl
+consul.hcl.bkp                     edge-ingress.hcl  edge-routes.hcl
+root@klusterx-envoyingress-01:/etc/consul.d# cat edge-gw.hcl
+# ---------- API Gateway (recommended) ----------
+Kind = "api-gateway"
+Name = "edge-gw"
+
+Listeners = [
+  {
+    Name     = "https443"
+    Port     = 443
+    Protocol = "http"   # TLS terminates here; host-based routing via HTTP routes
+    TLS = {
+      Certificates = [
+        { Kind = "file-system-certificate", Name = "edge-cert" }
+      ]
+    }
+  }
+]
+
+root@klusterx-envoyingress-01:/etc/consul.d# cat edge-gw-tcp.hcl
+Kind = "api-gateway"
+Name = "edge-gw-tcp"
+Listeners = [
+  { Name = "tcp4443", Port = 8443, Protocol = "tcp" }
+]
+root@klusterx-envoyingress-01:/etc/consul.d# cat edge-route-rancher.hcl
+Kind      = "http-route"
+Name      = "edge-rancher"
+Parents   = [{ Kind = "api-gateway", Name = "edge-gw", SectionName = "https443" }]
+Hostnames = ["rancher-klusterx.de.bosch.com"]
+Rules     = [{ Services = [{ Name = "rancher" }] }]
+root@klusterx-envoyingress-01:/etc/consul.d# cat  edge-route-hub.hcl
+Kind      = "tcp-route"
+Name      = "edge-hub-route"
+Parents   = [{Kind="api-gateway", Name="edge-gw-tcp", SectionName="tls4443"}]
+Services  = [{Name="cilium-gateway-hub-ui-gateway"}]
+root@klusterx-envoyingress-01:/etc/consul.d# cat service-defaults-rancher.hcl
+# /etc/consul.d/service-defaults-rancher.hcl
+Kind = "service-defaults"
+Name = "rancher"
+Protocol = "http"
+ExternalSNI = "rancher-klusterx.de.bosch.com"
+
