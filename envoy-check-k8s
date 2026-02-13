@@ -1505,3 +1505,11 @@ rancher
 rancher-webhook
 submariner-operator-metrics
 tg-egress
+##################################
+##################################
+
+# Delete unnecessary entries
+consul config delete terminating-gateway/tg-egress
+consul config delete service-defaults/hub-egress
+consul config delete tcp-route/old-8443-routes
+consul catalog deregister hub-lb  # optional if you now have mesh sidecar
