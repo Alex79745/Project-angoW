@@ -573,6 +573,249 @@ Citations
 VM API Gateway routes on VMs: listeners & routes are config entries; routes forward to mesh services.
 ServiceDefaults reference (including Destination, used by terminating‑gateway for external egress). [github.com]
 K8s Gateway (TLS Passthrough) routes by SNI; connecting by IP without matching SNI is reset. [github.com]
+
+------Got it — now we’re finally at the architecture level, and your intuition is actually correct. The confusion comes from what Consul OSS can and cannot treat as a “service”.
+
+I’ll give you a clean, OSS-only, future-proof design that fits:
+
+BGP / Anycast LBs (Cilium + Bird)
+
+VM Envoy ingress
+
+Hub ↔ Spoke
+
+Future replacement of Consul Enterprise with Submariner
+
+Real service discovery (not static IP hacks)
+
+0️⃣ The rule you must accept (everything depends on this)
+
+In Consul OSS, a thing is “discoverable” only if it runs an agent or a proxy.
+
+A LoadBalancer IP advertised via BGP is NOT a service to Consul.
+
+Even if:
+
+it’s routable
+
+it’s reachable
+
+it’s in DNS
+
+it’s Anycast
+
+👉 Without Envoy (or a Consul agent), it cannot participate in the mesh.
+
+This is not optional and not configurable.
+
+1️⃣ Why your current LB-in-catalog idea breaks
+
+You are trying to do this:
+
+Internet
+  → VM Envoy
+     → Consul service
+        → BGP Anycast LB (Cilium)
+           → K8s backend
+
+
+But Consul sees:
+
+service instance = where Envoy runs
+
+
+Since the LB:
+
+does not run Envoy
+
+does not run a Consul agent
+
+Consul cannot:
+
+health check it properly
+
+inject SNI context
+
+do failover
+
+reason about spokes vs hub
+
+That’s why you keep looping back to the VM IP.
+
+This is by design in Consul OSS.
+
+2️⃣ The correct mental model (this fixes everything)
+🔑 LBs are transport
+🔑 Envoy is identity
+
+Consul routes between identities, not transports.
+
+So your architecture must be:
+
+(identity) → (transport) → (identity)
+
+
+Not:
+
+(identity) → (transport only) → (nothing)
+
+3️⃣ The ONLY architecture that works for your goals (OSS, hub/spoke, BGP)
+✅ Final intended design (recommended)
+Internet
+  ↓
+VM Envoy (API Gateway, no mesh)
+  ↓
+Hub Ingress Envoy (inside K8s, part of mesh)
+  ↓
+Spoke Ingress Envoy (inside K8s, part of mesh)
+  ↓
+Service sidecars
+
+
+Where:
+
+Cilium LB + Bird
+
+ONLY provides IP reachability (Anycast)
+
+NEVER registered in Consul
+
+Envoy
+
+Is always the mesh boundary
+
+Is always the service identity
+
+4️⃣ What must be registered in Consul (this is critical)
+❌ Do NOT register
+
+Cilium LoadBalancer IPs
+
+Anycast IPs
+
+Bird-announced routes
+
+✅ DO register
+
+Envoy pods
+
+Envoy VMs
+
+Gateways (hub / spoke)
+
+Every hop that participates in discovery must run Envoy.
+
+5️⃣ How Hub / Spoke works in OSS (no Enterprise)
+
+You are correct to plan this:
+
+No Consul Enterprise
+
+No mesh gateways across clusters
+
+Submariner later
+
+Correct OSS pattern
+Hub cluster
+
+Runs Consul
+
+Runs Hub Gateway Envoy
+
+Exposes ClusterIP / NodePort
+
+Cilium LB advertises IP
+
+Spoke cluster
+
+Runs its own Consul or
+
+Registers upstreams via Submariner DNS/IP
+
+Runs Spoke Gateway Envoy
+
+Submariner replaces networking, not identity.
+
+Submariner
+Cilium
+
+6️⃣ Concrete service-discovery flow (this is what you want)
+Registration
+hub-gateway-envoy  → service: hub-gateway
+spoke-gateway-envoy → service: spoke-gateway
+
+Discovery
+Envoy → Consul → service name
+
+Transport
+Envoy → IP (via BGP / Submariner)
+
+
+Consul never needs to know how packets move — only who talks to whom.
+
+7️⃣ What about your VM ingress Envoy?
+
+That Envoy:
+
+❌ should NOT be in the mesh
+
+❌ should NOT have sidecars
+
+✅ should forward to a real mesh identity
+
+Example:
+
+VM Envoy
+  → hub-gateway.consul
+
+
+That’s it.
+
+No terminating-gateway needed.
+No service-defaults hacks.
+No Destination blocks.
+
+8️⃣ Why your instinct was right (important reassurance)
+
+You were right about:
+
+wanting service discovery
+
+avoiding static IP wiring
+
+planning for spoke clusters
+
+staying OSS-only
+
+The only wrong assumption was:
+
+“A LoadBalancer can be a service in Consul”
+
+It cannot.
+
+9️⃣ One-sentence architecture rule (memorize this)
+
+If it doesn’t run Envoy, it’s not part of the mesh — no matter how it’s routed.
+
+10️⃣ Next steps (I strongly recommend this order)
+
+Decide where Envoy boundaries are (VM, hub, spoke)
+
+Remove LB IPs from Consul catalog
+
+Register only Envoy-backed services
+
+Use Cilium/BGP purely as transport
+
+Add Submariner later without changing Consul configs
+
+If you want, next I can:
+
+Draw the final hub/spoke flow (text or diagram)
+
+Give you exact HCL for hub & spoke gateways
+
+Tell you honestly where Consul can be removed entirely
 Envoy/Consul behavior: no healthy/authorized upstream → 503 for HTTP or TCP close; cx_connect_fail indicates upstream connection failures. [developer....hicorp.com]
 
 You’re at the finish line—write the single intention with a token that has intentions:write, and your :4443 path will work end‑to‑end.
