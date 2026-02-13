@@ -299,3 +299,206 @@ root@klusterx-envoyingress-01:/etc/consul.d# HTTP_PROXY= HTTPS_PROXY= ALL_PROXY=
 * Closing connection
 curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to rancher-klusterx.de.bosch.com:4443 
 , we arwe going arounfd to much nohting workig
+-----
+
+Good — this clarification is the missing puzzle piece. Now the behavior you’re seeing makes sense, and yes: this is an intentional outcome of how Consul works, not a random bug.
+
+I’ll be very precise and tie it directly to your setup (VM → Envoy → K8s LB via BGP).
+
+1️⃣ What your architecture ACTUALLY is (as Consul sees it)
+
+Let’s restate it cleanly:
+
+Client VM (outside k8s)
+  └─ Envoy (running on the VM, registered in Consul)
+      └─ Consul service "hub-egress"
+          └─ Destination = K8s LoadBalancer (BGP-advertised)
+              └─ Rancher inside cluster
+
+
+Key facts you confirmed:
+
+10.19.143.93:8443 = the VM itself
+
+The K8s LB IP is advertised via BGP (Bird)
+
+The LB does NOT do port translation
+
+You expect Consul to “route through the LB” automatically
+
+This expectation is the problem.
+
+2️⃣ The core rule you’re hitting (this is NOT documented clearly)
+
+Consul never routes traffic “through” a LoadBalancer
+
+It routes traffic to service instances.
+
+And service instances are defined by where Envoy is running.
+
+What you registered
+
+You registered the service on the VM.
+
+So Consul does exactly this:
+
+hub-egress → 10.19.143.93:<port>
+
+
+That is correct and intentional.
+
+Consul has no concept of:
+
+“this service should forward to another IP”
+
+“this IP is just a hop”
+
+“this LB will translate ports”
+
+Unless you explicitly tell it.
+
+3️⃣ Why the K8s LoadBalancer is invisible to Consul
+
+Even though:
+
+Bird advertises the LB via BGP
+
+The VM has a route to the LB IP
+
+Curl from the VM works
+
+Consul still does not care, because:
+
+❌ The LB IP is not registered as a service instance
+❌ The LB is not part of the mesh
+❌ The LB does not run Envoy
+
+So Consul cannot “target” it implicitly.
+
+4️⃣ Why you see the VM IP as upstream (this is correct)
+
+This line proves everything:
+
+hub-egress...::10.19.143.93:8443
+
+
+Envoy is connecting to the service instance address, which is:
+
+the node where the service is registered
+
+Since the service runs on the VM → the VM IP is correct.
+
+This is not a bug
+This is not a port issue
+This is not an SNI issue
+
+This is service identity vs network routing
+
+5️⃣ The LB cannot “translate” inside Consul’s model
+
+Even if the LB:
+
+listens on 8443
+
+forwards to 443
+
+routes correctly at L4
+
+Consul will never chain:
+
+Envoy → VM → LB → backend
+
+
+Consul only does:
+
+Envoy → service instance
+
+
+Everything after that must be handled by that instance itself.
+
+6️⃣ You have THREE valid ways to make this work (pick ONE)
+✅ Option 1 — Register the LB as the service (MOST COMMON)
+
+Do not register the VM as hub-egress.
+
+Instead:
+
+service {
+  name = "hub-egress"
+  address = "<LB_IP>"
+  port = 443
+}
+
+
+Then:
+
+Envoy → LB → Rancher
+
+
+✔ Works with BGP
+✔ Works with no port translation
+✔ No terminating gateway needed
+✔ ExternalSNI stays top-level (as you already fixed)
+
+✅ Option 2 — VM acts as a real proxy (explicit forwarding)
+
+If you want the VM to stay the service instance, then the VM must:
+
+Listen on 8443
+
+Forward traffic to the LB itself (iptables / HAProxy / Envoy static cluster)
+
+Consul will not do that forwarding for you.
+
+✅ Option 3 — Put Envoy on the LB node (mesh-native)
+
+This is the “pure” mesh model:
+
+Envoy runs where the LB lives (or replaces it)
+
+That IP becomes the service instance
+
+Consul routing becomes 1:1
+
+This is how Consul expects things to work.
+
+7️⃣ What is NOT going to work (important)
+
+❌ Expecting Consul to:
+
+discover a BGP LB
+
+route through it
+
+translate ports
+
+or infer intent
+
+Consul never does this.
+
+8️⃣ Direct answer to your question
+
+“check on documentation if this is intention error or ports”
+
+✔ This is intentional behavior
+✔ Not a port bug
+✔ Not a schema issue
+✔ Not OSS vs Enterprise
+
+It is a service-registration model mismatch.
+
+9️⃣ One-sentence fix (if you want it to just work)
+
+Register the LoadBalancer IP as the service address, not the VM IP.
+
+Everything else you already did is fine.
+
+If you want, next I can:
+
+Show the exact minimal HCL for Option 1
+
+Explain how to keep security while bypassing the VM
+
+Help you decide if you even need Consul here at all (honest answer)
+
+You’re not “going around” — you just crossed the boundary between network routing and service identity, and Consul only understands one of them.
