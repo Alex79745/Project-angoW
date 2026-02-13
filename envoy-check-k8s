@@ -1418,3 +1418,28 @@ rancher-webhook
 submariner-operator-metrics
 tg-egress
 root@envoyingress-01:/etc/consul.d# 
+
+--------------------------------------------------
+
+# hub-gateway-ui.hcl
+service {
+  name = "cilium-gateway-hub-ui-gateway"
+  port = 443
+
+  connect {
+    sidecar_service {}
+  }
+}
+
+# cluster-gateway-ui.hcl
+service {
+  name = "cilium-gateway-clusters-ui-gateway"
+  port = 443
+
+  connect {
+    sidecar_service {}
+  }
+}
+consul services register hub-gateway-ui.hcl
+consul services register cluster-gateway-ui.hcl
+
