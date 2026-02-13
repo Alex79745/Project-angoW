@@ -1925,3 +1925,38 @@ consul connect envoy \
     -service edge-ingress \
     -address 0.0.0.0:443 \
     -admin-bind 127.0.0.1:9901
+
+
+
+
+
+
+
+
+################################################################################
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+###################################################################################
+
+
+# /etc/consul.d/hub-lb.hcl
+service {
+  name    = "hub-lb"
+  address = "10.19.143.82"   # LB IP advertised by BGP
+  port    = 443
+
+  connect {
+    sidecar_service {
+      proxy {
+        listen_port = 8443
+      }
+    }
+  }
+
+  check {
+    name     = "tcp-alive"
+    tcp      = "10.19.143.82:443"
+    interval = "10s"
+  }
+}
+
