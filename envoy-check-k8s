@@ -1388,3 +1388,33 @@ Verify: VM Envoy clusters show k8s-ingress-gw endpoints (PodIPs), curl to ranche
 
 
 If you want, I’ll paste one minimal K8s Deployment/Service for the mesh ingress Envoy (Pattern B) using consul-dataplane, and the two VM HCL files (api-gateway + http-route). That’s literally 3 files total to get you to real xDS discovery with zero fake services.
+--------------
+
+
+root@envoyingress-01:/etc/consul.d# consul catalog services
+api-gateway
+cilium-envoy
+cilium-gateway-clusters-ui-gateway
+cilium-gateway-hub-ui-gateway
+consul
+consul-connect-injector
+consul-dns
+consul-mesh-gateway
+consul-server
+consul-ui
+edge-gw
+edge-gw-tcp
+edge-proxy
+edge-proxy-sidecar-proxy
+hub-lb
+hubble-peer
+hubble-relay
+imperative-api-extension
+kube-dns
+kubernetes
+mesh-gateway
+rancher
+rancher-webhook
+submariner-operator-metrics
+tg-egress
+root@envoyingress-01:/etc/consul.d# 
