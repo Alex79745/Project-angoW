@@ -1,0 +1,35 @@
+ =========================
+# BIRD 2 - Core configuration (eBGP with Cilium)
+# =========================
+#
+router id 10.19.143.94;
+
+protocol device { }
+
+protocol kernel {
+  ipv4 {
+    export all;
+    import none;
+  };
+  persist;
+}
+
+filter ACCEPT_LB_ONLY {
+  if net ~ [ 10.19.143.0/24{32,32} ] then accept;
+  reject;
+}
+
+protocol bgp talos_clusters {
+  local as 64512;
+
+  neighbor range 101.19q3.143.0/24 as 64513;
+  dynamic name "talos_";
+
+  ipv4 {
+    import filter ACCEPT_LB_ONLY;
+    export none;
+  };
+
+  graceful restart off;   # ← FIXED
+}
+
