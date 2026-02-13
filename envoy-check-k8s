@@ -1,0 +1,301 @@
+im going roud now i need fix root@klusterx-envoyingress-01:~# consul config read -kind tcp-route -name hub-tcp
+consul config read -kind service-defaults -name hub-egress
+consul config read -kind terminating-gateway -name tg-egress
+curl -s --noproxy localhost http://localhost:9903/clusters | sed -n '/^hub-egress\./,/^$/p'
+{
+    "Kind": "tcp-route",
+    "Name": "hub-tcp",
+    "Parents": [
+        {
+            "Kind": "api-gateway",
+            "Name": "edge-gw-tcp",
+            "SectionName": "tcp4443"
+        }
+    ],
+    "Services": [
+        {
+            "Name": "hub-egress"
+        }
+    ],
+    "Status": {
+        "Conditions": [
+            {
+                "Type": "Accepted",
+                "Status": "True",
+                "Reason": "Accepted",
+                "Message": "route is valid",
+                "Resource": {
+                    "Kind": "",
+                    "Name": "",
+                    "SectionName": ""
+                },
+                "LastTransitionTime": "2026-02-13T00:44:10.91513962Z"
+            },
+            {
+                "Type": "Bound",
+                "Status": "True",
+                "Reason": "Bound",
+                "Message": "successfully bound route",
+                "Resource": {
+                    "Kind": "api-gateway",
+                    "Name": "edge-gw-tcp",
+                    "SectionName": "tcp4443"
+                },
+                "LastTransitionTime": "2026-02-13T00:44:10.915142833Z"
+            }
+        ]
+    },
+    "CreateIndex": 3248986,
+    "ModifyIndex": 3259293
+}
+{
+    "Kind": "service-defaults",
+    "Name": "hub-egress",
+    "Protocol": "tcp",
+    "TransparentProxy": {},
+    "MeshGateway": {},
+    "Expose": {},
+    "ExternalSNI": "rancher-klusterx.de.bosch.com",
+    "Destination": {
+        "Addresses": [
+            "10.19.143.82"
+        ],
+        "Port": 443
+    },
+    "CreateIndex": 3251897,
+    "ModifyIndex": 3255910
+}
+{
+    "Kind": "terminating-gateway",
+    "Name": "tg-egress",
+    "Services": [
+        {
+            "Name": "hub-egress"
+        }
+    ],
+    "CreateIndex": 3251989,
+    "ModifyIndex": 3251989
+}
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::observability_name::hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::outlier::success_rate_average::-1
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::outlier::success_rate_ejection_threshold::-1
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::outlier::local_origin_success_rate_average::-1
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::outlier::local_origin_success_rate_ejection_threshold::-1
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::default_priority::max_connections::1024
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::default_priority::max_pending_requests::1024
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::default_priority::max_requests::1024
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::default_priority::max_retries::3
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::high_priority::max_connections::1024
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::high_priority::max_pending_requests::1024
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::high_priority::max_requests::1024
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::high_priority::max_retries::3
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::added_via_api::true
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::cx_active::0
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::cx_connect_fail::190
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::cx_total::190
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::rq_active::0
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::rq_error::0
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::rq_success::0
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::rq_timeout::0
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::rq_total::0
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::hostname::
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::health_flags::healthy
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::weight::1
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::region::
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::zone::
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::sub_zone::
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::canary::false
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::priority::0
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::success_rate::-1
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::local_origin_success_rate::-1
+
+.--
+
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::zone::
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::sub_zone::
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::canary::false
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::priority::0
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::success_rate::-1
+hub-egress.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.19.143.93:8443::local_origin_success_rate::-1
+local_agent::observability_name::local_agent
+local_agent::default_priority::max_connections::1024
+local_agent::default_priority::max_pending_requests::1024
+local_agent::default_priority::max_requests::1024
+local_agent::default_priority::max_retries::3
+local_agent::high_priority::max_connections::1024
+local_agent::high_priority::max_pending_requests::1024
+local_agent::high_priority::max_requests::1024
+local_agent::high_priority::max_retries::3
+local_agent::added_via_api::false
+local_agent::127.0.0.1:8502::cx_active::1
+local_agent::127.0.0.1:8502::cx_connect_fail::0
+local_agent::127.0.0.1:8502::cx_total::1
+local_agent::127.0.0.1:8502::rq_active::1
+local_agent::127.0.0.1:8502::rq_error::0
+local_agent::127.0.0.1:8502::rq_success::0
+local_agent::127.0.0.1:8502::rq_timeout::0
+local_agent::127.0.0.1:8502::rq_total::1
+local_agent::127.0.0.1:8502::hostname::
+local_agent::127.0.0.1:8502::health_flags::healthy
+local_agent::127.0.0.1:8502::weight::1
+local_agent::127.0.0.1:8502::region::
+local_agent::127.0.0.1:8502::zone::
+local_agent::127.0.0.1:8502::sub_zone::
+local_agent::127.0.0.1:8502::canary::false
+local_agent::127.0.0.1:8502::priority::0
+local_agent::127.0.0.1:8502::success_rate::-1
+local_agent::127.0.0.1:8502::local_origin_success_rate::-1
+root@klusterx-envoyingress-01:/etc/consul.d# 
+HTTP_PROXY= HTTPS_PROXY= ALL_PROXY= http_proxy= https_proxy= all_proxy= \
+curl -vk -x "" \
+  https://rancher-klusterx.de.bosch.com:8443 \
+  --resolve rancher-klusterx.de.bosch.com:8443:10.19.143.93
+* Added rancher-klusterx.de.bosch.com:8443:10.19.143.93 to DNS cache
+* Uses proxy env variable no_proxy == 'http://rb-proxy-sl.bosch.com:8008'
+* Hostname rancher-klusterx.de.bosch.com was found in DNS cache
+*   Trying 10.19.143.93:8443...
+* Connected to rancher-klusterx.de.bosch.com (10.19.143.93) port 8443
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* Recv failure: Connection reset by peer
+* OpenSSL SSL_connect: Connection reset by peer in connection to rancher-klusterx.de.bosch.com:8443 
+* Closing connection
+curl: (35) Recv failure: Connection reset by peer
+root@klusterx-envoyingress-01:/etc/consul.d# 
+consul config list | grep -E 'api-gateway|tcp-route'
+consul config read -kind api-gateway -name edge-gw-tcp
+curl -s localhost:9903/listeners | jq '.[].name' | head
+curl -s localhost:9904/listeners | jq '.[].name' | head
+Must specify the -kind parameter
+{
+    "Kind": "api-gateway",
+    "Name": "edge-gw-tcp",
+    "Listeners": [
+        {
+            "Name": "tcp4443",
+            "Hostname": "",
+            "Port": 4443,
+            "Protocol": "tcp",
+            "TLS": {
+                "Certificates": null
+            }
+        }
+    ],
+    "Status": {
+        "Conditions": [
+            {
+                "Type": "Accepted",
+                "Status": "True",
+                "Reason": "Accepted",
+                "Message": "gateway is valid",
+                "Resource": {
+                    "Kind": "",
+                    "Name": "",
+                    "SectionName": ""
+                },
+                "LastTransitionTime": "2026-02-13T00:33:19.899611938Z"
+            },
+            {
+                "Type": "Conflicted",
+                "Status": "False",
+                "Reason": "NoConflict",
+                "Message": "listener has no route conflicts",
+                "Resource": {
+                    "Kind": "api-gateway",
+                    "Name": "edge-gw-tcp",
+                    "SectionName": "tcp4443"
+                },
+                "LastTransitionTime": "2026-02-13T00:33:19.899615594Z"
+            },
+            {
+                "Type": "ResolvedRefs",
+                "Status": "True",
+                "Reason": "ResolvedRefs",
+                "Message": "resolved refs",
+                "Resource": {
+                    "Kind": "api-gateway",
+                    "Name": "edge-gw-tcp",
+                    "SectionName": "tcp4443"
+                },
+                "LastTransitionTime": "2026-02-13T00:33:19.899611367Z"
+            }
+        ]
+    },
+    "CreateIndex": 3248062,
+    "ModifyIndex": 3248850
+}
+jq: parse error: Invalid numeric literal at line 1, column 13
+jq: parse error: Invalid numeric literal at line 1, column 13
+root@klusterx-envoyingress-01:/etc/consul.d# HTTP_PROXY= HTTPS_PROXY= ALL_PROXY= http_proxy= https_proxy= all_proxy= \
+curl -vk -x "" \
+  https://rancher-klusterx.de.bosch.com:443 \
+  --resolve rancher-klusterx.de.bosch.com:8443:10.19.143.93
+* Added rancher-klusterx.de.bosch.com:8443:10.19.143.93 to DNS cache
+* Uses proxy env variable no_proxy == 'http://rb-proxy-sl.bosch.com:8008'
+* Host rancher-klusterx.de.bosch.com:443 was resolved.
+* IPv6: (none)
+* IPv4: 10.19.143.74
+*   Trying 10.19.143.74:443...
+* Connected to rancher-klusterx.de.bosch.com (10.19.143.74) port 443
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* Recv failure: Connection reset by peer
+* OpenSSL SSL_connect: Connection reset by peer in connection to rancher-klusterx.de.bosch.com:443 
+* Closing connection
+curl: (35) Recv failure: Connection reset by peer
+root@klusterx-envoyingress-01:/etc/consul.d# HTTP_PROXY= HTTPS_PROXY= ALL_PROXY= http_proxy= https_proxy= all_proxy= curl -vk -x ""   https://rancher-klusterx.de.bosch.com:443   --resolve rancher-klusterx.de.bosch.com:443:10.19.143.93
+* Added rancher-klusterx.de.bosch.com:443:10.19.143.93 to DNS cache
+* Uses proxy env variable no_proxy == 'http://rb-proxy-sl.bosch.com:8008'
+* Hostname rancher-klusterx.de.bosch.com was found in DNS cache
+*   Trying 10.19.143.93:443...
+* Connected to rancher-klusterx.de.bosch.com (10.19.143.93) port 443
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_CHACHA20_POLY1305_SHA256 / X25519 / RSASSA-PSS
+* ALPN: server accepted http/1.1
+* Server certificate:
+*  subject: CN=rancher-klusterx.de.bosch.com
+*  start date: Feb 12 14:17:57 2026 GMT
+*  expire date: Mar 14 14:17:57 2026 GMT
+*  issuer: CN=rancher-klusterx.de.bosch.com
+*  SSL certificate verify result: self-signed certificate (18), continuing anyway.
+*   Certificate level 0: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+* using HTTP/1.x
+> GET / HTTP/1.1
+> Host: rancher-klusterx.de.bosch.com
+> User-Agent: curl/8.5.0
+> Accept: */*
+> 
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* old SSL session ID is stale, removing
+< HTTP/1.1 503 Service Unavailable
+< content-length: 19
+< content-type: text/plain
+< date: Fri, 13 Feb 2026 02:22:10 GMT
+< server: envoy
+< 
+* Connection #0 to host rancher-klusterx.de.bosch.com left intact
+no healthy upstreamroot@klusterx-envoyingress-01:/etc/consul.d# HTTP_PROXY= HTTPS_PROXY= ALL_PROXY= http_proxy= https_proxy= all_proxy= curl -vk -x ""   https://ran
+root@klusterx-envoyingress-01:/etc/consul.d# 
+root@klusterx-envoyingress-01:/etc/consul.d# 
+root@klusterx-envoyingress-01:/etc/consul.d# 
+root@klusterx-envoyingress-01:/etc/consul.d# HTTP_PROXY= HTTPS_PROXY= ALL_PROXY= http_proxy= https_proxy= all_proxy= curl -vk -x ""   https://rancher-klusterx.de.bosch.com:4443   --resolve rancher-klusterx.de.bosch.com:4443:10.19.143.93
+* Added rancher-klusterx.de.bosch.com:4443:10.19.143.93 to DNS cache
+* Uses proxy env variable no_proxy == 'http://rb-proxy-sl.bosch.com:8008'
+* Hostname rancher-klusterx.de.bosch.com was found in DNS cache
+*   Trying 10.19.143.93:4443...
+* Connected to rancher-klusterx.de.bosch.com (10.19.143.93) port 4443
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to rancher-klusterx.de.bosch.com:4443 
+* Closing connection
+curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to rancher-klusterx.de.bosch.com:4443 
+, we arwe going arounfd to much nohting workig
