@@ -995,3 +995,275 @@ You now have identity → transport → identity separation done right.
 ✔ Or a diagram of the final architecture
 Just say which one you want.
 Provide your feedback on BizChatYou said: why i need to craeted  more svc that is already in the catalog, if with acl this works , i already tried that it doens work i need upscream and downsresnt i need real xds service discovery, consul oss has this envoy external vm alerady have all ports ok, so it should iscovery service, lets remove all not needed api svc i created, if is not aprt of the mesh or if done have sireacar or something doesnt work if the aprach is what you are doing , if i need to create a lb with envoy in cilium a added envoy or smoething lets make this well architected framework, and cnfn, even if i create svc withoud i real upsrecam is nothing it needs to appear i already have api gatew
+
+
+############################################################################################################################################################
+
+
+Got it — now we’re finally aligned.
+You’re right about the schema, and your frustration makes sense. Let’s close this cleanly and precisely.
+
+I’ll do four things:
+
+Explain why your config is invalid (schema-accurate, OSS-accurate)
+
+Clarify where ExternalSNI is actually allowed
+
+Explain why “real xDS service discovery” is incompatible with your LB-as-transport model
+
+Give you the only two OSS-valid architectures — and why one must be chosen
+
+No hand-waving, no Enterprise features, no wrong nesting.
+
+1️⃣ Why your config is invalid (you are correct)
+
+In HashiCorp Consul OSS 1.22.x, the schema is strict.
+
+❌ This is INVALID (your error)
+UpstreamConfig {
+  Defaults {
+    ExternalSNI = "example.com"
+  }
+}
+
+
+Because:
+
+ExternalSNI is NOT a valid field under UpstreamConfig.Defaults
+
+You were right.
+The error is correct.
+The schema enforces this.
+
+2️⃣ Where ExternalSNI is actually allowed (OSS schema truth)
+✅ VALID location (top-level only)
+Kind     = "service-defaults"
+Name     = "rancher"
+Protocol = "tcp"
+
+ExternalSNI = "rancher-klusterx.de.bosch.com"
+
+
+That’s it.
+
+Why?
+
+Because:
+
+ExternalSNI applies to the service itself
+
+It is used only when Envoy connects to a TLS endpoint outside the mesh
+
+It is not an upstream override
+
+It is not per-destination
+
+It is not dynamic
+
+So your insistence that “the schema clearly shows top-level config” was 100% correct.
+
+I’m stating this explicitly: you were right here.
+
+3️⃣ The real blocker: service discovery vs transport discovery
+
+Now the uncomfortable but critical truth 👇
+
+Consul OSS service discovery works ONLY between identities
+
+Identity =
+
+Consul service + Envoy proxy + Consul agent
+
+Your LB (Cilium + BGP + Bird):
+
+❌ has no Envoy
+
+❌ has no Consul agent
+
+❌ cannot speak xDS
+
+❌ cannot participate in intentions
+
+❌ cannot do mTLS
+
+❌ cannot be an upstream in the Consul sense
+
+So when you say:
+
+“the LB is already in the catalog”
+
+What Consul actually sees is:
+
+Static IP + port
+NO identity
+NO proxy
+NO discovery
+
+
+That means:
+
+You can register it as a service
+
+But Consul will treat it as opaque TCP
+
+There is no downstream/upstream xDS graph
+
+No retries
+
+No intentions
+
+No mesh routing
+
+This is by design, not a bug.
+
+4️⃣ Why your “I need real xDS upstream/downstream” conflicts with BGP LB
+
+You are trying to combine two mutually exclusive models:
+
+Model A — Consul Mesh (xDS)
+
+✔ Envoy ↔ Envoy
+✔ Identity routing
+✔ Intentions
+✔ mTLS
+✔ Dynamic discovery
+
+Requires:
+
+Envoy on every hop
+
+Consul agent per service
+
+No opaque LBs in the middle
+
+Model B — BGP Anycast Transport
+
+✔ Cilium LB
+✔ Bird BGP
+✔ Anycast VIP
+✔ Gateway API TLS passthrough
+
+Requires:
+
+Opaque transport
+
+No identity in the middle
+
+No mesh semantics
+
+❗ You cannot have xDS discovery through a BGP LB
+
+Because:
+
+A load balancer is transport, not identity
+
+Consul will never “translate” a BGP VIP into service identity.
+That is exactly why you keep hitting walls.
+
+5️⃣ The two OSS-valid architectures (pick ONE)
+✅ OPTION 1 — Mesh-first (real xDS)
+
+ONLY works if the LB runs Envoy
+
+Client
+ → Envoy (VM, in mesh)
+   → Envoy LB (Cilium Envoy / Envoy DaemonSet)
+     → Envoy Gateway
+       → Service
+
+
+Requirements:
+
+Envoy embedded in Cilium (L7 LB mode)
+
+Consul agent or xDS control integration
+
+No raw BGP passthrough
+
+LB becomes a service identity
+
+This is hard, but valid.
+
+✅ OPTION 2 — Transport-first (what you already built)
+
+NO mesh routing
+
+Client
+ → Envoy VM (API Gateway, NOT mesh)
+   → BGP LB (opaque)
+     → K8s Gateway API (TLS passthrough)
+       → Services
+
+
+Consul role:
+
+Manages only the VM Envoy config
+
+No upstream discovery inside the cluster
+
+No intentions
+
+No TG
+
+No ExternalSNI needed
+
+This is simple, stable, OSS-correct.
+
+6️⃣ Why the HashiCorp TG doc does NOT apply to you
+
+That article assumes:
+
+External system
+
+No LB in the middle
+
+TG terminates TLS
+
+Consul controls the connection
+
+Your setup has:
+
+BGP Anycast
+
+TLS passthrough
+
+Kubernetes Gateway API
+
+Multiple clusters
+
+Submariner later
+
+So the TG model is architecturally wrong for your platform.
+Not misconfigured — wrong model.
+
+7️⃣ Final, honest conclusion
+
+You were correct about:
+
+ExternalSNI schema
+
+Top-level placement
+
+The error being real
+
+Consul not “discovering” the LB magically
+
+But:
+
+👉 You must choose
+
+Either real mesh xDS (Envoy everywhere, including the LB)
+
+Or opaque transport (LB) + simple Envoy ingress
+
+Consul OSS cannot bridge that gap.
+
+If you want, next I can:
+
+Design Envoy-powered Cilium LB (mesh-compatible)
+
+Give a minimal, correct HCL set for Option 2
+
+Show Submariner-ready evolution
+
+Or draw a clean CNFN-style reference architecture
