@@ -1864,4 +1864,64 @@ Kind = "service-defaults"
 Name = "rancher"
 Protocol = "http"
 ExternalSNI = "rancher-klusterx.de.bosch.com"
+------------
 
+-------------
+
+nohup consul connect envoy   -gateway=terminating   -register   -service tg-egress   -admin-bind 0.0.0.0:9904   > /var/log/tg-egress.log 2>&1 &   
+NO_PROXY="*,localhost,127.0.0.1,10.19.143.70" \
+no_proxy="*,localhost,127.0.0.1,10.19.143.70" \
+CONSUL_HTTP_SSL=true \
+CONSUL_HTTP_SSL_VERIFY=false \
+CONSUL_HTTP_ADDR="https://10.19.143.70:8501" \
+CONSUL_GRPC_ADDR="https://10.19.143.70:8502" \
+CONSUL_HTTP_TOKEN="5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2" \
+consul connect envoy \
+  -gateway api \
+  -register \
+  -admin-bind 0.0.0.0:9902 \
+  > /var/log/edge-gw-envoy.log 2>&1 &
+
+Better for sysmed 
+Point Envoy to the local Consul agent and register with the correct service name
+
+NO_PROXY="*,localhost,127.0.0.1" \
+no_proxy="*,localhost,127.0.0.1" \
+CONSUL_HTTP_ADDR="http://127.0.0.1:8500" \
+CONSUL_GRPC_ADDR="http://127.0.0.1:8502" \
+CONSUL_HTTP_TOKEN="5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2" \
+consul connect envoy \
+  -gateway api \
+  -register \
+  -service edge-gw \
+  -admin-bind 0.0.0.0:9902 \
+  > /var/log/edge-gw-envoy.log 2>&1 &
+
+
+sudo consul connect envoy \
+  -sidecar-for edge-proxy-01 \
+  -token 5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2 \
+  -admin-bind 127.0.0.1:19000 &
+
+udo consul connect envoy   -sidecar-for cilium-gateway-hub-ui-gateway   -token 5cedd10e-8c45-73d3-ae04-4e9d1db6b3f2   -admin-bind 127.0.0.1:19001 &
+
+
+
+NO_PROXY="*" no_proxy="*" \
+consul connect envoy \
+  -gateway api \
+  -name edge-gw \
+  -grpc-addr 10.19.143.100:8502 \
+  -address 10.19.143.100:8500 \
+  > /var/log/edge-gw-envoy.log 2>&1 &
+
+
+----
+
+
+consul connect envoy \
+    -gateway=ingress \
+    -register \
+    -service edge-ingress \
+    -address 0.0.0.0:443 \
+    -admin-bind 127.0.0.1:9901
