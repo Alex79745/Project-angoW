@@ -502,3 +502,77 @@ Explain how to keep security while bypassing the VM
 Help you decide if you even need Consul here at all (honest answer)
 
 You’re not “going around” — you just crossed the boundary between network routing and service identity, and Consul only understands one of them.
+-----
+
+
+
+
+Absolutely—your write‑up is spot on. What you’re seeing is intentional behavior in Consul’s model: the API Gateway on VMs forwards only to services in the mesh (i.e., endpoints delivered via EDS), and authorization is enforced by service intentions. A plain catalog registration (like the LB IP by itself) won’t become an upstream for the VM API Gateway; you solved that gap by introducing a terminating‑gateway that exposes a mesh service (hub‑egress) with Destination=10.19.143.82:443. That part is correct and matches the docs. [github.com]
+Right now, you’re blocked only by ACL: your token can’t write the intention that authorizes edge‑gw‑tcp → hub‑egress. That’s why the edge Envoy shows:
+hub‑egress … ::10.19.143.93:8443::health_flags::healthy
+… ::cx_connect_fail::N
+
+The endpoint exists (TG is up), but every mTLS connection attempt is refused by intentions → Envoy increments cx_connect_fail and your client socket on :4443 is accepted then closed (curl reports SSL_ERROR_SYSCALL). This is exactly how Consul behaves when the upstream cluster has no usable (authorized) endpoints. [developer....hicorp.com]
+Below are the precise, minimal steps to finish—no redesign, no re‑wiring—just fix the ACL and you’re done.
+
+✅ What to do (in order)
+1) Use a token that can write intentions
+You need intentions:write to create/modify service‑intentions. (Docs: the Config API requires specific ACLs by kind; for service‑intentions it’s intentions:write.) [discuss.ha...hicorp.com]
+Option A – quick test with a management token
+Temporarily set a management token to perform the write, then revert:
+Shellexport CONSUL_HTTP_TOKEN='<management-token>'Show more lines
+Option B – least privilege token
+Create a policy (with a management token), then mint a token from it:
+Terraform# policy: edge-gw-admin (example)node_prefix ""    { policy = "read" }service_prefix "" { policy = "read" }mesh              = "read"intentions        = "write"Show more lines
+Attach this policy to a new token and:
+Shellexport CONSUL_HTTP_TOKEN='<token-with-intentions:write>'Show more lines
+
+The error you saw—403 Permission denied … lacks permission 'intention:write'—is exactly this. Once you use a token with the right capability, the write will succeed. (The trailing “referenced by gateway/router” text is an additional guard for deletes/overwrites; it doesn’t prevent creating a new intention entry when you have permissions.) [discuss.ha...hicorp.com]
+
+
+2) Create the allow intention (edge‑gw‑tcp → hub‑egress)
+You can write it either as a Config Entry or via the classic CLI:
+Shell# Config Entry formconsul config write - <<'EOF'Kind = "service-intentions"Name = "hub-egress"Sources = [  { Name = "edge-gw-tcp", Action = "allow" }]EOFShow more lines
+or
+Shell# Classic ‘intention’ commandconsul intention create -allow edge-gw-tcp hub-egressShow more lines
+Verify:
+Shellconsul intention list | grep -E 'hub-egress|edge-gw-tcp' || trueShow more lines
+
+VM API Gateway routes attach to gateway listeners and forward to services in the mesh; those flows are governed by service intentions, just like any other Consul Connect traffic.
+
+
+3) Re‑test and watch the upstream stats flip from “connect_fail” to “connected”
+Client → edge TCP listener (preserve SNI; bypass corp proxy):
+ShellHTTP_PROXY= HTTPS_PROXY= ALL_PROXY= http_proxy= https_proxy= all_proxy= \curl -vk -x "" \  https://rancher-klusterx.de.bosch.com:4443 \  --resolve rancher-klusterx.de.bosch.com:4443:10.19.143.93``Show more lines
+Edge Envoy (admin :9903) → check the upstream cluster section:
+Shellcurl -s --noproxy localhost http://localhost:9903/clusters \  | sed -n '/^hub-egress\./,/^$/p'Show more lines
+Before the intention, this showed your host 10.19.143.93:8443 with ::cx_connect_fail::N increasing.
+After the intention, the counter stops increasing; the curl returns the K8s Gateway Passthrough response (TLSRoute by SNI → Rancher). That’s the expected end state. [github.com]
+
+🔎 Why your “recap” is correct—and how it maps to Consul’s model
+
+VM API Gateway on VMs = listeners via api-gateway + routes via tcp-route/http-route. Routes forward to mesh services (i.e., endpoints delivered via EDS).
+Terminating‑gateway turns an external address into a mesh service using ServiceDefaults → Destination; the TG exposes that service locally (here hub‑egress on :8443) and dials the external target (10.19.143.82:443). That’s exactly what your hub‑egress entry is doing. [github.com]
+K8s Gateway is TLS Passthrough and routes purely by SNI to TLSRoutes (e.g., rancher‑klusterx.de.bosch.com). Your TCP listener at the VM preserves SNI end‑to‑end, which is the correct pattern. [github.com]
+Upstream must be “usable”: if the edge Envoy cannot complete an authorized mTLS to its upstream (TG), it records connect failures and your client sees SSL_ERROR_SYSCALL (or HTTP 503 in L7). This is the documented behavior (“no healthy upstream” / empty or unusable cluster). [developer....hicorp.com]
+
+
+🧪 One‑command “doctor” (optional)
+If you want, I’ll paste a tiny gw_b_tg_doctor.sh that:
+
+asserts edge‑gw‑tcp and tg‑egress processes,
+confirms listeners :4443 (edge) and :8443 (TG),
+prints intentions for edge-gw-tcp → hub‑egress,
+dumps the :9903 hub‑egress cluster section (so you see cx_connect_fail stop),
+runs the canonical curl -x "" --resolve …:4443:….
+
+Say “doctor script please” and I’ll drop it ready‑to‑run.
+
+Citations
+
+VM API Gateway routes on VMs: listeners & routes are config entries; routes forward to mesh services.
+ServiceDefaults reference (including Destination, used by terminating‑gateway for external egress). [github.com]
+K8s Gateway (TLS Passthrough) routes by SNI; connecting by IP without matching SNI is reset. [github.com]
+Envoy/Consul behavior: no healthy/authorized upstream → 503 for HTTP or TCP close; cx_connect_fail indicates upstream connection failures. [developer....hicorp.com]
+
+You’re at the finish line—write the single intention with a token that has intentions:write, and your :4443 path will work end‑to‑end.
