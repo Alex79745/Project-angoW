@@ -1442,4 +1442,8 @@ service {
 }
 consul services register hub-gateway-ui.hcl
 consul services register cluster-gateway-ui.hcl
+---Kind      = "tcp-route"
+Name      = "edge-hub-route"
+Parents   = [{Kind="api-gateway", Name="edge-gw-tcp", SectionName="tls4443"}]
+Services  = [{Name="cilium-gateway-hub-ui-gateway"}]
 
