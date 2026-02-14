@@ -17,3 +17,4 @@ Zero-trust networking
 Hub-and-spoke multi-cluster thinking
 
 CNFC / Well-Architected mindset
+Senior Platform Engineer
