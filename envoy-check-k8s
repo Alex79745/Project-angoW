@@ -1960,3 +1960,86 @@ service {
   }
 }
 
+
+er.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::rq_timeout::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::rq_total::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::hostname::
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::health_flags::healthy
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::weight::1
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::region::
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::zone::
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::sub_zone::
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::canary::false
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::priority::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::success_rate::-1
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.5.163:20000::local_origin_success_rate::-1
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::cx_active::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::cx_connect_fail::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::cx_total::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::rq_active::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::rq_error::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::rq_success::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::rq_timeout::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::rq_total::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::hostname::
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::health_flags::healthy
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::weight::1
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::region::
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::zone::
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::sub_zone::
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::canary::false
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::priority::0
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::success_rate::-1
+rancher.default.central-primary-infra.internal.3301f5b2-7a40-f546-330a-d2ff660c775b.consul::10.244.3.174:20000::local_origin_success_rate::-1
+
+root@klusterx-envoyingress-01:~# HTTP_PROXY= HTTPS_PROXY= ALL_PROXY= \
+curl -vk -x "" \
+  https://rancher-klusterx.de.bosch.com \
+  --resolve rancher-klusterx.de.bosch.com:443:10.19.143.93
+* Added rancher-klusterx.de.bosch.com:443:10.19.143.93 to DNS cache
+* Uses proxy env variable no_proxy == 'http://rb-proxy-sl.bosch.com:8008'
+* Hostname rancher-klusterx.de.bosch.com was found in DNS cache
+*   Trying 10.19.143.93:443...
+* Connected to rancher-klusterx.de.bosch.com (10.19.143.93) port 443
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_CHACHA20_POLY1305_SHA256 / X25519 / RSASSA-PSS
+* ALPN: server accepted http/1.1
+* Server certificate:
+*  subject: CN=rancher-klusterx.de.bosch.com
+*  start date: Feb 12 14:17:57 2026 GMT
+*  expire date: Mar 14 14:17:57 2026 GMT
+*  issuer: CN=rancher-klusterx.de.bosch.com
+*  SSL certificate verify result: self-signed certificate (18), continuing anyway.
+*   Certificate level 0: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+* using HTTP/1.x
+> GET / HTTP/1.1
+> Host: rancher-klusterx.de.bosch.com
+> User-Agent: curl/8.5.0
+> Accept: */*
+> 
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* old SSL session ID is stale, removing
+< HTTP/1.1 200 OK
+< cache-control: no-cache, no-store, must-revalidate
+< content-type: application/json
+< expires: Wed 24 Feb 1982 18:42:00 GMT
+< x-api-cattle-auth: false
+< x-api-schemas: https://rancher-klusterx.de.bosch.com/meta/schemas
+< x-content-type-options: nosniff
+< date: Sat, 14 Feb 2026 20:07:58 GMT
+< x-envoy-upstream-service-time: 8
+< server: envoy
+< transfer-encoding: chunked
+< 
+{"type":"collection","links":{"self":"https://rancher-klusterx.de.bosch.com/"},"actions":{},"pagination":{"limit":1000,"total":4},"sort":{"order":"asc","reverse":"https://rancher-klusterx.de.bosch.com/?order=desc"},"resourceType":"apiRoot","data":[{"apiVersion":{"group":"meta.cattle.io","path":"/meta","version":"v1"},"baseType":"apiRoot","links":{"apiRoots":"https://rancher-klusterx.de.bosch.com/meta/apiroots","root":"https://rancher-klusterx.de.bosch.com/meta","schemas":"https://rancher-klusterx.de.bosch.com/meta/schemas","self":"https://rancher-klusterx.de.bosch.com/meta","subscribe":"https://rancher-klusterx.de.bosch.com/meta/subscribe"},"type":"apiRoot"},{"apiVersion":{"group":"management.cattle.io","path":"/v3","version":"v3"},"baseType":"apiRoot","links":{"authConfigs":"https://rancher-klusterx.de.bosch.com/v3/authconfigs","cloudCredentials":"https://rancher-klusterx.de.bosch.com/v3/cloudcredentials","clusterRegistrationTokens":"https://rancher-klusterx.de.bosch.com/v3/clusterregistrationtokens","clusterRoleTemplateBindings":"https://rancher-klusterx.de.bosch.com/v3/clusterroletemplatebindings","clusters":"https://rancher-klusterx.de.bosch.com/v3/clusters","composeConfigs":"https://rancher-klusterx.de.bosch.com/v3/composeconfigs","dynamicSchemas":"https://rancher-klusterx.de.bosch.com/v3/dynamicschemas","features":"https://rancher-klusterx.de.bosch.com/v3/features","fleetWorkspaces":"https://rancher-klusterx.de.bosch.com/v3/fleetworkspaces","globalRoleBindings":"https://rancher-klusterx.de.bosch.com/v3/globalrolebindings","globalRoles":"https://rancher-klusterx.de.bosch.com/v3/globalroles","groupMembers":"https://rancher-klusterx.de.bosch.com/v3/groupmembers","groups":"https://rancher-klusterx.de.bosch.com/v3/groups","kontainerDrivers":"https://rancher-klusterx.de.bosch.com/v3/kontainerdrivers","ldapConfigs":"https://rancher-klusterx.de.bosch.com/v3/ldapconfigs","managementSecrets":"https://rancher-klusterx.de.bosch.com/v3/managementsecrets","nodeDrivers":"https://rancher-klusterx.de.bosch.com/v3/nodedrivers","nodePools":"https://rancher-klusterx.de.bosch.com/v3/nodepools","nodes":"https://rancher-klusterx.de.bosch.com/v3/nodes","oidcClients":"https://rancher-klusterx.de.bosch.com/v3/oidcclients","podSecurityAdmissionConfigurationTemplates":"https://rancher-klusterx.de.bosch.com/v3/podsecurityadmissionconfigurationtemplates","preferences":"https://rancher-klusterx.de.bosch.com/v3/preferences","principals":"https://rancher-klusterx.de.bosch.com/v3/principals","projectNetworkPolicies":"https://rancher-klusterx.de.bosch.com/v3/projectnetworkpolicies","projectRoleTemplateBindings":"https://rancher-klusterx.de.bosch.com/v3/projectroletemplatebindings","projects":"https://rancher-klusterx.de.bosch.com/v3/projects","rancherUserNotifications":"https://rancher-klusterx.de.bosch.com/v3/rancherusernotifications","roleTemplates":"https://rancher-klusterx.de.bosch.com/v3/roletemplates","root":"https://rancher-klusterx.de.bosch.com/v3","samlTokens":"https://rancher-klusterx.de.bosch.com/v3/samltokens","self":"https://rancher-klusterx.de.bosch.com/v3","settings":"https://rancher-klusterx.de.bosch.com/v3/settings","subscribe":"https://rancher-klusterx.de.bosch.com/v3/subscribe","tokens":"https://rancher-klusterx.de.bosch.com/v3/tokens","users":"https://rancher-klusterx.de.bosch.com/v3/users"},"type":"apiRoot"},{"apiVersion":{"group":"cluster.cattle.io","path":"/v3/cluster","version":"v3"},"baseType":"apiRoot","links":{"apiServices":"https://rancher-klusterx.de.bosch.com/v3/cluster/apiservices","namespaces":"https://rancher-klusterx.de.bosch.com/v3/cluster/namespaces","persistentVolumes":"https://rancher-klusterx.de.bosch.com/v3/cluster/persistentvolumes","root":"https://rancher-klusterx.de.bosch.com/v3/cluster","self":"https://rancher-klusterx.de.bosch.com/v3/cluster","storageClasses":"https://rancher-klusterx.de.bosch.com/v3/cluster/storageclasses","subscribe":"https://rancher-klusterx.de.bosch.com/v3/cluster/subscribe"},"type":"apiRoot"},{"apiVersion":{"group":"project.cattle.io","path":"/v3/project","version":"v3"},"baseType":"apiRoot","links":{"basicAuths":"https://rancher-klusterx.de.bosch.com/v3/project/basicauths","certificates":"https://rancher-klusterx.de.bosch.com/v3/project/certificates","configMaps":"https://rancher-klusterx.de.bosch.com/v3/project/configmaps","cronJobs":"https://rancher-klusterx.de.bosch.com/v3/project/cronjobs","daemonSets":"https://rancher-klusterx.de.bosch.com/v3/project/daemonsets","deployments":"https://rancher-klusterx.de.bosch.com/v3/project/deployments","dnsRecords":"https://rancher-klusterx.de.bosch.com/v3/project/dnsrecords","dockerCredentials":"https://rancher-klusterx.de.bosch.com/v3/project/dockercredentials","horizontalPodAutoscalers":"https://rancher-klusterx.de.bosch.com/v3/project/horizontalpodautoscalers","ingresses":"https://rancher-klusterx.de.bosch.com/v3/project/ingresses","jobs":"https://rancher-klusterx.de.bosch.com/v3/project/jobs","namespacedBasicAuths":"https://rancher-klusterx.de.bosch.com/v3/project/namespacedbasicauths","namespacedCertificates":"https://rancher-klusterx.de.bosch.com/v3/project/namespacedcertificates","namespacedDockerCredentials":"https://rancher-klusterx.de.bosch.com/v3/project/namespaceddockercredentials","namespacedSecrets":"https://rancher-klusterx.de.bosch.com/v3/project/namespacedsecrets","namespacedServiceAccountTokens":"https://rancher-klusterx.de.bosch.com/v3/project/namespacedserviceaccounttokens","namespacedSshAuths":"https://rancher-klusterx.de.bosch.com/v3/project/namespacedsshauths","persistentVolumeClaims":"https://rancher-klusterx.de.bosch.com/v3/project/persistentvolumeclaims","pods":"https://rancher-klusterx.de.bosch.com/v3/project/pods","replicaSets":"https://rancher-klusterx.de.bosch.com/v3/project/replicasets","replicationControllers":"https://rancher-klusterx.de.bosch.com/v3/project/replicationcontrollers","root":"https://rancher-klusterx.de.bosch.com/v3/project","secrets":"https://rancher-klusterx.de.bosch.com/v3/project/secrets","self":"https://rancher-klusterx.de.bosch.com/v3/project","serviceAccountTokens":"https://rancher-klusterx.de.bosch.com/v3/project/serviceaccounttokens","services":"https://rancher-klusterx.de.bosch.com/v3/project/services","sshAuths":"https://rancher-klusterx.de.bosch.com/v3/project/sshauths","statefulSets":"https://rancher-klusterx.de.bosch.com/v3/project/statefulsets","subscribe":"https://rancher-klusterx.de.bosch.com/v3/project/subscribe","workloads":"https://rancher-klusterx.de.bosch.com/v3/project/workloads"},"type":"apiRoot"}]}
+* Connection #0 to host rancher-klusterx.de.bosch.com left intact
+
