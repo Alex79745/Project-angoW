@@ -73,3 +73,6 @@ Ingress strategy
 Operational model definition
 
 Knowledge transfer (workshops)
+I am responsible for the end-to-end design, implementation, and operation of the platform ingress and service connectivity architecture,
+spanning Kubernetes and VM-based environments. This includes L4/L7 traffic handling, service mesh integration, and production routing decisions.
+I currently act as the primary knowledge holder for this stack and am leading internal knowledge transfer to reduce operational risk.
