@@ -60,3 +60,16 @@ Manutenção e evolução contínua da plataforma, incluindo integração de ope
 👉 Write them in first person if required, e.g.:
 
 “Responsável por projetar e implementar…” etc.
+End-to-end architecture
+
+Hybrid (VM + Kubernetes)
+
+L4 + L7 networking
+
+Service mesh ownership
+
+Ingress strategy
+
+Operational model definition
+
+Knowledge transfer (workshops)
