@@ -32,4 +32,4 @@ protocol bgp talos_clusters {
 
   graceful restart off;   # ← FIXED
 }
-
+https://crxn.de/docs/routing/bird/bird
