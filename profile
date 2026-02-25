@@ -333,3 +333,21 @@ For further development, I aim to continue improving structured knowledge transf
 📝 Other Topics (IMPORTANT – subtle but powerful)
 
 As platform ownership and responsibility increase, it would be valuable to discuss alignment between role scope, expectations, and compensation, ensuring long-term motivation and sustainability.
+
+
+
+
+############################
+
+
+Bom dia [Nome],
+
+Queria voltar a pegar em dois pontos que considero importantes.
+
+Primeiro, a arquitetura de edge/DMZ que desenhei e implementei já está funcional: acesso via browser corporativo validado, HA com VMs em master/backup e integração com Consul. Gostava de perceber em que ponto está a validação formal desta arquitetura, incluindo o alinhamento com os workshops que já realizámos e os que ainda vou conduzir nas próximas semanas.
+
+Segundo, tendo em conta a responsabilidade técnica, a complexidade do design e o facto de eu estar a conduzir workshops e decisões de arquitetura, acho importante alinharmos o enquadramento da função e o respetivo job level, para garantir consistência entre o que está a ser entregue e o papel formal.
+
+Fico disponível para falarmos brevemente sobre isto ainda esta semana, ou então reservarmos tempo dedicado na nossa reunião de 13/03.
+
+Obrigado,
