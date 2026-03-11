@@ -1028,3 +1028,321 @@ But the telecom design above is more scalable for corporate networks.
 
 💡 If you want, I can also show you a very advanced pattern some Kuma users run with Talos + BGP where the mesh eliminates most zone-ingress hops entirely, reducing cross-cluster latency by ~30–40%.
 That design is quite interesting for the architecture you’re building.
+
+
+###################################################################################################################################################################
+########################################################################################################
+####################################################################################################################################################################
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Good — since you already requested the BGP + port 179 peering with the network team, we can now design the actual deployment for your hub-and-spoke mesh using hostNetwork gateways and no zone-ingress.
+
+Your architecture becomes:
+
+Hub cluster → central services (Rancher, monitoring, ArgoCD)
+
+Spoke clusters → application workloads
+
+BGP VIPs advertised by nodes
+
+MeshGateway on hub nodes
+
+VM BIRD routers advertising service VIPs
+
+This is still fully compatible with the CNCF service-mesh model implemented by Kuma.
+
+1️⃣ Final Architecture for Your Case
+Clients
+   │
+   ▼
+Corporate DNS
+   │
+   ▼
+rancher.com → VIP 10.10.10.10
+grafana.com → VIP 10.10.10.11
+argocd.com  → VIP 10.10.10.12
+
+        │
+        ▼
+Corp Routers
+(BGP routing)
+        │
+        ▼
+BIRD Router VMs
+        │
+        ▼
+Advertised VIP
+        │
+        ▼
+Hub Cluster Gateway Node
+(hostNetwork)
+        │
+        ▼
+Envoy MeshGateway
+        │
+        ▼
+Kuma Mesh
+        │
+        ▼
+Hub Services
+Rancher / Prometheus / ArgoCD
+
+Spoke clusters communicate via the mesh to the hub.
+
+2️⃣ Traffic Flow (Example: Rancher)
+
+User:
+
+https://rancher.com
+
+DNS:
+
+rancher.com → 10.10.10.10
+
+Router:
+
+BGP → nearest gateway node
+
+Node:
+
+Envoy MeshGateway
+port 443
+
+Gateway routing:
+
+Host: rancher.com
+↓
+MeshGatewayRoute
+↓
+rancher service
+
+Service mesh:
+
+Envoy sidecar
+↓
+rancher pod
+
+All internal traffic stays mTLS.
+
+3️⃣ Kuma Installation (Hub Cluster)
+
+Helm repo:
+
+helm repo add kuma https://kumahq.github.io/charts
+helm repo update
+
+Install global control plane.
+
+values-global.yaml
+
+controlPlane:
+  mode: global
+
+zone:
+  enabled: false
+
+ingress:
+  enabled: false
+
+monitoring:
+  enabled: true
+
+Install:
+
+helm install kuma kuma/kuma \
+  -n kuma-system \
+  --create-namespace \
+  -f values-global.yaml
+4️⃣ Spoke Cluster Installation
+
+Each spoke cluster runs zone control plane.
+
+values-zone.yaml
+
+controlPlane:
+  mode: zone
+  kdsGlobalAddress: kuma-global-cp.kuma-system.svc:5685
+
+zone:
+  name: spoke-eu1
+
+ingress:
+  enabled: false
+
+Install:
+
+helm install kuma kuma/kuma \
+  -n kuma-system \
+  --create-namespace \
+  -f values-zone.yaml
+5️⃣ Gateway Node Setup (Hub Cluster)
+
+Pick two nodes.
+
+Label them:
+
+kubectl label node node1 mesh-gateway=true
+kubectl label node node2 mesh-gateway=true
+6️⃣ Mesh Gateway Deployment
+
+mesh-gateway.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mesh-gateway
+  namespace: kuma-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mesh-gateway
+  template:
+    metadata:
+      labels:
+        app: mesh-gateway
+        kuma.io/service: mesh-gateway
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        mesh-gateway: "true"
+      containers:
+      - name: envoy
+        image: envoyproxy/envoy:v1.30.0
+        ports:
+        - containerPort: 443
+
+Apply:
+
+kubectl apply -f mesh-gateway.yaml
+7️⃣ Create MeshGateway Object
+
+gateway.yaml
+
+type: MeshGateway
+mesh: default
+name: hub-gateway
+selectors:
+- match:
+    kuma.io/service: mesh-gateway
+conf:
+  listeners:
+  - port: 443
+    protocol: HTTPS
+
+Apply with:
+
+kumactl apply -f gateway.yaml
+8️⃣ Routing Example (Rancher)
+
+rancher-route.yaml
+
+type: MeshGatewayRoute
+mesh: default
+name: rancher
+selectors:
+- match:
+    kuma.io/service: mesh-gateway
+conf:
+  http:
+  - match:
+    - headers:
+        host:
+          exact: rancher.com
+    backends:
+    - destination:
+        kuma.io/service: rancher
+9️⃣ Namespace Sidecar Injection
+
+Example namespace for apps:
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hub-services
+  labels:
+    kuma.io/sidecar-injection: enabled
+🔟 VM BGP Router Configuration
+
+Your BIRD VM advertises VIPs.
+
+Example:
+
+protocol bgp corp {
+  local as 65010;
+  neighbor 10.0.0.1 as 65000;
+
+  export filter {
+    if net = 10.10.10.10/32 then accept;
+    if net = 10.10.10.11/32 then accept;
+    if net = 10.10.10.12/32 then accept;
+  };
+}
+
+VIP mapping:
+
+10.10.10.10 → rancher.com
+10.10.10.11 → grafana.com
+10.10.10.12 → argocd.com
+1️⃣1️⃣ Observability Stack (Hub)
+
+Typical stack:
+
+Metrics → Prometheus
+Dashboards → Grafana
+GitOps → Argo CD
+
+All deployed in hub cluster.
+
+Spokes send metrics to hub.
+
+1️⃣2️⃣ Security Model
+
+Inside mesh:
+
+mTLS
+service identity
+policy routing
+
+Kuma handles certificates automatically.
+
+Optionally integrate CA with:
+
+HashiCorp Vault
+
+OpenBao
+
+1️⃣3️⃣ What Makes This Architecture Clean
+
+You now have:
+
+Layer	Component
+Edge	BGP VIP
+Gateway	Envoy MeshGateway
+Mesh	Kuma
+Control plane	hub cluster
+Observability	hub cluster
+
+No:
+
+MetalLB
+cloud load balancers
+zone ingress
+1️⃣4️⃣ Result
+
+Your platform becomes:
+
+hub cluster
+ ├ rancher
+ ├ prometheus
+ ├ grafana
+ ├ argocd
+ └ mesh gateway
+
+spoke clusters
+ └ workloads
+
+Clients always reach hub gateway first.
