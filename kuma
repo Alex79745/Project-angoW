@@ -1,0 +1,245 @@
+Boa decisão — para Talos OS é mesmo melhor usar Helm + GitOps porque não tens shell nem ferramentas tipo kumactl dentro dos nodes. O modelo recomendado é:
+	• instalar Kuma via Helm
+	• depois gerir tudo com Argo CD
+	• e correr zone ingress como DaemonSet (hostNetwork) como disseste.
+Vou mostrar instalação production-ready passo a passo.
+
+1️⃣ Adicionar Helm repo do Kuma
+
+helm repo add kuma https://kumahq.github.io/charts
+helm repo update
+Repo oficial:
+https://github.com/kumahq/charts
+
+2️⃣ Instalar Global Control Plane (Hub cluster)
+No cluster hub instalas o global control plane.
+values.yaml
+
+controlPlane:
+  mode: global
+
+ingress:
+  enabled: true
+
+zone:
+  enabled: false
+
+global:
+  image:
+    tag: "2.7.0"
+
+monitoring:
+  enabled: true
+Instalar:
+
+helm install kuma kuma/kuma \
+  -n kuma-system \
+  --create-namespace \
+  -f values.yaml
+Verificar:
+
+kubectl get pods -n kuma-system
+Esperado:
+
+kuma-control-plane
+kuma-dp-injector
+kuma-metrics
+
+3️⃣ Expor Control Plane (VMs vão ligar aqui)
+Precisas expor KDS.
+Service:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kuma-cp
+  namespace: kuma-system
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5685
+    name: kds
+  selector:
+    app: kuma-control-plane
+VMs depois ligam a:
+
+kuma-cp:5685
+
+4️⃣ Instalar Spoke Cluster (Zone)
+Cada cluster Talos será uma zone.
+values-zone.yaml
+
+controlPlane:
+  mode: zone
+
+zone:
+  name: cluster-eu1
+
+kdsGlobalAddress: kuma-cp.kuma-system.svc:5685
+
+ingress:
+  enabled: true
+
+global:
+  image:
+    tag: "2.7.0"
+Instalar:
+
+helm install kuma kuma/kuma \
+  -n kuma-system \
+  --create-namespace \
+  -f values-zone.yaml
+
+5️⃣ Zone ingress como hostNetwork
+Como queres evitar LB e usar nodes via BGP, faz isto:
+zone ingress DaemonSet
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kuma-zone-ingress
+  namespace: kuma-system
+spec:
+  selector:
+    matchLabels:
+      app: kuma-zone-ingress
+  template:
+    metadata:
+      labels:
+        app: kuma-zone-ingress
+    spec:
+      hostNetwork: true
+      containers:
+      - name: envoy
+        image: envoyproxy/envoy:v1.30
+        ports:
+        - containerPort: 10001
+Assim cada node terá:
+
+Envoy zone ingress
+hostNetwork
+Routers podem mandar tráfego para qualquer node.
+
+6️⃣ Ativar sidecar injection
+Namespace:
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: apps
+  labels:
+    kuma.io/sidecar-injection: enabled
+Todos os pods ganham:
+
+envoy sidecar
+
+7️⃣ VM dataplane (DMZ gateways)
+Nas VMs:
+instalar:
+
+curl -L https://kuma.io/installer.sh | sh
+Config dataplane:
+
+type: Dataplane
+mesh: default
+name: dmz-gateway-1
+networking:
+  address: 10.10.1.10
+  inbound:
+  - port: 443
+    servicePort: 443
+    tags:
+      kuma.io/service: gateway
+Correr:
+
+kuma-dp run \
+  --cp-address=https://kuma-cp:5678 \
+  --dataplane-file=dp.yaml
+
+8️⃣ Gateway para rancher.com
+
+type: MeshGateway
+mesh: default
+name: dmz-gateway
+selectors:
+- match:
+    kuma.io/service: gateway
+conf:
+  listeners:
+  - port: 443
+    protocol: HTTPS
+Routing:
+
+type: MeshGatewayRoute
+mesh: default
+name: rancher
+selectors:
+- match:
+    kuma.io/service: gateway
+conf:
+  http:
+  - match:
+    - headers:
+        host:
+          exact: rancher.com
+    backends:
+    - destination:
+        kuma.io/service: rancher
+
+9️⃣ Migração sem downtime do Consul
+Manténs HashiCorp Consul enquanto migras.
+Envoy gateway pode apontar para:
+
+rancher.consul
+ou
+
+rancher.mesh
+Fazes weight shifting.
+Exemplo:
+
+80% consul
+20% kuma
+Depois:
+
+100% kuma
+Sem downtime.
+
+🔟 Estrutura GitOps com ArgoCD
+Repo:
+
+infra-gitops
+ ├── kuma
+ │   ├── hub
+ │   │   └── helm-values.yaml
+ │   ├── clusters
+ │   │   ├── cluster1
+ │   │   └── cluster2
+ │
+ ├── gateways
+ └── policies
+Argo CD sincroniza tudo.
+
+1️⃣1️⃣ Links oficiais
+Docs:
+https://kuma.io/docs/
+Helm:
+https://github.com/kumahq/charts
+Architecture:
+https://kuma.io/docs/latest/production/
+
+1️⃣2️⃣ Recomendações production
+Adicionar:
+	• Prometheus
+	• Grafana
+	• OpenBao
+	• Envoy Proxy metrics
+
+✅ O teu design final fica alinhado com CNCF patterns:
+	• Hub control plane
+	• Spoke zones
+	• Envoy gateways
+	• BGP reachability
+	• mTLS zero trust
+	• GitOps deployment
+
+Se quiseres, posso também mostrar uma otimização usada em plataformas Kuma com 100-300 clusters que elimina 80-90% dos zone ingress e reduz drasticamente o número de rotas BGP, o que provavelmente vai ajudar muito na tua rede corporativa
