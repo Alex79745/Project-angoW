@@ -1343,6 +1343,347 @@ hub cluster
  └ mesh gateway
 
 spoke clusters
- └ workloads
+
+
+
+
+##################################################################
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#################################################################
+ └ Below is a complete, corrected “Edge Gateway” Kuma design that fits your constraints:
+
+Hub-and-spoke clusters
+
+BGP from your VMs
+
+Envoy + BIRD already running on VMs
+
+No Kubernetes load balancers
+
+Minimal VIP usage
+
+Cross-cluster routing
+
+CNCF-aligned architecture
+
+This design uses Edge Gateway VMs as Kuma dataplanes so corporate routers never need to know about cluster nodes.
+
+Mesh control and discovery are handled by Kuma.
+
+1️⃣ Final Architecture (Edge Gateway Pattern)
+                        Corporate Network
+                               │
+                               ▼
+                        Corporate Routers
+                               │
+                               ▼
+                         BGP Peering
+                               │
+                               ▼
+                           BIRD VMs
+                        (Edge Gateways)
+                   Envoy + Kuma Dataplane
+                               │
+                               ▼
+                        Mesh Gateway
+                               │
+                               ▼
+                     Kuma Global Control Plane
+                          (Hub Cluster)
+                               │
+                    ┌──────────┴───────────┐
+                    ▼                      ▼
+
+              Hub Cluster              Spoke Cluster
+             (zone = hub)             (zone = eu1)
+
+         Rancher.mesh               Gitlab.mesh
+         Grafana.mesh               Registry.mesh
+         ArgoCD.mesh                CI.mesh
+
+Key idea:
+
+Your VMs become the mesh edge.
+
+Traffic never needs to reach Kubernetes nodes directly.
+
+2️⃣ Traffic Flow Example
+
+User opens:
+
+https://rancher.company.com
+
+Flow:
+
+Client
+ │
+ ▼
+DNS
+ │
+ ▼
+VIP (BGP advertised)
+ │
+ ▼
+Edge Gateway VM
+ │
+ ▼
+Envoy mesh gateway
+ │
+ ▼
+rancher.mesh
+ │
+ ▼
+Hub cluster pod
+
+Cross-cluster example:
+
+gitlab.company.com
+ ↓
+Edge gateway
+ ↓
+gitlab.mesh
+ ↓
+Spoke cluster EU1
+ ↓
+GitLab pod
+
+Kuma handles the service discovery.
+
+3️⃣ What Runs Where
+Edge Gateway VM
+
+Runs:
+
+BIRD
+Envoy
+kuma-dp
+
+Purpose:
+
+external entry
+mesh dataplane
+BGP advertisement
+Hub Cluster
+
+Runs:
+
+Kuma global control plane
+Rancher
+Grafana
+Prometheus
+ArgoCD
+
+Purpose:
+
+service discovery
+mesh policies
+cross-cluster routing
+platform services
+Spoke Clusters
+
+Runs:
+
+Kuma zone control plane
+workloads
+sidecars
+
+Purpose:
+
+application workloads
+mesh participation
+4️⃣ Install Kuma Global Control Plane (Hub)
+
+Docs:
+
+https://kuma.io/docs/latest/installation/kubernetes/
+
+Add Helm repo:
+
+helm repo add kuma https://kumahq.github.io/charts
+helm repo update
+
+values-global.yaml
+
+controlPlane:
+  mode: global
+
+zone:
+  enabled: false
+
+ingress:
+  enabled: false
+
+monitoring:
+  enabled: true
+
+Install:
+
+helm install kuma kuma/kuma \
+  -n kuma-system \
+  --create-namespace \
+  -f values-global.yaml
+5️⃣ Install Kuma Zone Control Plane (Spokes)
+
+values-zone.yaml
+
+controlPlane:
+  mode: zone
+  kdsGlobalAddress: kuma-global-cp.kuma-system.svc:5685
+
+zone:
+  name: eu1
+
+ingress:
+  enabled: false
+
+Install:
+
+helm install kuma kuma/kuma \
+  -n kuma-system \
+  --create-namespace \
+  -f values-zone.yaml
+6️⃣ Install Kuma Dataplane on Edge Gateway VM
+
+Docs:
+
+https://kuma.io/docs/latest/installation/universal/
+
+Install:
+
+curl -L https://kuma.io/installer.sh | sh
+
+This installs:
+
+kumactl
+kuma-dp
+
+You already have:
+
+Envoy
+BIRD
+7️⃣ Edge Gateway Dataplane Config
+
+edge-gateway.yaml
+
+type: Dataplane
+mesh: default
+name: edge-gateway-1
+networking:
+  address: 10.20.1.10
+  inbound:
+  - port: 443
+    servicePort: 443
+    tags:
+      kuma.io/service: edge-gateway
+
+Run dataplane:
+
+kuma-dp run \
+  --cp-address=https://kuma-global-cp:5678 \
+  --dataplane-file=edge-gateway.yaml
+8️⃣ Mesh Gateway Resource (Hub)
+
+mesh-gateway.yaml
+
+type: MeshGateway
+mesh: default
+name: edge-gateway
+selectors:
+- match:
+    kuma.io/service: edge-gateway
+conf:
+  listeners:
+  - port: 443
+    protocol: HTTPS
+
+Apply:
+
+kumactl apply -f mesh-gateway.yaml
+9️⃣ Automatic Service Discovery
+
+Kuma automatically registers services as:
+
+service-name.mesh
+
+Examples:
+
+rancher.mesh
+grafana.mesh
+gitlab.mesh
+registry.mesh
+
+Discovery is synced using KDS.
+
+Docs:
+
+https://kuma.io/docs/latest/networking/multi-zone/
+
+🔟 BGP Configuration (Edge VM)
+
+Example BIRD config:
+
+protocol bgp corp {
+  local as 65010;
+  neighbor 10.0.0.1 as 65000;
+
+  export filter {
+    if net = 10.10.10.10/32 then accept;
+    if net = 10.10.10.11/32 then accept;
+  };
+}
+
+Routers route traffic to the edge gateway.
+
+1️⃣1️⃣ DNS Layout
+
+You only need a few VIPs.
+
+Example:
+
+rancher.company.com → 10.10.10.10
+grafana.company.com → 10.10.10.10
+gitlab.company.com → 10.10.10.10
+argocd.company.com → 10.10.10.10
+
+Routing happens inside the mesh.
+
+1️⃣2️⃣ Why This Architecture Is Well-Architected
+
+This design follows platform architecture principles:
+
+Reliability
+
+multiple edge gateways
+
+Scalability
+
+service mesh routing
+
+Security
+
+mTLS inside mesh
+
+Network simplicity
+
+few BGP VIPs
+
+Operational clarity
+
+hub control plane
+spoke workloads
+1️⃣3️⃣ Result
+
+Your platform becomes:
+
+2 VIPs
+2 edge gateway VMs
+1 hub cluster
+N spoke clusters
+
+All traffic enters through the mesh.
+
+No LB exhaustion.
+
+✅ If you want, I can also show you the exact GitOps repo layout (ArgoCD apps + Helm values) used to deploy this entire Kuma hub-and-spoke mesh automatically, which makes operating many clusters much easier.
 
 Clients always reach hub gateway first.
