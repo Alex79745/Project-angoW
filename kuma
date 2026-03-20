@@ -3630,10 +3630,55 @@ webhooks:
   sideEffects: None
   timeoutSeconds: 10
 
-PAA3LIS@LIS-C-002L2 MINGW64 ~
 $ kubectx  omni-infra
 ✔ Switched to context "omni-infra".
 
-PAA3LIS@LIS-C-002L2 MINGW64 ~
 $ kubectl get mutatingwebhookconfigurations | grep kuma
 kuma-admission-mutating-webhook-configuration   2          27h
+--------
+
+$ helm install kuma ./kuma-2.13.2.tgz -n kuma-system  -f kuma-global.yaml
+I0320 12:27:11.373172   31656 warnings.go:110] "Warning: would violate PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false (containers \"pre-upgrade-job-init\", \"pre-upgrade-job\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (containers \"pre-upgrade-job-init\", \"pre-upgrade-job\" must set securityContext.capabilities.drop=[\"ALL\"]), seccompProfile (pod or containers \"pre-upgrade-job-init\", \"pre-upgrade-job\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")"
+I0320 12:27:30.431524   31656 warnings.go:110] "Warning: would violate PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false (container \"pre-install-job\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"pre-install-job\" must set securityContext.capabilities.drop=[\"ALL\"]), seccompProfile (pod or container \"pre-install-job\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")"
+I0320 12:27:37.076639   31656 warnings.go:110] "Warning: would violate PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false (container \"control-plane\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"control-plane\" must set securityContext.capabilities.drop=[\"ALL\"])"
+NAME: kuma
+LAST DEPLOYED: Fri Mar 20 12:26:51 2026
+NAMESPACE: kuma-system
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+NOTES:
+kuma has been installed!
+
+Your release is named 'kuma'.
+
+You can access the control-plane via either the GUI, kubectl, the HTTP API, or the kumactl CLI.
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl get mutatingwebhookconfigurations
+NAME                                            WEBHOOKS   AGE
+capi-mutating-webhook-configuration             9          22h
+kuma-admission-mutating-webhook-configuration   2          16s
+rancher.cattle.io                               7          22h
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ cat kuma-global.yaml
+controlPlane:
+  mode: global
+  #envVars:
+  #  KUMA_RUNTIME_KUBERNATES_INJECTOR_ENABLED: "true"
+
+  injector:
+    enabled:true
+
+ingress:
+  enabled: false
+
+monitoring:
+  enabled: true
+
+global:
+  image:
+    # Leave empty to let the Helm chart use its compatible appVersion
+    tag: ""
