@@ -2041,3 +2041,397 @@ global:
 NAME                          TYPE           CLUSTER-IP       EXTERNAL-IP    PORT(S)                              AGE
 kuma-control-plane            ClusterIP      10.103.23.88     <none>         5680/TCP,5681/TCP,5682/TCP,443/TCP   25h
 kuma-global-zone-sync         LoadBalancer   10.111.219.193   10.19.143.83   5685:31586/TCP                       25h
+You’re actually very close — your reasoning makes sense, but the conclusion (adding a Zone CP in the hub) is the part that breaks Kuma’s model.
+
+Let’s straighten it out clearly, without hand-wavy theory.
+
+⚠️ The Core Issue
+
+You created this in the same cluster:
+
+Global CP (via Helm)
+
+Zone CP (your Deployment)
+
+👉 This is not a valid Kuma topology
+
+Even though it feels like “I need a zone for hub services”, Kuma doesn’t work like that.
+
+🧠 The Key Concept (Most Important)
+
+A Kubernetes Global CP already acts as a zone for its own cluster
+
+So your hub cluster is already:
+
+✔ Global Control Plane
+✔ Local zone (implicit)
+✔ Service registry
+
+👉 No extra Zone CP needed. Ever.
+
+❌ Why Your Current Setup Breaks
+
+Your Deployment:
+
+KUMA_MODE=zone
+KUMA_ENVIRONMENT=kubernetes
+
+This tells Kuma:
+
+“I am a separate zone, syncing to a different global”
+
+But…
+
+👉 It’s running in the SAME cluster as Global CP
+
+So you get:
+
+KDS confusion (zone ↔ global loop)
+
+resource ownership conflicts
+
+no proper sync
+
+weird “it runs but doesn’t work” behavior
+
+💥 The Misunderstanding
+
+You said:
+
+“Without zone I can’t resolve Rancher via zone ingress”
+
+That’s the Consul mental model sneaking in.
+
+Kuma does NOT resolve services via:
+
+❌ zone ingress DNS
+❌ per-zone catalogs
+
+Instead:
+
+✔ Envoy asks Control Plane directly
+✔ Control Plane returns endpoints (from ALL zones)
+
+✅ What You ACTUALLY Need
+
+Not a Zone CP.
+
+👉 You need an entry point into the mesh
+
+That is:
+
+🔥 MeshGateway (not Zone Ingress)
+🧱 Correct Architecture (Your Case)
+Hub cluster (your “central” cluster)
+
+✅ Global CP (Helm)
+
+✅ Rancher, Grafana, etc.
+
+✅ MeshGateway (this is the entry point)
+
+Spoke clusters
+
+✅ Zone CP
+
+✅ Workloads
+
+VM / external clients (your “DMZ”)
+
+✅ kuma-dp + Envoy
+
+❗ Connects to Global CP, not a zone
+
+🔁 Traffic Flow (What You Want)
+Browser
+   ↓
+VM (Envoy dataplane)
+   ↓
+MeshGateway (hub)
+   ↓
+rancher service (in hub)
+
+👉 No Zone CP involved in hub.
+
+🔧 What To Change (Concrete)
+1️⃣ DELETE this (important)
+
+Your whole Deployment:
+
+kuma-infra-zone-control-plane
+2️⃣ KEEP
+
+Global CP (Helm install)
+
+3️⃣ CREATE MeshGateway
+
+Example:
+
+apiVersion: kuma.io/v1alpha1
+kind: MeshGateway
+mesh: default
+metadata:
+  name: hub-gateway
+spec:
+  selectors:
+    - match:
+        kuma.io/service: edge-gateway
+  conf:
+    listeners:
+      - port: 443
+        protocol: HTTPS
+4️⃣ VM becomes your “entry point”
+
+Instead of Zone Ingress, use a dataplane:
+
+type: Dataplane
+mesh: default
+name: dmz-gateway-1
+networking:
+  address: <VM-IP>
+  inbound:
+    - port: 443
+      servicePort: 443
+      tags:
+        kuma.io/service: edge-gateway
+
+Run:
+
+kuma-dp run \
+  --cp-address=https://<global-cp>:5678
+5️⃣ Expose Rancher via MeshGatewayRoute
+
+This is what actually routes traffic:
+
+apiVersion: kuma.io/v1alpha1
+kind: MeshGatewayRoute
+mesh: default
+metadata:
+  name: rancher-route
+spec:
+  selectors:
+    - match:
+        kuma.io/service: edge-gateway
+  conf:
+    http:
+      - match:
+          - path:
+              prefix: /
+        forward:
+          - destination:
+              kuma.io/service: rancher
+⚠️ About “Hybrid Mode” (Docs confusion)
+
+When docs say hybrid:
+
+👉 They mean:
+
+Kubernetes zones
+
+VMs (Universal dataplanes)
+
+NOT:
+
+❌ Global + Zone in same cluster
+
+🧩 Your Helm Issue (You were right, but…)
+
+You said:
+
+“Helm ownership conflicts”
+
+Exactly — because:
+
+👉 Helm already owns the Global CP resources
+
+So deploying another CP manually = conflict
+
+👉 That was actually a signal you were going in the wrong direction.
+
+✅ Final Mental Model
+
+Think of Kuma like this:
+
+Global CP = brain
+
+Zones = remote clusters
+
+MeshGateway = entry door
+
+Dataplane (Envoy) = traffic handler
+
+👉 Your hub already has a brain + local body
+👉 You only needed a door (MeshGateway)
+
+🚀 Bottom Line
+
+👉 You do NOT need a Zone CP in the hub
+👉 You DO need:
+
+MeshGateway
+
+Dataplane on VM connected to Global CP
+
+If you want, I can:
+
+Fix your TLS setup properly (no skip verify)
+
+Show a full working Rancher exposure config (HTTPS + SNI)
+
+Or map your current YAML → correct architecture line-by-line
+
+Just tell me 👍
+
+para o global eu não temho porta automaticamente criada pelo zone  cat kuma-global.yaml
+controlPlane:
+  mode: global
+
+
+ingress:
+  enabled: false
+
+monitoring:
+  enabled: true
+
+global:
+  image:
+    # Leave empty to let the Helm chart use its compatible appVersion
+    tag: ""
+ kubectl get svc -n kuma-system
+NAME                          TYPE           CLUSTER-IP       EXTERNAL-IP    PORT(S)                              AGE
+kuma-control-plane            ClusterIP      10.103.23.88     <none>         5680/TCP,5681/TCP,5682/TCP,443/TCP   25h
+kuma-global-zone-sync         LoadBalancer   10.111.219.193   10.19.143.83   5685:31586/TCP
+
+Boa — agora ficou claro o que está a acontecer 👍
+
+👉 O teu problema não é falta de Zone CP no hub
+👉 É só exposição de portas do Global CP
+
+E isso resolve-se sem hack nenhum.
+
+🧠 O que estás a ver (explicado)
+
+Tens isto:
+
+Service do Global CP
+kuma-control-plane (ClusterIP)
+Ports:
+- 5680 (API)
+- 5681
+- 5682
+- 443
+
+👉 interno ao cluster apenas
+
+Service automático para zones
+kuma-global-zone-sync (LoadBalancer)
+Port:
+- 5685 (KDS)
+
+👉 Este já está correto
+👉 É usado por Zone CPs
+
+⚠️ O “problema” que sentes
+
+Dizes:
+
+“não tenho porta automaticamente criada”
+
+✔ Verdade — mas isso é intencional no Kuma
+
+Porque:
+
+Porta	Quem usa	Exposta automaticamente?
+5685	Zone CP → Global CP (KDS)	✅ Sim
+5678 / 5680	Dataplane / API	❌ Não
+🔥 O que te falta MESMO
+
+Tu queres ligar:
+
+👉 VM (kuma-dp) → Global CP
+
+Para isso precisas expor:
+
+👉 xDS / API do control plane
+
+✅ Solução (simples e correta)
+
+Cria um LoadBalancer para o control-plane:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kuma-cp-external
+  namespace: kuma-system
+spec:
+  type: LoadBalancer
+  selector:
+    app: kuma-control-plane
+  ports:
+    - name: xds
+      port: 5678
+      targetPort: 5678
+    - name: api
+      port: 5680
+      targetPort: 5680
+🧪 Depois disso
+
+Vais ter algo tipo:
+
+EXTERNAL-IP: 10.19.x.x
+PORT: 5678
+🔌 VM conecta assim
+kuma-dp run \
+  --cp-address=https://<EXTERNAL-IP>:5678
+⚠️ IMPORTANTE (TLS)
+
+Tu tens isto no zone:
+
+KUMA_MULTIZONE_ZONE_KDS_TLS_SKIP_VERIFY=true
+
+👉 Isso é só para KDS (zone ↔ global)
+
+Para VM:
+
+ou usas cert válido
+
+ou também vais precisar skip verify
+
+💥 Resumo direto
+
+👉 O teu erro foi tentar resolver isto com Zone CP
+
+Mas na realidade:
+
+❌ Não precisas de zone no hub
+❌ Não precisas de zone ingress
+
+👉 Só faltava:
+
+✅ Expor o kuma-control-plane (5678)
+
+🧠 Arquitetura final correta
+VM (kuma-dp)
+     ↓
+LoadBalancer (5678)
+     ↓
+Global CP
+     ↓
+Rancher (K8s service)
+🚀 Extra (recomendado)
+
+Se quiseres fazer isto “à séria”:
+
+usar Ingress + TLS (em vez de LB direto)
+
+usar DNS (ex: kuma.example.com)
+
+configurar certs válidos
+
+Se quiseres, posso montar-te:
+
+✅ config completa com TLS correto
+✅ MeshGateway + hostname tipo rancher.example.com
+✅ ligação VM segura (sem skip verify)
+
+Só diz 👍
