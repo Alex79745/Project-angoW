@@ -550,3 +550,62 @@ This approach replaces per-node DP injection for hub services if you just need m
 For K8s pods in hub cluster that need traffic routing and sidecars, you still need a zone CP.
 
 If you want, I can write a full Helm values.yaml / Deployment template that will automatically create universal DPs for all hub services so you can just helm install in the hub cluster. This is exactly what you need for your hybrid hub-DMZ mesh.
+
+
+----------------------------------------------------------------
+##############################################################
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$  helm install kuma ./kuma-2.13.2.tgz   -n kuma-system   -f values-hub-zone.yaml
+level=ERROR msg="release name check failed" error="cannot reuse a name that is still in use"
+Error: INSTALLATION FAILED: release name check failed: cannot reuse a name that is still in use
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$  helm install kuma-zone ./kuma-2.13.2.tgz   -n kuma-system   -f values-hub-zone.yaml
+Error: INSTALLATION FAILED: unable to continue with install: ServiceAccount "kuma-control-plane" in namespace "kuma-system" exists and cannot be imported into the current release: invalid ownership metadata; annotation validation error: key "meta.helm.sh/release-name" must equal "kuma-zone": current value is "kuma"
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl label ns kuma-system app.kubernetes.io/managed-by=Helm
+namespace/kuma-system labeled
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl annotate ns kuma-system meta.helm.sh/release-name=kuma-zone
+namespace/kuma-system annotated
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl annotate ns kuma-system meta.helm.sh/release-namespace=kuma-system
+namespace/kuma-system annotated
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$  helm install kuma-zone ./kuma-2.13.2.tgz   -n kuma-system   -f values-hub-zone.yaml
+Error: INSTALLATION FAILED: unable to continue with install: ServiceAccount "kuma-control-plane" in namespace "kuma-system" exists and cannot be imported into the current release: invalid ownership metadata; annotation validation error: key "meta.helm.sh/release-name" must equal "kuma-zone": current value is "kuma"
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$  helm install kuma-zone ./kuma-2.13.2.tgz   -n kuma-system   -f values-hub-zone.yaml --force
+Flag --force has been deprecated, use --force-replace instead
+Error: INSTALLATION FAILED: unable to continue with install: ServiceAccount "kuma-control-plane" in namespace "kuma-system" exists and cannot be imported into the current release: invalid ownership metadata; annotation validation error: key "meta.helm.sh/release-name" must equal "kuma-zone": current value is "kuma"
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ vim values-hub-zone.yaml
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ cat values-hub-zone.yaml
+controlPlane:
+  mode: zone
+  zone: omni-infra
+  kdsGlobalAddress: grpcs://10.19.143.83:5685
+  image:
+    tag: "2.13.2"
+
+  # Disable admission/injector in this Zone to avoid webhooks
+  envVars:
+    KUMA_MULTIZONE_ZONE_KDS_TLS_SKIP_VERIFY: "true"     # while your KDS cert lacks SAN=IP:10.19.143.83
+  #  KUMA_RUNTIME_KUBERNETES_ADMISSION_SERVER_DISABLED: "true"
+  #  KUMA_RUNTIME_KUBERNETES_INJECTOR_ENABLED: "true"
+
+ingress:
+  enabled: false
+
+global:
+  image:
+    tag: "2.13.2"
