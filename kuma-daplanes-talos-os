@@ -609,3 +609,150 @@ ingress:
 global:
   image:
     tag: "2.13.2"
+Perfect — now you’re aligned with a valid production pattern 👍
+We’ll do exactly this:
+
+SAME CLUSTER (infra / hub)
+
+✔ Global CP  → Universal mode (manual Deployment, no K8s features)
+✔ Zone CP    → Helm (full Kubernetes integration + injector)
+
+This avoids all conflicts and is the only safe way to run both in one cluster.
+
+🧱 1. GLOBAL CP (Universal) — Deployment
+
+👉 This runs as a plain process inside Kubernetes
+👉 NO injector, NO webhooks, NO CRDs
+
+✅ kuma-global-cp.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuma-global-cp
+  namespace: kuma-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kuma-global-cp
+  template:
+    metadata:
+      labels:
+        app: kuma-global-cp
+    spec:
+      containers:
+      - name: kuma-cp
+        image: docker.io/kumahq/kuma-cp:2.13.2
+        args:
+          - run
+          - --mode=global
+        ports:
+        - containerPort: 5680   # admin API
+        - containerPort: 5685   # KDS (zones connect here)
+        env:
+        - name: KUMA_MODE
+          value: "global"
+
+        # 🔥 IMPORTANT: use memory store or external store (prod = Postgres)
+        - name: KUMA_STORE_TYPE
+          value: memory
+✅ Service for Global CP
+apiVersion: v1
+kind: Service
+metadata:
+  name: kuma-global-cp
+  namespace: kuma-system
+spec:
+  type: ClusterIP
+  selector:
+    app: kuma-global-cp
+  ports:
+  - name: admin
+    port: 5680
+    targetPort: 5680
+  - name: kds
+    port: 5685
+    targetPort: 5685
+🚨 PROD NOTE (IMPORTANT)
+
+For production, DO NOT use memory store
+
+Replace with:
+
+- name: KUMA_STORE_TYPE
+  value: postgres
+
+(and configure Postgres)
+
+⚙️ 2. ZONE CP (Helm) — your infra cluster
+✅ values-zone.yaml
+controlPlane:
+  mode: zone
+  zone: omni-infra
+
+  kdsGlobalAddress: grpcs://kuma-global-cp.kuma-system.svc:5685
+
+  envVars:
+    KUMA_MULTIZONE_ZONE_KDS_TLS_SKIP_VERIFY: "true"
+
+ingress:
+  enabled: false
+
+monitoring:
+  enabled: true
+
+global:
+  image:
+    tag: "2.13.2"
+✅ Install
+helm install kuma ./kuma-2.13.2.tgz \
+  -n kuma-system \
+  --create-namespace \
+  -f values-zone.yaml
+🔗 3. FINAL ARCHITECTURE
+kuma-system namespace:
+
+[ kuma-global-cp ]  (universal)
+        ↓ KDS :5685
+
+[ kuma (zone CP via Helm) ]
+        ↓
+   sidecar injection
+   dataplanes
+   DMZ VMs
+🌐 4. DMZ VMs (your case)
+
+👉 They MUST connect to:
+
+zone CP (kuma-control-plane)
+
+NOT global.
+
+🔥 5. Why this works
+Component	Handles
+Global CP	config + sync
+Zone CP	dataplanes + injection
+DMZ VMs	connect to zone
+K8s pods	injected by zone
+⚠️ 6. Things you MUST avoid
+
+❌ Do NOT install global via Helm
+❌ Do NOT run global in kubernetes mode
+❌ Do NOT expose dataplanes to global
+
+🚀 7. Production improvements (strongly recommended)
+✔ Add Postgres for global
+✔ Add TLS (instead of skip verify)
+✔ Expose global via LoadBalancer if zones are external
+✔ Backup global state
+💬 If you want next
+
+I can help you with:
+
+✅ Postgres config for global CP
+
+✅ Proper mTLS between zone ↔ global (no skip verify)
+
+✅ DMZ dataplane config (real working example)
+
+✅ Multi-cluster service discovery (*.mesh)
