@@ -2695,3 +2695,165 @@ LimitNOFILE=1048576
 
 [Install]
 WantedBy=multi-user.target
+#########################33
+
+
+kubectl get mutatingwebhookconfigurations kuma-admission-mutating-webhook-configuration -o yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    meta.helm.sh/release-name: kuma
+    meta.helm.sh/release-namespace: kuma-system
+  creationTimestamp: "2026-03-19T08:46:19Z"
+  generation: 1
+  labels:
+    app: kuma-control-plane
+    app.kubernetes.io/instance: kuma
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kuma
+    app.kubernetes.io/version: 2.13.2
+    helm.sh/chart: kuma-2.13.2
+  name: kuma-admission-mutating-webhook-configuration
+  resourceVersion: "50967476"
+  uid: 7ff4bac0-17c5-4a67-a706-cc6b1b5bbbd1
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUREekNDQWZlZ0F3SUJBZ0lRWDZUS3pBSDc0ZGdXalk1b1BmRnVlVEFOQmdrcWhraUc5dzBCQVFzRkFEQVMKTVJBd0RnWURWUVFERXdkcmRXMWhMV05oTUI0WERUSTJNRE14T1RBNE5EVXpPRm9YRFRNMk1ETXhOakE0TkRVegpPRm93RWpFUU1BNEdBMVVFQXhNSGEzVnRZUzFqWVRDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDCkFRb0NnZ0VCQU0wbmRnbXlXT1YzdXJ4VldrY1FraXB4bmltM1pOYnFtbWpoak82bW9Ia2s5UmVnblBQMUNSckcKUUVSZ0xzOGlmckJnUkJxdDk1WXpBcjU3V24vMjJMRTJRUWVPdE1LUFB6bGJUOTJObkg0aXZ5Y1VRM0hFY1JMUAp1VDRhclhzN0xkdWRnRVJGazZmU29ENVh0MzlWN2xQaGZFUUNHRVJRY1hpVG1hK3I3MHcrQlcwUGZJc2dLcVh1ClUvM0ZkL0ZiOXlvckZ6OTVLRVNYSFp6ZklMa21GR0JlUERTQ0dtWUNOelVuVmZOc3gvWktwWklpQmZtdjJBYmsKRHRDOXEzSzB5OUtkSnQyR3pLNHhQWHhFUi9KdTB1THVBNkN3TElPekNiUTBaUzFDVGVDWU41MTZNbHUzM1hSRwpvU3ArU2IxbmZVWG54RzkvSG5XR0VFRnJGb3EzWjRzQ0F3RUFBYU5oTUY4d0RnWURWUjBQQVFIL0JBUURBZ0trCk1CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0RBakFQQmdOVkhSTUJBZjhFQlRBREFRSC8KTUIwR0ExVWREZ1FXQkJRWnBsMHNUMUIyVzNCU3RzQVlZRTJwVUJnT3J6QU5CZ2txaGtpRzl3MEJBUXNGQUFPQwpBUUVBSjB6NGxMWWNERXRnemFGckhEbC8xSU1FYTBQc0syRFZBZit2dkRIU2hveUdTZHYrR2pUdDFsSWkyL0t6ClQ0Tk5sVGpsTHpFVmNZZHVOTCtVM296UVN5SEtsSUFWbjZxN2xEWmczZ2tlQTYreFZNSE5jVU1zTUxPNFVvTzIKaVVUcFBzM3ZueHU0SUdQY2dhWkhSOER6Y1pOSHhJR0RvdWNYNml4K3daWittRmE4RjR3Mzl5dkl6QUNGRnRxVAoyWFNyWlhSQ056VHFCZlQraEFSaXJadHphdFI0STBSV2dpUlM4WFZ5dmk1N1VKMStZa3A2aGFKQXRmTDljMDJyCjFFN3FESHhqRWNEM2MraExYSWhVdnJlTzVQa3ZFL0ZSVFRYNDFLL2dsRWpIR3gxZElTMm5Uem1aYnJjWXd1ZGIKemh4VkFsRzUxRjBGdHdUNEFDc3NIeTBTQ1E9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    service:
+      name: kuma-control-plane
+      namespace: kuma-system
+      path: /default-kuma-io-v1alpha1-mesh
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: mesh.defaulter.kuma-admission.kuma.io
+  namespaceSelector:
+    matchExpressions:
+    - key: kuma.io/sidecar-injection
+      operator: Exists
+    - key: kubernetes.io/metadata.name
+      operator: NotIn
+      values:
+      - kube-system
+  objectSelector: {}
+  reinvocationPolicy: Never
+  rules:
+  - apiGroups:
+    - kuma.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - meshes
+    - dataplanes
+    - dataplaneinsights
+    - meshgateways
+    - zoneingresses
+    - zoneingressinsights
+    - zoneegresses
+    - zoneegressinsights
+    - serviceinsights
+    - zone
+    - zoneinsights
+    - meshaccesslogs
+    - meshcircuitbreakers
+    - meshfaultinjections
+    - meshhealthchecks
+    - meshhttproutes
+    - meshloadbalancingstrategies
+    - meshmetrics
+    - meshpassthroughs
+    - meshproxypatches
+    - meshratelimits
+    - meshretries
+    - meshtcproutes
+    - meshtimeouts
+    - meshtlses
+    - meshtraces
+    - meshtrafficpermissions
+    - hostnamegenerators
+    - meshexternalservices
+    - meshidentities
+    - meshmultizoneservices
+    - meshservices
+    - meshtrusts
+    - workloads
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 10
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUREekNDQWZlZ0F3SUJBZ0lRWDZUS3pBSDc0ZGdXalk1b1BmRnVlVEFOQmdrcWhraUc5dzBCQVFzRkFEQVMKTVJBd0RnWURWUVFERXdkcmRXMWhMV05oTUI0WERUSTJNRE14T1RBNE5EVXpPRm9YRFRNMk1ETXhOakE0TkRVegpPRm93RWpFUU1BNEdBMVVFQXhNSGEzVnRZUzFqWVRDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDCkFRb0NnZ0VCQU0wbmRnbXlXT1YzdXJ4VldrY1FraXB4bmltM1pOYnFtbWpoak82bW9Ia2s5UmVnblBQMUNSckcKUUVSZ0xzOGlmckJnUkJxdDk1WXpBcjU3V24vMjJMRTJRUWVPdE1LUFB6bGJUOTJObkg0aXZ5Y1VRM0hFY1JMUAp1VDRhclhzN0xkdWRnRVJGazZmU29ENVh0MzlWN2xQaGZFUUNHRVJRY1hpVG1hK3I3MHcrQlcwUGZJc2dLcVh1ClUvM0ZkL0ZiOXlvckZ6OTVLRVNYSFp6ZklMa21GR0JlUERTQ0dtWUNOelVuVmZOc3gvWktwWklpQmZtdjJBYmsKRHRDOXEzSzB5OUtkSnQyR3pLNHhQWHhFUi9KdTB1THVBNkN3TElPekNiUTBaUzFDVGVDWU41MTZNbHUzM1hSRwpvU3ArU2IxbmZVWG54RzkvSG5XR0VFRnJGb3EzWjRzQ0F3RUFBYU5oTUY4d0RnWURWUjBQQVFIL0JBUURBZ0trCk1CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0RBakFQQmdOVkhSTUJBZjhFQlRBREFRSC8KTUIwR0ExVWREZ1FXQkJRWnBsMHNUMUIyVzNCU3RzQVlZRTJwVUJnT3J6QU5CZ2txaGtpRzl3MEJBUXNGQUFPQwpBUUVBSjB6NGxMWWNERXRnemFGckhEbC8xSU1FYTBQc0syRFZBZit2dkRIU2hveUdTZHYrR2pUdDFsSWkyL0t6ClQ0Tk5sVGpsTHpFVmNZZHVOTCtVM296UVN5SEtsSUFWbjZxN2xEWmczZ2tlQTYreFZNSE5jVU1zTUxPNFVvTzIKaVVUcFBzM3ZueHU0SUdQY2dhWkhSOER6Y1pOSHhJR0RvdWNYNml4K3daWittRmE4RjR3Mzl5dkl6QUNGRnRxVAoyWFNyWlhSQ056VHFCZlQraEFSaXJadHphdFI0STBSV2dpUlM4WFZ5dmk1N1VKMStZa3A2aGFKQXRmTDljMDJyCjFFN3FESHhqRWNEM2MraExYSWhVdnJlTzVQa3ZFL0ZSVFRYNDFLL2dsRWpIR3gxZElTMm5Uem1aYnJjWXd1ZGIKemh4VkFsRzUxRjBGdHdUNEFDc3NIeTBTQ1E9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    service:
+      name: kuma-control-plane
+      namespace: kuma-system
+      path: /owner-reference-kuma-io-v1alpha1
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: owner-reference.kuma-admission.kuma.io
+  namespaceSelector:
+    matchExpressions:
+    - key: kuma.io/sidecar-injection
+      operator: Exists
+    - key: kubernetes.io/metadata.name
+      operator: NotIn
+      values:
+      - kube-system
+  objectSelector: {}
+  reinvocationPolicy: Never
+  rules:
+  - apiGroups:
+    - kuma.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    resources:
+    - circuitbreakers
+    - externalservices
+    - faultinjections
+    - healthchecks
+    - meshgateways
+    - meshgatewayroutes
+    - proxytemplates
+    - ratelimits
+    - retries
+    - timeouts
+    - trafficlogs
+    - trafficpermissions
+    - trafficroutes
+    - traffictraces
+    - virtualoutbounds
+    - meshaccesslogs
+    - meshcircuitbreakers
+    - meshfaultinjections
+    - meshhealthchecks
+    - meshhttproutes
+    - meshloadbalancingstrategies
+    - meshmetrics
+    - meshpassthroughs
+    - meshproxypatches
+    - meshratelimits
+    - meshretries
+    - meshtcproutes
+    - meshtimeouts
+    - meshtlses
+    - meshtraces
+    - meshtrafficpermissions
+    - hostnamegenerators
+    - meshexternalservices
+    - meshidentities
+    - meshmultizoneservices
+    - meshservices
+    - meshtrusts
+    - workloads
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 10
