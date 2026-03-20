@@ -2442,11 +2442,9 @@ rancher-68d554b5d4-9kgwb           1/1     Running   1 (24m ago)   25m
 rancher-68d554b5d4-cvs8n           1/1     Running   0             25m
 rancher-webhook-867d747f79-xrdqz   1/1     Running   0             25m
 
-PAA3LIS@LIS-C-002L2 MINGW64 ~
 $ kubectl get pods -n cattle-system rancher-68d554b5d4-9kgwb -o ymal
 error: unable to match a printer suitable for the output format "ymal", allowed formats are: custom-columns,custom-columns-file,go-template,go-template-file,json,jsonpath,jsonpath-as-json,jsonpath-file,name,template,templatefile,wide,yaml
 
-PAA3LIS@LIS-C-002L2 MINGW64 ~
 $ kubectl get pods -n cattle-system rancher-68d554b5d4-9kgwb -o yaml
 apiVersion: v1
 kind: Pod
@@ -2511,11 +2509,11 @@ spec:
     - name: IMPERATIVE_API_APP_SELECTOR
       value: rancher
     - name: HTTP_PROXY
-      value: rb-proxy-sl.bosch.com:8080
+      value: 
     - name: HTTPS_PROXY
-      value: rb-proxy-sl.bosch.com:8080
+      value:
     - name: NO_PROXY
-      value: bosch.com,.bosch.com,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16
+      value: 
     image: rancher/rancher:v2.13.2
     imagePullPolicy: IfNotPresent
     livenessProbe:
@@ -2669,3 +2667,31 @@ status:
   - ip: 10.244.4.1
   qosClass: BestEffort
   startTime: "2026-03-20T10:36:20Z"
+Unit]
+Description=Kuma Dataplane Proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Environment=NO_PROXY=10.0.0.0/8,127.0.0.1,localhost,10.244.0.0/16
+Environment=HTTPS_PROXY=
+Environment=HTTP_PROXY=
+
+ExecStart=/usr/local/bin/kuma-dp run \
+  --cp-address=https://10.19.143.84:5678 \
+  --dataplane-file=/etc/kuma/dp-dmz-gw-1.yaml \
+  --dataplane-token-file=/etc/kuma/token/dmz-gw.token \
+  --dns-enabled=false \
+  --ca-cert-file=/etc/kuma/certs/ca.crt 
+ 
+
+Restart=always
+RestartSec=5
+
+# Increase limits for Envoy
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target
