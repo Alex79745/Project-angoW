@@ -456,3 +456,97 @@ spec:
         ports:
         - containerPort: 5678
         - containerPort: 5676
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+Ah — now I fully see what you want: you need the Global CP to “see” your hub services via dataplanes so the DMZ gateways can route traffic, even though the global CP cluster itself isn’t a zone and won’t run injections. Let’s break this down carefully.
+
+1️⃣ The problem
+
+Global CP cluster: runs global control plane, no sidecar injector.
+
+Hub services (K8s pods): you want them to be addressable by the DMZ gateways / spokes via the mesh.
+
+DMZ VMs: universal dataplanes, external, can’t use the Kubernetes injector.
+
+Global CP cannot inject pods or “see” Kubernetes services by itself. It only coordinates dataplanes that are registered to it.
+
+So if you want all hub services registered as dataplanes, you need something to act as a “proxy dataplane” inside the cluster.
+
+2️⃣ The solution
+
+You can create a Deployment inside the hub cluster that acts as a universal dataplane per service.
+
+This deployment will register a DP with the Global CP.
+
+It will point to the hub service inside the cluster.
+
+This allows DMZ gateways to see hub services through the mesh.
+
+Essentially:
+
+[Global CP]
+   ^
+   | KDS
+[Hub Universal DPs per service]  <-- deployment inside hub
+   |
+   v
+[Hub services (K8s pods)]
+
+✅ Benefits:
+
+You don’t need a separate cluster just for global DP.
+
+DMZ VMs (universal) can route through global CP to these service-DPs.
+
+Works fully in a hub-spoke hybrid setup.
+
+3️⃣ How to implement
+
+Example Deployment per service (universal dataplane):
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuma-universal-dp-proxy
+  namespace: kuma-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kuma-universal-dp
+  template:
+    metadata:
+      labels:
+        app: kuma-universal-dp
+    spec:
+      containers:
+      - name: kuma-dp
+        image: kumahq/kuma-dp:2.13.2
+        env:
+        - name: KUMA_CONTROL_PLANE_URL
+          value: "https://<GLOBAL_CP_ADDRESS>:5685"
+        - name: KUMA_DATAPLANE_NAME
+          value: "hub-service-1"
+        - name: KUMA_DATAPLANE_MESH
+          value: "hub-mesh"
+        - name: KUMA_DATAPLANE_SERVICE
+          value: "service1.kuma-system.svc.cluster.local:80"
+
+You can replicate this Deployment per service you want visible globally.
+
+Each DP acts like a mesh proxy for that service.
+
+DMZ universal DPs and other zones can now route to these “hub service DPs”.
+
+4️⃣ Notes / Gotchas
+
+Global CP itself never exposes ports — universal DP is needed to register outside workloads.
+
+This approach replaces per-node DP injection for hub services if you just need mesh visibility.
+
+For K8s pods in hub cluster that need traffic routing and sidecars, you still need a zone CP.
+
+If you want, I can write a full Helm values.yaml / Deployment template that will automatically create universal DPs for all hub services so you can just helm install in the hub cluster. This is exactly what you need for your hybrid hub-DMZ mesh.
