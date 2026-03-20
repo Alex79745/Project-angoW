@@ -2020,3 +2020,20 @@ Show exact MeshGatewayRoute for Rancher
 Or map Consul → Kuma migration cleanly
 
 Just tell me 👍
+
+
+ cat kuma-global.yaml
+controlPlane:
+  mode: global
+
+
+ingress:
+  enabled: false
+
+monitoring:
+  enabled: true
+
+global:
+  image:
+    # Leave empty to let the Helm chart use its compatible appVersion
+    tag: ""
