@@ -2037,3 +2037,7 @@ global:
   image:
     # Leave empty to let the Helm chart use its compatible appVersion
     tag: ""
+ kubectl get svc -n kuma-system
+NAME                          TYPE           CLUSTER-IP       EXTERNAL-IP    PORT(S)                              AGE
+kuma-control-plane            ClusterIP      10.103.23.88     <none>         5680/TCP,5681/TCP,5682/TCP,443/TCP   25h
+kuma-global-zone-sync         LoadBalancer   10.111.219.193   10.19.143.83   5685:31586/TCP                       25h
