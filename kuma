@@ -2435,3 +2435,237 @@ Se quiseres, posso montar-te:
 ✅ ligação VM segura (sem skip verify)
 
 Só diz 👍
+$ kubectl get pods -n cattle-system
+NAME                               READY   STATUS    RESTARTS      AGE
+rancher-68d554b5d4-8lkkq           1/1     Running   1 (24m ago)   25m
+rancher-68d554b5d4-9kgwb           1/1     Running   1 (24m ago)   25m
+rancher-68d554b5d4-cvs8n           1/1     Running   0             25m
+rancher-webhook-867d747f79-xrdqz   1/1     Running   0             25m
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl get pods -n cattle-system rancher-68d554b5d4-9kgwb -o ymal
+error: unable to match a printer suitable for the output format "ymal", allowed formats are: custom-columns,custom-columns-file,go-template,go-template-file,json,jsonpath,jsonpath-as-json,jsonpath-file,name,template,templatefile,wide,yaml
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl get pods -n cattle-system rancher-68d554b5d4-9kgwb -o yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubectl.kubernetes.io/restartedAt: "2026-03-17T09:58:56Z"
+    kuma.io/port: "443"
+    kuma.io/protocol: https
+    kuma.io/sidecar-injection: enabled
+  creationTimestamp: "2026-03-20T10:35:39Z"
+  generateName: rancher-68d554b5d4-
+  generation: 1
+  labels:
+    app: rancher
+    pod-template-hash: 68d554b5d4
+    release: rancher
+  name: rancher-68d554b5d4-9kgwb
+  namespace: cattle-system
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: rancher-68d554b5d4
+    uid: 0dc7d3b0-b955-45b3-ba80-dcce87a9b62f
+  resourceVersion: "51744399"
+  uid: 37f9833c-cb5f-4910-bd57-934eb6ebba62
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/os
+            operator: NotIn
+            values:
+            - windows
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - rancher
+          topologyKey: kubernetes.io/hostname
+        weight: 100
+  containers:
+  - args:
+    - --no-cacerts
+    - --http-listen-port=80
+    - --https-listen-port=443
+    - --add-local=true
+    env:
+    - name: CATTLE_NAMESPACE
+      value: cattle-system
+    - name: CATTLE_PEER_SERVICE
+      value: rancher
+    - name: IMPERATIVE_API_DIRECT
+      value: "true"
+    - name: IMPERATIVE_API_APP_SELECTOR
+      value: rancher
+    - name: HTTP_PROXY
+      value: rb-proxy-sl.bosch.com:8080
+    - name: HTTPS_PROXY
+      value: rb-proxy-sl.bosch.com:8080
+    - name: NO_PROXY
+      value: bosch.com,.bosch.com,10.0.0.0/8,172.16.0.0/16,192.168.0.0/16
+    image: rancher/rancher:v2.13.2
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 5
+      httpGet:
+        path: /healthz
+        port: 80
+        scheme: HTTP
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 5
+    name: rancher
+    ports:
+    - containerPort: 80
+      protocol: TCP
+    - containerPort: 6666
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 5
+      httpGet:
+        path: /healthz
+        port: 80
+        scheme: HTTP
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 5
+    resources: {}
+    startupProbe:
+      failureThreshold: 12
+      httpGet:
+        path: /healthz
+        port: 80
+        scheme: HTTP
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-kznn9
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: klusterx-worker-infra-01
+  preemptionPolicy: PreemptLowerPriority
+  priority: 1000000000
+  priorityClassName: rancher-critical
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: rancher
+  serviceAccountName: rancher
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoSchedule
+    key: cattle.io/os
+    operator: Equal
+    value: linux
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-kznn9
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-03-20T10:36:23Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-03-20T10:36:20Z"
+    observedGeneration: 1
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-03-20T10:37:00Z"
+    observedGeneration: 1
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-03-20T10:37:00Z"
+    observedGeneration: 1
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-03-20T10:36:20Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://94d9d53f86f5be4d4d2da1bf79e4c327ffa0785dbff3a56edacf0f7b4e79c84a
+    image: docker.io/rancher/rancher:v2.13.2
+    imageID: docker.io/rancher/rancher@sha256:9d6dd0a873545a45c4ba066ac9bd673700a1570897d46a874ecd73a9a05a2121
+    lastState:
+      terminated:
+        containerID: containerd://e8eb546d15d200a551d3d9556b8ba39005194c18cf18eb2820d1d6b76f1bbfc1
+        exitCode: 1
+        finishedAt: "2026-03-20T10:36:39Z"
+        reason: Error
+        startedAt: "2026-03-20T10:36:22Z"
+    name: rancher
+    ready: true
+    resources: {}
+    restartCount: 1
+    started: true
+    state:
+      running:
+        startedAt: "2026-03-20T10:36:41Z"
+    user:
+      linux:
+        gid: 0
+        supplementalGroups:
+        - 0
+        uid: 0
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-kznn9
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 10.19.143.67
+  hostIPs:
+  - ip: 10.19.143.67
+  observedGeneration: 1
+  phase: Running
+  podIP: 10.244.4.1
+  podIPs:
+  - ip: 10.244.4.1
+  qosClass: BestEffort
+  startTime: "2026-03-20T10:36:20Z"
