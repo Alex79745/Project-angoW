@@ -760,6 +760,14 @@ I can help you with:
 
 
 ################################
+
+"dpServer":{
+  ...
+  "authn":{
+    "dpProxy":{
+      "type":"serviceAccountToken"
+
+
 2026-03-21T20:59:20.993Z        INFO    xds.server      registering Aggregated Discovery Service V3 in Dataplane Server
 2026-03-21T20:59:20.993Z        INFO    xds.bootstrap   registering Bootstrap in Dataplane Server
 2026-03-21T20:59:21.101Z        INFO    mads-server     MADS v1 is enabled
