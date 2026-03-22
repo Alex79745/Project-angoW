@@ -1276,3 +1276,133 @@ kubectl -n cattle-system patch deploy rancher --type='strategic' -p '{
     "kuma.io/gateway": "enabled"
   }}}}
 }'
+
+
+
+###########################################
+##########################################
+
+
+
+[2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.geoip_providers: envoy.geoip_providers.maxmind                                           │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.filters.listener: envoy.filters.listener.http_inspector, envoy.filters.listener.local_ra │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.udp_packet_writer: envoy.udp_packet_writer.default, envoy.udp_packet_writer.gso          │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.access_loggers: envoy.access_loggers.file, envoy.access_loggers.fluentd, envoy.access_lo │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   quic.http_server_connection: quic.http_server_connection.default                               │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.internal_redirect_predicates: envoy.internal_redirect_predicates.allow_listed_routes, en │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.health_checkers: envoy.health_checkers.grpc, envoy.health_checkers.http, envoy.health_ch │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.matching.action: envoy.matching.actions.format_string, filter-chain-name                 │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.tracers: envoy.tracers.datadog, envoy.tracers.fluentd, envoy.tracers.opentelemetry, envo │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.formatter: envoy.formatter.cel, envoy.formatter.metadata, envoy.formatter.req_without_qu │
+│ [2026-03-22 21:50:42.324][15][info][main] [source/server/server.cc:471]   envoy.config.validators: envoy.config.validators.minimum_clusters, envoy.config.validators.min │
+│ [2026-03-22 21:50:42.328][15][info][main] [source/server/server.cc:531] HTTP header map info:                                                                            │
+│ [2026-03-22 21:50:42.328][15][info][main] [source/server/server.cc:534]   request header map: 664 bytes: :authority,:method,:path,:protocol,:scheme,accept,accept-encodi │
+│ [2026-03-22 21:50:42.328][15][info][main] [source/server/server.cc:534]   request trailer map: 120 bytes:                                                                │
+│ [2026-03-22 21:50:42.328][15][info][main] [source/server/server.cc:534]   response header map: 432 bytes: :status,access-control-allow-credentials,access-control-allow- │
+│ [2026-03-22 21:50:42.328][15][info][main] [source/server/server.cc:534]   response trailer map: 144 bytes: grpc-message,grpc-status                                      │
+│ [2026-03-22 21:50:42.339][15][info][main] [source/server/server.cc:942] runtime: layers:                                                                                 │
+│   - name: kuma                                                                                                                                                           │
+│     static_layer:                                                                                                                                                        │
+│       re2.max_program_size.error_level: 4294967295                                                                                                                       │
+│       re2.max_program_size.warn_level: 1000                                                                                                                              │
+│ [2026-03-22 21:50:42.339][15][info][main] [source/server/server.cc:774] Starting admin HTTP server at 127.0.0.1:9901                                                     │
+│ [2026-03-22 21:50:42.340][15][info][admin] [source/server/admin/admin.cc:65] admin address: 127.0.0.1:9901                                                               │
+│ [2026-03-22 21:50:42.341][15][info][config] [source/server/configuration_impl.cc:181] loading tracing configuration                                                      │
+│ [2026-03-22 21:50:42.341][15][info][config] [source/server/configuration_impl.cc:132] loading 1 static secret(s)                                                         │
+│ [2026-03-22 21:50:42.341][15][info][config] [source/server/configuration_impl.cc:138] loading 1 cluster(s)                                                               │
+│ [2026-03-22 21:50:42.353][15][info][config] [source/server/configuration_impl.cc:148] loading 0 listener(s)                                                              │
+│ [2026-03-22 21:50:42.353][15][info][config] [source/server/configuration_impl.cc:164] loading stats configuration                                                        │
+│ [2026-03-22 21:50:42.354][15][info][runtime] [source/common/runtime/runtime_impl.cc:551] RTDS has finished initialization                                                │
+│ [2026-03-22 21:50:42.354][15][info][upstream] [source/common/upstream/cluster_manager_impl.cc:244] cm init: initializing cds                                             │
+│ [2026-03-22 21:50:42.354][15][warning][main] [source/server/server.cc:1012] There is no configured limit to the number of allowed active downstream connections. Configu │
+│ [2026-03-22 21:50:42.354][15][info][main] [source/server/server.cc:1051] starting main dispatch loop                                                                     │
+│ [2026-03-22 21:50:42.360][15][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-con │
+│ [2026-03-22 21:50:42.389][15][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-con │
+│ [2026-03-22 21:50:43.016][15][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-con │
+│ [2026-03-22 21:50:44.504][15][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-con │
+│ [2026-03-22 21:50:47.453][15][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-con │
+│ [2026-03-22 21:50:54.757][15][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-con │
+│ [2026-03-22 21:50:58.454][15][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-con │
+│ 2026-03-22T21:50:58.571Z    INFO    runtime    received signal, stopping instance gracefully    {"signal": "terminated"}                                                 │
+│ 2026-03-22T21:50:58.572Z    INFO    kuma-dp.run    Kuma DP caught an exit signal                                                                                         │
+│ 2026-03-22T21:50:58.572Z    INFO    kuma-dp.run    draining Envoy connections                                                                                            │
+│ 2026-03-22T21:50:58.573Z    INFO    kuma-dp.run    waiting for connections to be drained    {"waitTime": "30s"}                                                          │
+│ [2026-03-22 21:50:58.980][15][warning][config] [./source/extensions/config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-con 
+
+
+
+                                                                                                                                                                      │
+│ 774] Starting admin HTTP server at 127.0.0.1:9901                                                                                                                        │
+│ in.cc:65] admin address: 127.0.0.1:9901                                                                                                                                  │
+│ ation_impl.cc:181] loading tracing configuration                                                                                                                         │
+│ ation_impl.cc:132] loading 1 static secret(s)                                                                                                                            │
+│ ation_impl.cc:138] loading 1 cluster(s)                                                                                                                                  │
+│ ation_impl.cc:148] loading 0 listener(s)                                                                                                                                 │
+│ ation_impl.cc:164] loading stats configuration                                                                                                                           │
+│ /runtime_impl.cc:551] RTDS has finished initialization                                                                                                                   │
+│ am/cluster_manager_impl.cc:244] cm init: initializing cds                                                                                                                │
+│ cc:1012] There is no configured limit to the number of allowed active downstream connections. Configure a limit in `envoy.resource_monitors.global_downstream_max_connec │
+│ 1051] starting main dispatch loop                                                                                                                                        │
+│ /config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-control-plane.kuma-system:5678 closed: 2, authentication failed: there │
+│ /config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-control-plane.kuma-system:5678 closed: 2, authentication failed: there │
+│ /config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-control-plane.kuma-system:5678 closed: 2, authentication failed: there │
+│ /config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-control-plane.kuma-system:5678 closed: 2, authentication failed: there │
+│ /config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-control-plane.kuma-system:5678 closed: 2, authentication failed: there │
+│ /config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-control-plane.kuma-system:5678 closed: 2, authentication failed: there │
+│ /config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-control-plane.kuma-system:5678 closed: 2, authentication failed: there │
+│ pping instance gracefully    {"signal": "terminated"}                                                                                                                    │
+│ n exit signal                                                                                                                                                            │
+│ onnections                                                                                                                                                               │
+│ ections to be drained    {"waitTime": "30s"}                                                                                                                             │
+│ /config_subscription/grpc/grpc_stream.h:189] StreamAggregatedResources gRPC config stream to kuma-control-plane.kuma-system:5678 closed: 2, authentication failed: there │
+│ -sidecar)                                                                                                                                                                │
+                                                                                                                                                                         │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│ figure a limit in `envoy.resource_monitors.global_downstream_max_connections` resource monitor.                                                                          │
+│                                                                                                                                                                          │
+│ -control-plane.kuma-system:5678 closed: 2, authentication failed: there is no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplan │
+│ -control-plane.kuma-system:5678 closed: 2, authentication failed: there is no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplan │
+│ -control-plane.kuma-system:5678 closed: 2, authentication failed: there is no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplan │
+│ -control-plane.kuma-system:5678 closed: 2, authentication failed: there is no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplan │
+│ -control-plane.kuma-system:5678 closed: 2, authentication failed: there is no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplan │
+│ -control-plane.kuma-system:5678 closed: 2, authentication failed: there is no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplan │
+│ -control-plane.kuma-system:5678 closed: 2, authentication failed: there is no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplan │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│ -control-plane.kuma-system:5678 closed: 2, authentication failed: there is no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplan │
+│                                                                                                                                                       
+                                                                                                                                                                      │
+│                                                                                                                                                                          │
+│ ns` resource monitor.                                                                                                                                                    │
+│                                                                                                                                                                          │
+│  no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplane-token-signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" i │
+│  no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplane-token-signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" i │
+│  no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplane-token-signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" i │
+│  no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplane-token-signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" i │
+│  no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplane-token-signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" i │
+│  no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplane-token-signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" i │
+│  no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplane-token-signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" i │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│  no signing key with KID f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo. Secret of name "dataplane-token-signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" i │
+
+
+ -signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" in mesh "default" is not found. If signing key was rotated, regenerate the token                       │
+│ -signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" in mesh "default" is not found. If signing key was rotated, regenerate the token                       │
+│ -signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" in mesh "default" is not found. If signing key was rotated, regenerate the token                       │
+│ -signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" in mesh "default" is not found. If signing key was rotated, regenerate the token                       │
+│ -signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" in mesh "default" is not found. If signing key was rotated, regenerate the token                       │
+│ -signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" in mesh "default" is not found. If signing key was rotated, regenerate the token                       │
+│ -signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" in mesh "default" is not found. If signing key was rotated, regenerate the token                       │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│                                                                                                                                                                          │
+│ -signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" in mesh "default" is not found. If signing key was rotated, regenerate the token                       │
+│                                                                                                                                
