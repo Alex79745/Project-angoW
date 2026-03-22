@@ -760,6 +760,20 @@ I can help you with:
 
 
 ################################
+2026-03-21T20:59:20.993Z        INFO    xds.server      registering Aggregated Discovery Service V3 in Dataplane Server
+2026-03-21T20:59:20.993Z        INFO    xds.bootstrap   registering Bootstrap in Dataplane Server
+2026-03-21T20:59:21.101Z        INFO    mads-server     MADS v1 is enabled
+2026-03-21T20:59:21.101Z        INFO    dp-server       starting        {"interface": "0.0.0.0", "port": 5678, "tls": true}
+2026-03-21T20:59:21.101Z        INFO    xds-server.diagnostics  starting server {"tls": false, "interface": ":5680"}
+2026-03-21T20:59:21.304Z        INFO    mads-server     starting server {"tls": false, "interface": ":5676"}
+2026-03-21T20:59:48.791Z        INFO    plugins.authn.api-server.tokens bootstrap of Admin User Token is enabled. To extract credentials execute 'kubectl get secret admin-user-token -n kuma-system --template={{.data.value}} | base64 -d'. You configure kumactl with them 'kumactl config control-planes add --auth-type=tokens --auth-conf token=YOUR_TOKEN'. To disable bootstrap of Admin User Token set KUMA_API_SERVER_AUTHN_TOKENS_BOOTSTRAP_ADMIN_TOKEN to false.
+2026-03-21T20:59:48.791Z        INFO    kds-mux-client  initializing Kuma Discovery Service (KDS) stream for zone to global sync of resources with delta xDS    {"client-id": "omni-infra", "rpc": "zone-to-global"}
+2026-03-21T20:59:48.791Z        INFO    kds-mux-client  initializing Kuma Discovery Service (KDS) stream for global to zone sync of resources with delta xDS    {"client-id": "omni-infra", "rpc": "global-to-zone"}
+2026-03-21T20:59:48.791Z        INFO    kds-mux-client  initializing rpc stream for executing config dump on data plane proxies {"client-id": "omni-infra", "rpc": "XDS Configs"}
+2026-03-21T20:59:48.892Z        ERROR   controllers.MeshGatewayInstance.gateway-to-gateway-instance-mapper      failed to fetch GatewayInstances        {"gateway": "dmz-gateway", "mesh": "default", "error": "incorrect service name: dmz-gateway"}
+2026-03-21T20:59:49.316Z        INFO    kds-delta-zone  creating a new resource from upstream   {"type": "Secret", "name": "dataplane-token-signing-key-default-1", "mesh": "default"}
+2026-03-21T20:59:49.327Z        INFO    kds-mux-client  received resource is invalid, sending NACK      {"client-id": "omni-infra", "rpc": "global-to-zone", "err": "user error\nuser error\nuser error\nresource already exists: type=\"Secret\" name=\"default.ca-builtin-key-ca-1\" mesh=\"default\"\nresource already exists: type=\"Secret\" name=\"dataplane-token-signing-key-default-1\" mesh=\"default\"\nresource already exists: type=\"Secret\" name=\"default.ca-builtin-cert-ca-1\" mesh=\"default\""}
+2026-03-21T23:12:56.816Z        ERROR   controllers.MeshGatewayInstance.gateway-to-gateway-instance-mapper      failed to fetch GatewayInstances        {"gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "error": "incorrect service name: dmz-gateway"}
 
 
 kubectl -n kuma-system logs deploy/kuma-control-plane | egrep -i "dp-server|xds|ads|auth|unauth|token|denied|failed"
