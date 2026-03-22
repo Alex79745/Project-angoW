@@ -1010,3 +1010,242 @@ kubectl -n cattle-system patch deploy rancher --type='strategic' -p '{
     "consul.hashicorp.com/service-port": "80"
   }}}}
 }'
+
+
+
+------------------------------
+
+ kubectl get mutatingwebhookconfiguration kuma-admission-mutating-webhook-configuration -o yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    meta.helm.sh/release-name: kuma
+    meta.helm.sh/release-namespace: kuma-system
+  creationTimestamp: "2026-03-21T10:24:09Z"
+  generation: 5
+  labels:
+    app: kuma-control-plane
+    app.kubernetes.io/instance: kuma
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kuma
+    app.kubernetes.io/version: 2.13.2
+    helm.sh/chart: kuma-2.13.2
+  name: kuma-admission-mutating-webhook-configuration
+  resourceVersion: "53004240"
+  uid: 1951a72c-4b55-4715-9e2c-939ac6b596e1
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURQRENDQWlTZ0F3SUJBZ0lSQUtnUERFazBnc213dWJFOG9qSFgxVVV3RFFZSktvWklodmNOQVFFTEJRQXcKQURBZUZ3MHlOakF6TWpFeE56UXhNREJhRncwek5qQXpNVGd4TnpReE1EQmFNQUF3Z2dFaU1BMEdDU3FHU0liMwpEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUM4bnloU2gzRHZER3hZV1E5WFdzUWt1d3lNVS9mb0FqTXUzS0dUClhDOXhjemt1NXFkcFZMUiswMUpqTTNqVkdOeHlUNU93VzIzOHlGWG1JWVBSdUVhSitjTEZsOUpNNnlxZFQ5QUEKeGJQNzM3YVQvSDM1SGJoQTNlN2lMR0Y5Q0lWTmliWEV5SGtCVWxwdE5iM09IQjduUG0xZkI2YXlydUl2dUNjVgpXaFJsSmNpVUkreGUyWkI1Z2Zzem82Y3FqRS9yNVdrSEc4WVlOSWJzUHhIWnFHdGU0endKTnhXTHd3Wk5SUElRCjBBTjFQTmVMK1RvdTBYdnBHcC9DV3BVcGh2dXRhOFhMK3F3OWZTK2JLcmFuVVIwaGxSUHhLTEJoTTZZNmNVWjcKeWhFU0VtMHYwOHZlVjUwckF4VXcxajBHUGgrTTJoM2JkN0dpc05pUEt2SUVYRUFoQWdNQkFBR2pnYkF3Z2EwdwpEZ1lEVlIwUEFRSC9CQVFEQWdLa01CTUdBMVVkSlFRTU1Bb0dDQ3NHQVFVRkJ3TUJNQThHQTFVZEV3RUIvd1FGCk1BTUJBZjh3SFFZRFZSME9CQllFRkE5b3dPNkYyRWNYV1BPSWJhMENTU1MvRUREV01GWUdBMVVkRVFFQi93Uk0KTUVxQ0htdDFiV0V0WTI5dWRISnZiQzF3YkdGdVpTNXJkVzFoTFhONWMzUmxiWUlpYTNWdFlTMWpiMjUwY205cwpMWEJzWVc1bExtdDFiV0V0YzNsemRHVnRMbk4yWTRjRUNoT1BWREFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBCnJqQXZYbUtzSEYrbjN4WmR3T0x5bExTV1k5L3NkcEpTTlh5N0c1T1QxSTdoQURZUXE4T2YyM2VSM01QRXNZTWcKYThhUnBFakI2RHFOZVVya1FqSUNEYURLcUIrbVVEL3V3cUxmZ2JQS0srdUdncTVsRjNtTEExOGVmdmcvMFU2YQpHNllTRDZ0OTh3YWxFZHIyY3c2bnJpeU5EbjZ6SVZjb25RK3NsS0NsR0ZadVF3MWtrOStVOVZGTnh1TmdQY1FaCnBUbnJNOFdwcTFKVFBMMTNyVnp3SkpDWmZ0YWhibzN4cS8zTDRQVElMdFNDbE5hWkRwR3liVXVyUnZ5dFBBZHoKcm9QMHVSM0JscnJieVV2SEVEelVXUUNvL1B4YXBrbWwzTjhSYkZwWVVNRzczcnZXdmhsVHRBS0F0MTlvMk5CTgowazJBUVp4VlplOVFVYWZJTkkvbDZ3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQoKCgo=
+    service:
+      name: kuma-control-plane
+      namespace: kuma-system
+      path: /default-kuma-io-v1alpha1-mesh
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: mesh.defaulter.kuma-admission.kuma.io
+  namespaceSelector:
+    matchExpressions:
+    - key: kuma.io/sidecar-injection
+      operator: Exists
+    - key: kubernetes.io/metadata.name
+      operator: NotIn
+      values:
+      - kube-system
+  objectSelector: {}
+  reinvocationPolicy: Never
+  rules:
+  - apiGroups:
+    - kuma.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - meshes
+    - dataplanes
+    - dataplaneinsights
+    - meshgateways
+    - zoneingresses
+    - zoneingressinsights
+    - zoneegresses
+    - zoneegressinsights
+    - serviceinsights
+    - zone
+    - zoneinsights
+    - meshaccesslogs
+    - meshcircuitbreakers
+    - meshfaultinjections
+    - meshhealthchecks
+    - meshhttproutes
+    - meshloadbalancingstrategies
+    - meshmetrics
+    - meshpassthroughs
+    - meshproxypatches
+    - meshratelimits
+    - meshretries
+    - meshtcproutes
+    - meshtimeouts
+    - meshtlses
+    - meshtraces
+    - meshtrafficpermissions
+    - hostnamegenerators
+    - meshexternalservices
+    - meshidentities
+    - meshmultizoneservices
+    - meshservices
+    - meshtrusts
+    - workloads
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 10
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURQRENDQWlTZ0F3SUJBZ0lSQUtnUERFazBnc213dWJFOG9qSFgxVVV3RFFZSktvWklodmNOQVFFTEJRQXcKQURBZUZ3MHlOakF6TWpFeE56UXhNREJhRncwek5qQXpNVGd4TnpReE1EQmFNQUF3Z2dFaU1BMEdDU3FHU0liMwpEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUM4bnloU2gzRHZER3hZV1E5WFdzUWt1d3lNVS9mb0FqTXUzS0dUClhDOXhjemt1NXFkcFZMUiswMUpqTTNqVkdOeHlUNU93VzIzOHlGWG1JWVBSdUVhSitjTEZsOUpNNnlxZFQ5QUEKeGJQNzM3YVQvSDM1SGJoQTNlN2lMR0Y5Q0lWTmliWEV5SGtCVWxwdE5iM09IQjduUG0xZkI2YXlydUl2dUNjVgpXaFJsSmNpVUkreGUyWkI1Z2Zzem82Y3FqRS9yNVdrSEc4WVlOSWJzUHhIWnFHdGU0endKTnhXTHd3Wk5SUElRCjBBTjFQTmVMK1RvdTBYdnBHcC9DV3BVcGh2dXRhOFhMK3F3OWZTK2JLcmFuVVIwaGxSUHhLTEJoTTZZNmNVWjcKeWhFU0VtMHYwOHZlVjUwckF4VXcxajBHUGgrTTJoM2JkN0dpc05pUEt2SUVYRUFoQWdNQkFBR2pnYkF3Z2EwdwpEZ1lEVlIwUEFRSC9CQVFEQWdLa01CTUdBMVVkSlFRTU1Bb0dDQ3NHQVFVRkJ3TUJNQThHQTFVZEV3RUIvd1FGCk1BTUJBZjh3SFFZRFZSME9CQllFRkE5b3dPNkYyRWNYV1BPSWJhMENTU1MvRUREV01GWUdBMVVkRVFFQi93Uk0KTUVxQ0htdDFiV0V0WTI5dWRISnZiQzF3YkdGdVpTNXJkVzFoTFhONWMzUmxiWUlpYTNWdFlTMWpiMjUwY205cwpMWEJzWVc1bExtdDFiV0V0YzNsemRHVnRMbk4yWTRjRUNoT1BWREFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBCnJqQXZYbUtzSEYrbjN4WmR3T0x5bExTV1k5L3NkcEpTTlh5N0c1T1QxSTdoQURZUXE4T2YyM2VSM01QRXNZTWcKYThhUnBFakI2RHFOZVVya1FqSUNEYURLcUIrbVVEL3V3cUxmZ2JQS0srdUdncTVsRjNtTEExOGVmdmcvMFU2YQpHNllTRDZ0OTh3YWxFZHIyY3c2bnJpeU5EbjZ6SVZjb25RK3NsS0NsR0ZadVF3MWtrOStVOVZGTnh1TmdQY1FaCnBUbnJNOFdwcTFKVFBMMTNyVnp3SkpDWmZ0YWhibzN4cS8zTDRQVElMdFNDbE5hWkRwR3liVXVyUnZ5dFBBZHoKcm9QMHVSM0JscnJieVV2SEVEelVXUUNvL1B4YXBrbWwzTjhSYkZwWVVNRzczcnZXdmhsVHRBS0F0MTlvMk5CTgowazJBUVp4VlplOVFVYWZJTkkvbDZ3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQoKCgo=
+    service:
+      name: kuma-control-plane
+      namespace: kuma-system
+      path: /owner-reference-kuma-io-v1alpha1
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: owner-reference.kuma-admission.kuma.io
+  namespaceSelector:
+    matchExpressions:
+    - key: kuma.io/sidecar-injection
+      operator: Exists
+    - key: kubernetes.io/metadata.name
+      operator: NotIn
+      values:
+      - kube-system
+  objectSelector: {}
+  reinvocationPolicy: Never
+  rules:
+  - apiGroups:
+    - kuma.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    resources:
+    - circuitbreakers
+    - externalservices
+    - faultinjections
+    - healthchecks
+    - meshgateways
+    - meshgatewayroutes
+    - proxytemplates
+    - ratelimits
+    - retries
+    - timeouts
+    - trafficlogs
+    - trafficpermissions
+    - trafficroutes
+    - traffictraces
+    - virtualoutbounds
+    - meshaccesslogs
+    - meshcircuitbreakers
+    - meshfaultinjections
+    - meshhealthchecks
+    - meshhttproutes
+    - meshloadbalancingstrategies
+    - meshmetrics
+    - meshpassthroughs
+    - meshproxypatches
+    - meshratelimits
+    - meshretries
+    - meshtcproutes
+    - meshtimeouts
+    - meshtlses
+    - meshtraces
+    - meshtrafficpermissions
+    - hostnamegenerators
+    - meshexternalservices
+    - meshidentities
+    - meshmultizoneservices
+    - meshservices
+    - meshtrusts
+    - workloads
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 10
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURQRENDQWlTZ0F3SUJBZ0lSQUtnUERFazBnc213dWJFOG9qSFgxVVV3RFFZSktvWklodmNOQVFFTEJRQXcKQURBZUZ3MHlOakF6TWpFeE56UXhNREJhRncwek5qQXpNVGd4TnpReE1EQmFNQUF3Z2dFaU1BMEdDU3FHU0liMwpEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUM4bnloU2gzRHZER3hZV1E5WFdzUWt1d3lNVS9mb0FqTXUzS0dUClhDOXhjemt1NXFkcFZMUiswMUpqTTNqVkdOeHlUNU93VzIzOHlGWG1JWVBSdUVhSitjTEZsOUpNNnlxZFQ5QUEKeGJQNzM3YVQvSDM1SGJoQTNlN2lMR0Y5Q0lWTmliWEV5SGtCVWxwdE5iM09IQjduUG0xZkI2YXlydUl2dUNjVgpXaFJsSmNpVUkreGUyWkI1Z2Zzem82Y3FqRS9yNVdrSEc4WVlOSWJzUHhIWnFHdGU0endKTnhXTHd3Wk5SUElRCjBBTjFQTmVMK1RvdTBYdnBHcC9DV3BVcGh2dXRhOFhMK3F3OWZTK2JLcmFuVVIwaGxSUHhLTEJoTTZZNmNVWjcKeWhFU0VtMHYwOHZlVjUwckF4VXcxajBHUGgrTTJoM2JkN0dpc05pUEt2SUVYRUFoQWdNQkFBR2pnYkF3Z2EwdwpEZ1lEVlIwUEFRSC9CQVFEQWdLa01CTUdBMVVkSlFRTU1Bb0dDQ3NHQVFVRkJ3TUJNQThHQTFVZEV3RUIvd1FGCk1BTUJBZjh3SFFZRFZSME9CQllFRkE5b3dPNkYyRWNYV1BPSWJhMENTU1MvRUREV01GWUdBMVVkRVFFQi93Uk0KTUVxQ0htdDFiV0V0WTI5dWRISnZiQzF3YkdGdVpTNXJkVzFoTFhONWMzUmxiWUlpYTNWdFlTMWpiMjUwY205cwpMWEJzWVc1bExtdDFiV0V0YzNsemRHVnRMbk4yWTRjRUNoT1BWREFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBCnJqQXZYbUtzSEYrbjN4WmR3T0x5bExTV1k5L3NkcEpTTlh5N0c1T1QxSTdoQURZUXE4T2YyM2VSM01QRXNZTWcKYThhUnBFakI2RHFOZVVya1FqSUNEYURLcUIrbVVEL3V3cUxmZ2JQS0srdUdncTVsRjNtTEExOGVmdmcvMFU2YQpHNllTRDZ0OTh3YWxFZHIyY3c2bnJpeU5EbjZ6SVZjb25RK3NsS0NsR0ZadVF3MWtrOStVOVZGTnh1TmdQY1FaCnBUbnJNOFdwcTFKVFBMMTNyVnp3SkpDWmZ0YWhibzN4cS8zTDRQVElMdFNDbE5hWkRwR3liVXVyUnZ5dFBBZHoKcm9QMHVSM0JscnJieVV2SEVEelVXUUNvL1B4YXBrbWwzTjhSYkZwWVVNRzczcnZXdmhsVHRBS0F0MTlvMk5CTgowazJBUVp4VlplOVFVYWZJTkkvbDZ3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQoKCgo=
+    service:
+      name: kuma-control-plane
+      namespace: kuma-system
+      path: /inject-sidecar
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: namespace-kuma-injector.kuma.io
+  namespaceSelector:
+    matchExpressions:
+    - key: kuma.io/sidecar-injection
+      operator: In
+      values:
+      - enabled
+      - "true"
+    - key: kubernetes.io/metadata.name
+      operator: NotIn
+      values:
+      - kube-system
+      - kuma-system
+  objectSelector: {}
+  reinvocationPolicy: Never
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    resources:
+    - pods
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 10
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURQRENDQWlTZ0F3SUJBZ0lSQUtnUERFazBnc213dWJFOG9qSFgxVVV3RFFZSktvWklodmNOQVFFTEJRQXcKQURBZUZ3MHlOakF6TWpFeE56UXhNREJhRncwek5qQXpNVGd4TnpReE1EQmFNQUF3Z2dFaU1BMEdDU3FHU0liMwpEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUM4bnloU2gzRHZER3hZV1E5WFdzUWt1d3lNVS9mb0FqTXUzS0dUClhDOXhjemt1NXFkcFZMUiswMUpqTTNqVkdOeHlUNU93VzIzOHlGWG1JWVBSdUVhSitjTEZsOUpNNnlxZFQ5QUEKeGJQNzM3YVQvSDM1SGJoQTNlN2lMR0Y5Q0lWTmliWEV5SGtCVWxwdE5iM09IQjduUG0xZkI2YXlydUl2dUNjVgpXaFJsSmNpVUkreGUyWkI1Z2Zzem82Y3FqRS9yNVdrSEc4WVlOSWJzUHhIWnFHdGU0endKTnhXTHd3Wk5SUElRCjBBTjFQTmVMK1RvdTBYdnBHcC9DV3BVcGh2dXRhOFhMK3F3OWZTK2JLcmFuVVIwaGxSUHhLTEJoTTZZNmNVWjcKeWhFU0VtMHYwOHZlVjUwckF4VXcxajBHUGgrTTJoM2JkN0dpc05pUEt2SUVYRUFoQWdNQkFBR2pnYkF3Z2EwdwpEZ1lEVlIwUEFRSC9CQVFEQWdLa01CTUdBMVVkSlFRTU1Bb0dDQ3NHQVFVRkJ3TUJNQThHQTFVZEV3RUIvd1FGCk1BTUJBZjh3SFFZRFZSME9CQllFRkE5b3dPNkYyRWNYV1BPSWJhMENTU1MvRUREV01GWUdBMVVkRVFFQi93Uk0KTUVxQ0htdDFiV0V0WTI5dWRISnZiQzF3YkdGdVpTNXJkVzFoTFhONWMzUmxiWUlpYTNWdFlTMWpiMjUwY205cwpMWEJzWVc1bExtdDFiV0V0YzNsemRHVnRMbk4yWTRjRUNoT1BWREFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBCnJqQXZYbUtzSEYrbjN4WmR3T0x5bExTV1k5L3NkcEpTTlh5N0c1T1QxSTdoQURZUXE4T2YyM2VSM01QRXNZTWcKYThhUnBFakI2RHFOZVVya1FqSUNEYURLcUIrbVVEL3V3cUxmZ2JQS0srdUdncTVsRjNtTEExOGVmdmcvMFU2YQpHNllTRDZ0OTh3YWxFZHIyY3c2bnJpeU5EbjZ6SVZjb25RK3NsS0NsR0ZadVF3MWtrOStVOVZGTnh1TmdQY1FaCnBUbnJNOFdwcTFKVFBMMTNyVnp3SkpDWmZ0YWhibzN4cS8zTDRQVElMdFNDbE5hWkRwR3liVXVyUnZ5dFBBZHoKcm9QMHVSM0JscnJieVV2SEVEelVXUUNvL1B4YXBrbWwzTjhSYkZwWVVNRzczcnZXdmhsVHRBS0F0MTlvMk5CTgowazJBUVp4VlplOVFVYWZJTkkvbDZ3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQoKCgo=
+    service:
+      name: kuma-control-plane
+      namespace: kuma-system
+      path: /inject-sidecar
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: pods-kuma-injector.kuma.io
+  namespaceSelector:
+    matchExpressions:
+    - key: kuma.io/sidecar-injection
+      operator: Exists
+    - key: kubernetes.io/metadata.name
+      operator: NotIn
+      values:
+      - kube-system
+      - kuma-system
+  objectSelector:
+    matchLabels:
+      kuma.io/sidecar-injection: enabled
+  reinvocationPolicy: Never
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    resources:
+    - pods
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 10
