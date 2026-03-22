@@ -1265,6 +1265,15 @@ controlPlane:
 ingress:
   enabled: true
 
+
+kubectl -n cattle-system patch deploy rancher --type='strategic' -p '{
+  "spec": { "template": { "metadata": { "annotations": {
+    "kuma.io/sidecar-injection": "enabled",
+    "kuma.io/transparent-proxying": "disabled",
+    "kuma.io/gateway": "enabled"
+  }}}}
+}'
+
 global:
   image:
     tag: "2.13.2"
