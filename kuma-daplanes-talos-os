@@ -874,3 +874,56 @@ Lembras-te daqueles erros de Secret already exists? Eles acontecem porque, ao mu
 Próximo passo sugerido:
 Limpa os segredos de signing-key uma última vez e aplica o Helm com a env KUMA_DP_SERVER_AUTHN_DP_PROXY_TYPE: dpToken.
 Queres que te ajude a gerar o comando kumactl correto para a tua VM já com este novo modo ativo?
+
+
+######################
+
+kubectl -n kuma-system get sa
+kubectl -n kuma-system get deploy kuma-control-plane -o yaml | grep serviceAccount
+ kubectl get secret -n kuma-system admin-user-token -o jsonpath='{.data.value}' | base64 -d > admin.token
+
+ cat admin.token | kubectl exec -i kuma-admin -n kuma-system -- sh -c "cat > /tmp/admin.token"
+
+kubectl cp admin.token  kuma-system/kuma-admin:/tmp/admin.token
+
+Worked #####kubectl -n kuma-system cp admin.token kuma-admin:/tmp/admin.token##########
+kubectl exec -it kuma-admin -n kuma-system -- sh
+
+mkdir -p ~/.kumactl/tokens
+cp /tmp/admin.token ~/.kumactl/tokens/global.token
+
+
+###################################################3
+-- use admin pod kumactl image
+
+I way to create token -
+which wget
+
+ TOKEN=$(cat /tmp/admin.token)
+ wget -qO- \
+  --header="Authorization: Bearer $TOKEN" \
+  --header="Content-Type: application/json" \
+   --header="Authorization: Bearer $TOKEN" \
+   --post-data='{
+    "mesh": "default",
+    "name": "dmz-gw-1",
+    "validFor": "8760h"
+   }' \
+   http://kuma-control-plane.kuma-system.svc:5681/tokens/dataplane \
+   > /tmp/dmz-gw-1.token
+
+ cat /tmp/dmz-gw-1.token
+eyJhbGciOiJSUzI1NiIsImtpZCI6IjEiLCJ0eXAiOiJKV1QifQ.eyJOYW1lIjoiZG16LWd3LTEiLCJNZXNoIjoiZGVmYXVsdCIsIlRhZ3MiOnt9LCJUeXBlIjoiIiwiV29ya2xvYWQiOiIiLCJleHAiOjE4MDUzNjI4MTcsIm5iZiI6MTc3MzgyNjgxMiwiaWF0IjoxNzczODI2ODEyLCJqdGkiOiI4NjRkZmQwNy0zYzcwLTQzNzUtYjNjZi1lN2FlMDY0YmEyMDEifQ.RMapqYp7sqV9jzq1l9coHMhLabS7Ga6eOs34Ozgff6uh6Tjkx751SdjKoFGbFYNXIDSC_UUUcQavFNikBdPuvFLjVMQKCuchfTUTvRJ_5EN7eud02Yu6gNE5LL7GWLZOOSFTM6_muL0H_6801UWxEcDuEpNQf4DE_QUnsijYzj6ObEEQhalGU2Q2AetbpittQlDl21SFfCJvZhhBiqUARwRkL0Uas4OyUECxo0my5fTe2-wwvU6Qy4S0iXiGVZ3iYPOPUu6OfdHzQ65mb1fO9rBH7AywyFFHldPGbnl8xrsqUFwuse7Q1-RxuXaHJZ_EjKCvIpdWPOdR7i0799GV3Q
+
+ TOKEN=$(cat /tmp/admin.token)
+ wget -qO- \
+  --header="Authorization: Bearer $TOKEN" \
+  --header="Content-Type: application/json" \
+   --header="Authorization: Bearer $TOKEN" \
+   --post-data='{
+    "mesh": "default",
+    "name": "dmz-gw-2",
+    "validFor": "8760h"
+   }' \
+   http://kuma-control-plane.kuma-system.svc:5681/tokens/dataplane \
+   > /tmp/dmz-gw-2.token
