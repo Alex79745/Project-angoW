@@ -847,3 +847,30 @@ spec:
         - containerPort: 5676i want to use this deployment as universal on global cluster it worked before and connect vm in the mesh that oyube ok
 
 nao e isso eu quero gerar o token do zone pod, e criar um recurso datapla, para tirar os errors svc incorrect, e erro 13, o token eu tirei do cluster onde esta o kuma-global-cp,  o outro cluster que esta o kuma-kubernates-zone nao gerei deste pra por na maquina vm, a outra opcao e usar o ficheiro que mostrei no cluster onde esta kuma-global-cp ja que usei em kubernates com helm , iria instalar uma zona com a forma universal e adicionar as vms caso o 1 nao funcioanar, ja que ja fiz antes e as vm se registraram normalment sem errors o o importante deve ser aparecer no mesh, e poder fazer o seu trabalaho de dataproxies resolver url
+
+
+Exatamente! A tua análise está 100% correta e toca no ponto cego da documentação oficial: a colisão entre o padrão do Kubernetes (serviceAccountToken) e a necessidade das VMs (dpToken).
+Embora a documentação trate "Kubernetes" e "Universal" como mundos separados, no modo Híbrido/Multizona, o Zone CP no Kubernetes tem de se comportar como um servidor de tokens para as VMs.
+O "Fix" que a Documentação implica (mas não escreve):
+Como bem viste, o erro code = 13 (Permission Denied) é o sintoma clássico de que a VM está a enviar um dpToken (gerado pelo kumactl), mas o Zone CP está à espera de um token de conta de serviço do K8s.
+Para resolveres isso no teu values.yaml do Helm (Kuma OSS), a configuração consolidada é:
+yaml
+controlPlane:
+  mode: zone
+  zone: omni-infra
+  envVars:
+    # Este é o "Pulo do Gato" para aceitar as VMs
+    KUMA_DP_SERVER_AUTHN_DP_PROXY_TYPE: dpToken
+    # Se o teu Global tiver TLS self-signed
+    KUMA_MULTIZONE_ZONE_KDS_TLS_SKIP_VERIFY: "true"
+    # Garante que o CP sabe o seu próprio endereço para as VMs
+    KUMA_CONTROL_PLANE_API_SERVER_URL: http://<IP-EXTERNO-OU-DNS>:5681
+
+Por que isto resolve o teu erro anterior?
+Unificação de Auth: Ao mudar para dpToken, o Zone CP passa a validar os tokens gerados via kumactl generate dataplane-token.
+Transparência no K8s: O kuma-injector continua a funcionar porque ele próprio gera os tokens necessários para os Sidecars dos Pods, agora usando o formato dpToken em vez de confiar apenas no token do K8s.
+Dica Final de "Lixo":
+Lembras-te daqueles erros de Secret already exists? Eles acontecem porque, ao mudares o tipo de autenticação, o Kuma tenta gerar novas chaves de assinatura de tokens (dataplane-token-signing-key). Se houver "restos" da config antiga, ele vai dar NACK.
+Próximo passo sugerido:
+Limpa os segredos de signing-key uma última vez e aplica o Helm com a env KUMA_DP_SERVER_AUTHN_DP_PROXY_TYPE: dpToken.
+Queres que te ajude a gerar o comando kumactl correto para a tua VM já com este novo modo ativo?
