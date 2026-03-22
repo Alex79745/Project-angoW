@@ -927,3 +927,48 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6IjEiLCJ0eXAiOiJKV1QifQ.eyJOYW1lIjoiZG16LWd3LTEiLCJNZ
    }' \
    http://kuma-control-plane.kuma-system.svc:5681/tokens/dataplane \
    > /tmp/dmz-gw-2.token
+
+###############################
+
+##################################
+
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kuma-zone-ingress-ds
+  namespace: kuma-system
+spec:
+  selector:
+    matchLabels:
+      app: kuma-zone-ingress-ds
+  template:
+    metadata:
+      labels:
+        app: kuma-zone-ingress-ds
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      # (Optional) run only on dedicated ingress nodes:
+      # nodeSelector:
+      #   node-role.kubernetes.io/ingress: "true"
+      containers:
+      - name: zone-ingress
+        image: docker.io/kumahq/kuma-dp:latest
+        args:
+          - run
+          - --proxy-type=ingress
+          - --cp-address=https://kuma-control-plane.kuma-system.svc:5678
+        ports:
+          - containerPort: 10001  # data port
+            hostPort: 10001
+            name: data
+          - containerPort: 9901   # Envoy admin
+            hostPort: 9901
+            name: admin
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 9901
+          initialDelaySeconds: 5
+          periodSeconds: 5
