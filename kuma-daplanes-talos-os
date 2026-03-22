@@ -1249,3 +1249,22 @@ webhooks:
     scope: '*'
   sideEffects: None
   timeoutSeconds: 10
+ cat values-hub-zone.yaml
+controlPlane:
+  mode: zone
+  zone: omni-infra
+  #kdsGlobalAddress: grpcs://kuma-control-plane.kuma-system.svc:5685
+  kdsGlobalAddress: grpcs://10.19.143.83:5685
+  image:
+    tag: "2.13.2"
+
+  envVars:
+    KUMA_MULTIZONE_ZONE_KDS_TLS_SKIP_VERIFY: "true"     # while your KDS cert lacks SAN=IP:10.19.143.83
+    KUMA_DP_SERVER_AUTHN_DP_PROXY_TYPE: dpToken
+    KUMA_DP_SERVER_AUTHN_TYPE: tokens
+ingress:
+  enabled: true
+
+global:
+  image:
+    tag: "2.13.2"
