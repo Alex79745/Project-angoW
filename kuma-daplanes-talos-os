@@ -1264,6 +1264,9 @@ controlPlane:
     KUMA_DP_SERVER_AUTHN_TYPE: tokens
 ingress:
   enabled: true
+global:
+  image:
+    tag: "2.13.2"
 
 
 kubectl -n cattle-system patch deploy rancher --type='strategic' -p '{
@@ -1273,7 +1276,3 @@ kubectl -n cattle-system patch deploy rancher --type='strategic' -p '{
     "kuma.io/gateway": "enabled"
   }}}}
 }'
-
-global:
-  image:
-    tag: "2.13.2"
