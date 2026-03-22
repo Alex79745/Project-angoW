@@ -972,3 +972,10 @@ spec:
             port: 9901
           initialDelaySeconds: 5
           periodSeconds: 5
+
+controlPlane:
+  envVars:
+    # Isto permite que o porto 5678 aceite tokens de VMs
+    KUMA_DP_SERVER_AUTHN_DP_PROXY_TYPE: dpToken
+    # Garante que o CP não tenta validar contra a API do K8s para as VMs
+    KUMA_DP_SERVER_AUTHN_TYPE: tokens 
