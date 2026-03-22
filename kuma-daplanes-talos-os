@@ -979,3 +979,24 @@ controlPlane:
     KUMA_DP_SERVER_AUTHN_DP_PROXY_TYPE: dpToken
     # Garante que o CP não tenta validar contra a API do K8s para as VMs
     KUMA_DP_SERVER_AUTHN_TYPE: tokens 
+
+
+$ helm upgrade kuma ./kuma-2.13.2.tgz   -n kuma-system   -f values-hub-zone.yaml
+I0322 20:22:23.973204   10684 warnings.go:110] "Warning: would violate PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false (containers \"pre-upgrade-job-init\", \"pre-upgrade-job\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (containers \"pre-upgrade-job-init\", \"pre-upgrade-job\" must set securityContext.capabilities.drop=[\"ALL\"]), seccompProfile (pod or containers \"pre-upgrade-job-init\", \"pre-upgrade-job\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")"
+I0322 20:22:39.472221   10684 warnings.go:110] "Warning: would violate PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false (container \"control-plane\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"control-plane\" must set securityContext.capabilities.drop=[\"ALL\"])"
+I0322 20:22:39.615159   10684 warnings.go:110] "Warning: would violate PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false (container \"ingress\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"ingress\" must set securityContext.capabilities.drop=[\"ALL\"]), seccompProfile (pod or container \"ingress\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")"
+Release "kuma" has been upgraded. Happy Helming!
+NAME: kuma
+LAST DEPLOYED: Sun Mar 22 20:22:19 2026
+NAMESPACE: kuma-system
+STATUS: deployed
+REVISION: 5
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+NOTES:
+kuma has been installed!
+
+Your release is named 'kuma'.
+
+You can access the control-plane via either the GUI, kubectl, the HTTP API, or the kumactl CLI.
+
