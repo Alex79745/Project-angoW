@@ -1406,3 +1406,14 @@ kubectl -n cattle-system patch deploy rancher --type='strategic' -p '{
 │                                                                                                                                                                          │
 │ -signing-key-default-f9n8axAKqVxtxhgRQtjDFJzwWAPgcj138DiURXAClHo" in mesh "default" is not found. If signing key was rotated, regenerate the token                       │
 │                                                                                                                                
+
+
+################################
+
+
+kubectl patch mutatingwebhookconfiguration kuma-admission-mutating-webhook-configuration \
+  --type='json' -p='[{"op": "replace", "path": "/webhooks/0/failurePolicy", "value": "Ignore"}, {"op": "replace", "path": "/webhooks/1/failurePolicy", "value": "Ignore"}]'
+
+kubectl label ns cattle-system kuma.io/sidecar-injection-
+
+kubectl rollout restart deployment rancher -n cattle-system
