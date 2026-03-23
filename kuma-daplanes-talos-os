@@ -1471,3 +1471,48 @@ kubectl delete mutatingwebhookconfiguration kuma-admission-mutating-webhook-conf
 │ ] Shutting down management.cattle.io/v3, Kind=User workers                                                                                                               │
 │ ] Shutting down apiregistration.k8s.io/v1, Kind=APIService workers                                                                                                       │
 │ ] requested to terminate, exiting                                                   
+
+
+
+026-03-23 00:43:56.059][15][info][config] [source/server/configuration_impl.cc:181] loading tracing configuration                                                      │
+│ [2026-03-23 00:43:56.059][15][info][config] [source/server/configuration_impl.cc:132] loading 1 static secret(s)                                                         │
+│ [2026-03-23 00:43:56.059][15][info][config] [source/server/configuration_impl.cc:138] loading 1 cluster(s)                                                               │
+│ [2026-03-23 00:43:56.071][15][info][config] [source/server/configuration_impl.cc:148] loading 0 listener(s)                                                              │
+│ [2026-03-23 00:43:56.071][15][info][config] [source/server/configuration_impl.cc:164] loading stats configuration                                                        │
+│ [2026-03-23 00:43:56.071][15][info][runtime] [source/common/runtime/runtime_impl.cc:551] RTDS has finished initialization                                                │
+│ [2026-03-23 00:43:56.071][15][info][upstream] [source/common/upstream/cluster_manager_impl.cc:244] cm init: initializing cds                                             │
+│ [2026-03-23 00:43:56.072][15][warning][main] [source/server/server.cc:1012] There is no configured limit to the number of allowed active downstream connections. Configu │
+│ [2026-03-23 00:43:56.072][15][info][main] [source/server/server.cc:1051] starting main dispatch loop                                                                     │
+│ [2026-03-23 00:43:56.196][15][info][upstream] [source/common/upstream/cds_api_helper.cc:31] cds: response indicates 19 added/updated cluster(s), 1 removed cluster(s); a │
+│ [2026-03-23 00:43:56.531][15][info][upstream] [source/common/upstream/cds_api_helper.cc:84] cds: added/updated 19 cluster(s) (skipped 0 unmodified cluster(s)); removed  │
+│ [2026-03-23 00:43:56.531][15][info][upstream] [source/common/upstream/cluster_manager_impl.cc:225] cm init: initializing secondary clusters                              │
+│ [2026-03-23 00:43:56.534][15][info][upstream] [source/common/upstream/cluster_manager_impl.cc:248] cm init: all clusters initialized                                     │
+│ [2026-03-23 00:43:56.535][15][info][main] [source/server/server.cc:1031] all clusters initialized. initializing init manager                                             │
+│ [2026-03-23 00:43:56.538][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:passthrough:ipv4'                       │
+│ [2026-03-23 00:43:56.560][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'kuma:envoy:admin'                                │
+│ [2026-03-23 00:43:56.563][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:10.106.78.84:80'                        │
+│ [2026-03-23 00:43:56.567][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:241.0.0.0:443'                          │
+│ [2026-03-23 00:43:56.568][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'inbound:10.244.5.36:6666'                        │
+│ [2026-03-23 00:43:56.570][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'inbound:passthrough:ipv6'                        │
+│ [2026-03-23 00:43:56.573][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:10.106.78.84:443'                       │
+│ [2026-03-23 00:43:56.577][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:10.96.124.63:6666'                      │
+│ [2026-03-23 00:43:56.579][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:passthrough:ipv6'                       │
+│ [2026-03-23 00:43:56.581][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'inbound:10.244.5.36:80'                          │
+│ [2026-03-23 00:43:56.584][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:10.105.103.96:443'                      │
+│ [2026-03-23 00:43:56.587][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:240.0.0.0:80'                           │
+│ [2026-03-23 00:43:56.589][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:240.0.0.1:80'                           │
+│ [2026-03-23 00:43:56.601][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener '_kuma:dynamicconfig'                             │
+│ [2026-03-23 00:43:56.603][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'inbound:10.244.5.36:443'                         │
+│ [2026-03-23 00:43:56.605][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'inbound:passthrough:ipv4'                        │
+│ [2026-03-23 00:43:56.607][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:240.0.0.2:80'                           │
+│ [2026-03-23 00:43:56.610][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:241.0.0.1:80'                           │
+│ [2026-03-23 00:43:56.610][15][info][config] [source/common/listener_manager/listener_manager_impl.cc:1009] all dependencies initialized. starting workers                │
+│ 2026-03-23T00:43:57.013Z    INFO    envoy-config-fetcher    scraped config from Envoy changed    {"path": "/dns", "etag": "f535d03a3390c83b20dc06a98dcee0732aee24e9d6c00 │
+│ [2026-03-23 00:44:01.089][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:240.0.0.0:80'                           │
+│ [2026-03-23 00:44:01.091][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:240.0.0.2:80'                           │
+│ [2026-03-23 00:44:13.088][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:240.0.0.0:80'                           │
+│ [2026-03-23 00:44:13.090][15][info][upstream] [source/common/listener_manager/lds_api.cc:106] lds: add/update listener 'outbound:240.0.0.2:80'                           │
+│ 2026-03-23T00:44:13.832Z    INFO    runtime    received signal, stopping instance gracefully    {"signal": "terminated"}                                                 │
+│ 2026-03-23T00:44:13.832Z    INFO    kuma-dp.run    Kuma DP caught an exit signal                                                                                         │
+│ 2026-03-23T00:44:13.832Z    INFO    kuma-dp.run    draining Envoy connections                                                                                            │
+│ 2026-03-23T00:44:13.833Z    INFO    kuma-dp.run    waiting for connections to be drained    {"waitTime": "30s"}
