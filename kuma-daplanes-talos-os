@@ -1794,5 +1794,19 @@ status:
     type: Progressing
   observedGeneration: 1
   readyReplicas: 1
-  replicas: 1
+  replicas: 3
   updatedReplicas: 1
+
+
+########################################
+
+ingress:
+  enabled: true
+  replicas: 3  # HA com 3 nós
+  service:
+    type: LoadBalancer
+    externalTrafficPolicy: Local # Garante que o tráfego entra e morre no nó com o Pod
+    annotations:
+      # Instrução ao Cilium para usar o IP do nó onde o Pod aterrar
+      io.cilium/lb-ipam-ips: "" # Deixa vazio ou usa a label de node-ip se o teu IPAM permitir
+
