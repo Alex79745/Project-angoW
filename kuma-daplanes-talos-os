@@ -1449,3 +1449,25 @@ global:
 
 
 kubectl delete mutatingwebhookconfiguration kuma-admission-mutating-webhook-configuration
+
+
+
+ 43 warnings.go:110] "Warning: cilium.io/v2alpha1 CiliumBGPPeeringPolicy is deprecated; use cilium.io/v2 CRDs (CiliumBGPClusterConfig, CiliumBGPPeerConfig, CiliumBGPAd │
+│   43 warnings.go:110] "Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice"                                                             │
+│   43 warnings.go:110] "Warning: cilium.io/v2alpha1 CiliumBGPPeeringPolicy is deprecated; use cilium.io/v2 CRDs (CiliumBGPClusterConfig, CiliumBGPPeerConfig, CiliumBGPAd │
+│   43 warnings.go:110] "Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice"                                                             │
+│   43 reflector.go:205] "Failed to watch" err="failed to list *summary.SummarizedObject: the server is currently unable to handle the request" logger="UnhandledError" re │
+│   43 reflector.go:205] "Failed to watch" err="failed to list *summary.SummarizedObject: the server is currently unable to handle the request" logger="UnhandledError" re │
+│   43 gvks.go:80] Failed to read API for groups: map[ext.cattle.io/v1:stale GroupVersion discovery: ext.cattle.io/v1]                                                     │
+│ ] Removing peer 10.244.3.19                                                                                                                                              │
+│   43 gvks.go:80] Failed to read API for groups: map[ext.cattle.io/v1:stale GroupVersion discovery: ext.cattle.io/v1]                                                     │
+│   43 reflector.go:205] "Failed to watch" err="failed to list *summary.SummarizedObject: the server is currently unable to handle the request" logger="UnhandledError" re │
+│   43 reflector.go:205] "Failed to watch" err="failed to list *summary.SummarizedObject: the server is currently unable to handle the request" logger="UnhandledError" re │
+│   43 reflector.go:205] "Failed to watch" err="failed to list *v1.Token: the server is currently unable to handle the request (get tokens.meta.k8s.io)" logger="Unhandled │
+│   43 reflector.go:205] "Failed to watch" err="failed to list *summary.SummarizedObject: the server is currently unable to handle the request" logger="UnhandledError" re │
+│   43 reflector.go:205] "Failed to watch" err="failed to list *summary.SummarizedObject: the server is currently unable to handle the request" logger="UnhandledError" re │
+│ ING] signal received: "terminated", canceling context...                                                                                                                 │
+│ ] Shutting down management.cattle.io/v3, Kind=Token workers                                                                                                              │
+│ ] Shutting down management.cattle.io/v3, Kind=User workers                                                                                                               │
+│ ] Shutting down apiregistration.k8s.io/v1, Kind=APIService workers                                                                                                       │
+│ ] requested to terminate, exiting                                                   
