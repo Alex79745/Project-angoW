@@ -1417,3 +1417,32 @@ kubectl patch mutatingwebhookconfiguration kuma-admission-mutating-webhook-confi
 kubectl label ns cattle-system kuma.io/sidecar-injection-
 
 kubectl rollout restart deployment rancher -n cattle-system
+
+
+
+ helm upgrade kuma ./kuma-2.13.2.tgz   -n kuma-system   -f values-hub-zone.yaml
+level=WARN msg="upgrade failed" name=kuma error="conflict occurred while applying object /kuma-admission-mutating-webhook-configuration admissionregistration.k8s.io/v1, Kind=MutatingWebhookConfiguration: Apply failed with 2 conflicts: conflicts with \"kubectl-patch\" using admissionregistration.k8s.io/v1:\n- .webhooks[name=\"mesh.defaulter.kuma-admission.kuma.io\"].failurePolicy\n- .webhooks[name=\"owner-reference.kuma-admission.kuma.io\"].failurePolicy"
+Error: UPGRADE FAILED: conflict occurred while applying object /kuma-admission-mutating-webhook-configuration admissionregistration.k8s.io/v1, Kind=MutatingWebhookConfiguration: Apply failed with 2 conflicts: conflicts with "kubectl-patch" using admissionregistration.k8s.io/v1:
+- .webhooks[name="mesh.defaulter.kuma-admission.kuma.io"].failurePolicy
+- .webhooks[name="owner-reference.kuma-admission.kuma.io"].failurePolicy
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ cat values-hub-zone.yaml
+controlPlane:
+  mode: zone
+  zone: omni-infra
+  #kdsGlobalAddress: grpcs://kuma-control-plane.kuma-system.svc:5685
+  kdsGlobalAddress: grpcs://10.19.143.83:5685
+  image:
+    tag: "2.13.2"
+
+  envVars:
+    KUMA_MULTIZONE_ZONE_KDS_TLS_SKIP_VERIFY: "true"     # while your KDS cert lacks SAN=IP:10.19.143.83
+#    KUMA_DP_SERVER_AUTHN_DP_PROXY_TYPE: serviceAccount
+#    KUMA_DP_SERVER_AUTHN_TYPE: tokens
+ingress:
+  enabled: true
+
+global:
+  image:
+    tag: "2.13.2"
