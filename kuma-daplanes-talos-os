@@ -1615,3 +1615,184 @@ E0323 00:45:20.706955       1 controller.go:146] "Unhandled Error" err=<
 E0323 00:45:20.706989       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:45132->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
 E0323 00:45:20.714446       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:45192->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
 W0323 00:45:20.714544       1 handler_proxy.go:99] no RequestInfo found in th
+##################################################################################################################################################
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    meta.helm.sh/release-name: kuma
+    meta.helm.sh/release-namespace: kuma-system
+  creationTimestamp: "2026-03-22T20:22:39Z"
+  generation: 1
+  labels:
+    app: kuma-ingress
+    app.kubernetes.io/instance: kuma
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kuma
+    app.kubernetes.io/version: 2.13.2
+    helm.sh/chart: kuma-2.13.2
+  name: kuma-ingress
+  namespace: kuma-system
+  resourceVersion: "53283211"
+  uid: 98083d2b-e83c-4dc7-8660-092536ff9d4d
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: kuma-ingress
+      app.kubernetes.io/instance: kuma
+      app.kubernetes.io/name: kuma
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kuma.io/ingress: enabled
+      labels:
+        app: kuma-ingress
+        app.kubernetes.io/instance: kuma
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kuma
+        app.kubernetes.io/version: 2.13.2
+        helm.sh/chart: kuma-2.13.2
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - kuma
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                  - kuma
+                - key: app
+                  operator: In
+                  values:
+                  - kuma-ingress
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      automountServiceAccountToken: true
+      containers:
+      - args:
+        - run
+        - --log-level=info
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: KUMA_CONTROL_PLANE_URL
+          value: https://kuma-control-plane.kuma-system:5678
+        - name: KUMA_CONTROL_PLANE_CA_CERT_FILE
+          value: /var/run/secrets/kuma.io/cp-ca/ca.crt
+        - name: KUMA_DATAPLANE_DRAIN_TIME
+          value: 30s
+        - name: KUMA_DATAPLANE_RUNTIME_TOKEN_PATH
+          value: /var/run/secrets/kubernetes.io/serviceaccount/token
+        - name: KUMA_DATAPLANE_PROXY_TYPE
+          value: ingress
+        image: docker.io/kumahq/kuma-dp:2.13.2
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 12
+          httpGet:
+            path: /ready
+            port: 9901
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: ingress
+        ports:
+        - containerPort: 10001
+          protocol: TCP
+        - containerPort: 9901
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 12
+          httpGet:
+            path: /ready
+            port: 9901
+            scheme: HTTP
+          initialDelaySeconds: 1
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        securityContext:
+          readOnlyRootFilesystem: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/run/secrets/kuma.io/cp-ca
+          name: control-plane-ca
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsGroup: 5678
+        runAsNonRoot: true
+        runAsUser: 5678
+      serviceAccount: kuma-ingress
+      serviceAccountName: kuma-ingress
+      terminationGracePeriodSeconds: 40
+      volumes:
+      - name: control-plane-ca
+        secret:
+          defaultMode: 420
+          items:
+          - key: ca.crt
+            path: ca.crt
+          secretName: kuma-tls-cert
+      - emptyDir: {}
+        name: tmp
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-03-22T20:23:15Z"
+    lastUpdateTime: "2026-03-22T20:23:15Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2026-03-22T20:22:39Z"
+    lastUpdateTime: "2026-03-22T20:23:15Z"
+    message: ReplicaSet "kuma-ingress-6b9dc65d69" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
