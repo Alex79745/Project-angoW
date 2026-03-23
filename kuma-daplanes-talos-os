@@ -1446,3 +1446,6 @@ ingress:
 global:
   image:
     tag: "2.13.2"
+
+
+kubectl delete mutatingwebhookconfiguration kuma-admission-mutating-webhook-configuration
