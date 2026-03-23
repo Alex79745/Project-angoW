@@ -1516,3 +1516,102 @@ kubectl delete mutatingwebhookconfiguration kuma-admission-mutating-webhook-conf
 │ 2026-03-23T00:44:13.832Z    INFO    kuma-dp.run    Kuma DP caught an exit signal                                                                                         │
 │ 2026-03-23T00:44:13.832Z    INFO    kuma-dp.run    draining Envoy connections                                                                                            │
 │ 2026-03-23T00:44:13.833Z    INFO    kuma-dp.run    waiting for connections to be drained    {"waitTime": "30s"}
+
+
+#######################################
+
+ kubectl -n kube-system logs kube-apiserver-klusterx-control-infra-01 --tail=200
+E0323 00:45:14.544993       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:14.546391       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": EOF" logger="UnhandledError"
+E0323 00:45:14.581102       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:41596->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+W0323 00:45:14.581186       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:14.581205       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:14.587238       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": EOF" logger="UnhandledError"
+W0323 00:45:14.587316       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:14.587361       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:14.588217       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": EOF" logger="UnhandledError"
+W0323 00:45:15.230012       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:15.230053       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:15.230117       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:41690->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+E0323 00:45:15.237551       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": EOF" logger="UnhandledError"
+W0323 00:45:15.237715       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:15.237747       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:15.238780       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": EOF" logger="UnhandledError"
+E0323 00:45:20.641546       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)" logger="UnhandledError"
+W0323 00:45:20.641608       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.641642       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:20.648453       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:44712->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+W0323 00:45:20.648584       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.648617       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:20.651536       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: Operation cannot be fulfilled on apiservices.apiregistration.k8s.io \"v1.ext.cattle.io\": the object has been modified; please apply your changes to the latest version and try again" logger="UnhandledError"
+W0323 00:45:20.659357       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.659394       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:20.659461       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:44798->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+W0323 00:45:20.667328       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.667342       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": EOF" logger="UnhandledError"
+E0323 00:45:20.667354       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:20.672951       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:44894->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+W0323 00:45:20.673032       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.673057       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+W0323 00:45:20.678472       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.678523       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:20.678795       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": EOF" logger="UnhandledError"
+W0323 00:45:20.686350       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.686375       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:20.686400       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:44998->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+E0323 00:45:20.693813       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:45038->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+W0323 00:45:20.694043       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.694070       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+W0323 00:45:20.699342       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.699375       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:20.699398       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:45084->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+W0323 00:45:20.706925       1 handler_proxy.go:99] no RequestInfo found in the context
+E0323 00:45:20.706955       1 controller.go:146] "Unhandled Error" err=<
+        Error updating APIService "v1.ext.cattle.io" with err: failed to download v1.ext.cattle.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+        , Header: map[Content-Type:[text/plain; charset=utf-8] X-Content-Type-Options:[nosniff]]
+ > logger="UnhandledError"
+E0323 00:45:20.706989       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:45132->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+E0323 00:45:20.714446       1 remote_available_controller.go:462] "Unhandled Error" err="v1.ext.cattle.io failed with: failing or missing response from https://10.96.124.63:6666/apis/ext.cattle.io/v1: Get \"https://10.96.124.63:6666/apis/ext.cattle.io/v1\": read tcp 10.244.0.192:45192->10.96.124.63:6666: read: connection reset by peer" logger="UnhandledError"
+W0323 00:45:20.714544       1 handler_proxy.go:99] no RequestInfo found in th
