@@ -148,3 +148,76 @@ NAME                       ENDPOINTS                                            
 imperative-api-extension   10.244.1.208:6666,10.244.3.103:6666,10.244.4.73:6666   109d
 NAME                             ADDRESSTYPE   PORTS   ENDPOINTS                               AGE
 imperative-api-extension-frsmp   IPv4          6666    10.244.3.103,10.244.1.208,10.244.4.73   109d
+
+
+
+after i did 
+ kubectl -n cattle-system patch deploy rancher --type='merge' -p '{
+  "spec": {
+    "template": {
+      "metadata": {
+        "labels": {
+          "kuma.io/sidecar-injection": "enabled"
+        },
+        "annotations": {
+          "kuma.io/virtual-probes": "enabled",
+          "kuma.io/virtual-probes-port": "9000"
+        }
+      }
+    }
+  }
+}'
+deployment.apps/rancher patched
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n cattle-system patch deploy rancher --type='json' -p='[
+  {
+    "op":"add",
+    "path":"/spec/template/spec/containers/0/resources",
+    "value":{
+      "requests":{"cpu":"100m","memory":"512Mi","ephemeral-storage":"1Gi"},
+      "limits":{"memory":"2Gi","ephemeral-storage":"4Gi"}
+    }
+  }
+]'
+deployment.apps/rancher patched
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n cattle-system get events --sort-by=.lastTimestamp | tail -n 30
+53m         Normal    Created                pod/rancher-648c59679-cznjs     Created container: rancher
+53m         Normal    Started                pod/rancher-648c59679-cznjs     Started container rancher
+53m         Warning   Unhealthy              pod/rancher-6f4db95bf8-2r8hp    Startup probe failed: Get "http://10.244.5.217:80/healthz": dial tcp 10.244.5.217:80: connect: connection refused
+53m         Normal    UpdatedKumaDataplane   pod/rancher-6f4db95bf8-2r8hp    Updated Kuma Dataplane: rancher-6f4db95bf8-2r8hp
+53m         Warning   Evicted                pod/rancher-6f4db95bf8-2r8hp    Pod ephemeral local storage usage exceeds the total limit of containers 1G.
+53m         Normal    Killing                pod/rancher-6f4db95bf8-2r8hp    Stopping container rancher
+53m         Normal    Killing                pod/rancher-6f4db95bf8-2r8hp    Stopping container kuma-sidecar
+53m         Warning   Unhealthy              pod/rancher-648c59679-cznjs     Startup probe failed: Get "http://10.244.1.208:80/healthz": dial tcp 10.244.1.208:80: connect: connection refused
+53m         Warning   Unhealthy              pod/rancher-648c59679-z7r86     Startup probe failed: Get "http://10.244.4.73:80/healthz": dial tcp 10.244.4.73:80: connect: connection refused
+53m         Normal    SuccessfulCreate       replicaset/rancher-6f4db95bf8   (combined from similar events): Created pod: rancher-6f4db95bf8-5hxmd
+53m         Normal    Pulled                 pod/rancher-6f4db95bf8-5hxmd    Container image "docker.io/kumahq/kuma-init:2.13.2" already present on machine
+53m         Normal    Created                pod/rancher-6f4db95bf8-5hxmd    Created container: kuma-init
+53m         Normal    Started                pod/rancher-6f4db95bf8-5hxmd    Started container kuma-init
+53m         Normal    CreatedKumaDataplane   pod/rancher-6f4db95bf8-5hxmd    Created Kuma Dataplane: rancher-6f4db95bf8-5hxmd
+53m         Normal    SuccessfulDelete       replicaset/rancher-6f4db95bf8   Deleted pod: rancher-6f4db95bf8-5hxmd
+53m         Normal    UpdatedKumaDataplane   pod/rancher-6f4db95bf8-5hxmd    Updated Kuma Dataplane: rancher-6f4db95bf8-5hxmd
+53m         Warning   Unhealthy              pod/rancher-6f4db95bf8-spnxr    Readiness probe failed: HTTP probe failed with statuscode: 503
+53m         Warning   Unhealthy              pod/rancher-6f4db95bf8-xkl5q    Readiness probe failed: HTTP probe failed with statuscode: 503
+53m         Normal    UpdatedKumaDataplane   pod/rancher-6f4db95bf8-spnxr    Updated Kuma Dataplane: rancher-6f4db95bf8-spnxr
+53m         Normal    UpdatedKumaDataplane   pod/rancher-6f4db95bf8-xkl5q    Updated Kuma Dataplane: rancher-6f4db95bf8-xkl5q
+3m43s       Warning   FailedCreate           job/rancher-pre-upgrade         Error creating: pods "rancher-pre-upgrade-" is forbidden: error looking up service account cattle-system/rancher-pre-upgrade: serviceaccount "rancher-pre-upgrade" not found
+2m11s       Normal    ScalingReplicaSet      deployment/rancher              Scaled down replica set rancher-648c59679 from 3 to 2
+2m11s       Normal    Killing                pod/rancher-648c59679-z7r86     Stopping container rancher
+2m11s       Normal    SuccessfulDelete       replicaset/rancher-648c59679    Deleted pod: rancher-648c59679-z7r86
+2m11s       Normal    ScalingReplicaSet      deployment/rancher              Scaled up replica set rancher-6879c5b8d from 0 to 1
+2m11s       Normal    ScalingReplicaSet      deployment/rancher              Scaled up replica set rancher-6879c5b8d from 1 to 2
+2m          Warning   FailedCreate           replicaset/rancher-6879c5b8d    Error creating: admission webhook "pods-kuma-injector.kuma.io" denied the request: unable to set kuma.io/virtual-probes: virtual probes can't be enabled in gateway mode
+2m          Normal    ScalingReplicaSet      deployment/rancher              Scaled down replica set rancher-6879c5b8d from 2 to 0
+2m          Normal    ScalingReplicaSet      deployment/rancher              Scaled up replica set rancher-59f899fbcd from 0 to 2
+38s         Warning   FailedCreate           replicaset/rancher-59f899fbcd   Error creating: admission webhook "pods-kuma-injector.kuma.io" denied the request: unable to set kuma.io/virtual-probes: virtual probes can't be enabled in gateway mode
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n kube-system logs kube-apiserver-klusterx-control-infra-01 --since=10m | egrep -i "ext.cattle.io|ReverseProxy|refused|reset|unknown authority"
+E0324 12:31:18.809135       1 wrap.go:53] "Timeout or abort while handling" logger="UnhandledError" method="GET" URI="/apis/ext.cattle.io/v1/tokens?allowWatchBookmarks=true&resourceVersion=54396940&timeout=15m0s&timeoutSeconds=325&watch=true" auditID="3d9b87f9-1be7-4f5d-89ce-a41b7133bb8c"
+E0324 12:31:18.809460       1 wrap.go:53] "Timeout or abort while handling" logger="UnhandledError" method="GET" URI="/apis/ext.cattle.io/v1/kubeconfigs?allowWatchBookmarks=true&resourceVersion=54397058&timeout=15m0s&timeoutSeconds=372&watch=true" auditID="bb841d91-6c99-41bf-8c55-b0f4ebcbbdca"
+E0324 12:31:18.811289       1 wrap.go:53] "Timeout or abort while handling" logger="UnhandledError" method="GET" URI="/apis/ext.cattle.io/v1/tokens?allowWatchBookmarks=true&resourceVersion=54396125&timeout=5m4s&timeoutSeconds=304&watch=true" auditID="3ce408a2-2313-4d31-b586-fa4bd5436abb"
+
