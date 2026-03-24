@@ -1,0 +1,150 @@
+kubectl -n cattle-system get pods -l app=rancher -o wide
+kubectl -n cattle-system get pods -l app=rancher \
+  -o custom-columns=NAME:.metadata.name,READY:.status.containerStatuses[*].ready,RESTARTS:.status.containerStatuses[*].restartCount,STATE:.status.containerStatuses[*].state
+NAME                       READY   STATUS                   RESTARTS   AGE     IP             NODE                       NOMINATED NODE   READINESS GATES
+rancher-648c59679-cznjs    1/1     Running                  0          3m9s    10.244.1.208   klusterx-worker-infra-02   <none>           <none>
+rancher-648c59679-ngncv    1/1     Running                  0          12m     10.244.3.103   klusterx-worker-infra-05   <none>           <none>
+rancher-648c59679-z7r86    1/1     Running                  0          3m9s    10.244.4.73    klusterx-worker-infra-01   <none>           <none>
+rancher-6f4db95bf8-2r8hp   0/2     Error                    1          3m18s   10.244.5.217   klusterx-worker-infra-04   <none>           <none>
+rancher-6f4db95bf8-7pbfr   0/2     Error                    1          3m42s   10.244.4.94    klusterx-worker-infra-01   <none>           <none>
+rancher-6f4db95bf8-kgs6w   0/2     ContainerStatusUnknown   2          3m42s   10.244.1.139   klusterx-worker-infra-02   <none>           <none>
+NAME                       READY         RESTARTS   STATE
+rancher-648c59679-cznjs    true          0          map[running:map[startedAt:2026-03-24T11:39:54Z]]
+rancher-648c59679-ngncv    true          0          map[running:map[startedAt:2026-03-24T11:30:19Z]]
+rancher-648c59679-z7r86    true          0          map[running:map[startedAt:2026-03-24T11:39:54Z]]
+rancher-6f4db95bf8-2r8hp   false,false   0,1        map[terminated:map[containerID:containerd://4d176949a97941a969a049b83c61c89996f809428c26353528e2d2a9ae71a998 exitCode:137 finishedAt:2026-03-24T11:40:06Z reason:Error startedAt:2026-03-24T11:39:50Z]],map[terminated:map[exitCode:137 finishedAt:<nil> message:The container could not be located when the pod was terminated reason:ContainerStatusUnknown startedAt:<nil>]]
+rancher-6f4db95bf8-7pbfr   false,false   0,1        map[terminated:map[containerID:containerd://7ce38c478504641d788c06f41782e50cabf2ee9eff480d1d7dd4d118cd23afbb exitCode:137 finishedAt:2026-03-24T11:39:45Z reason:Error startedAt:2026-03-24T11:39:25Z]],map[terminated:map[exitCode:137 finishedAt:<nil> message:The container could not be located when the pod was terminated reason:ContainerStatusUnknown startedAt:<nil>]]
+rancher-6f4db95bf8-kgs6w   false,false   1,1        map[terminated:map[exitCode:137 finishedAt:<nil> message:The container could not be located when the pod was terminated reason:ContainerStatusUnknown startedAt:<nil>]],map[terminated:map[exitCode:137 finishedAt:<nil> message:The container could not be located when the pod was terminated reason:ContainerStatusUnknown startedAt:<nil>]]
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n cattle-system describe pod -l app=rancher | egrep -i "killing|probe|failed|unhealthy|oom|reason|exit|terminated" | head -n 80
+kubectl -n cattle-system get events --sort-by=.lastTimestamp | tail -n 40
+  Type     Reason     Age                    From               Message
+  Warning  Unhealthy  3m19s (x2 over 3m24s)  kubelet            Startup probe failed: Get "http://10.244.1.208:80/healthz": dial tcp 10.244.1.208:80: connect: connection refused
+  Type     Reason     Age                From               Message
+  Warning  Unhealthy  12m (x2 over 12m)  kubelet            Startup probe failed: Get "http://10.244.3.103:80/healthz": dial tcp 10.244.3.103:80: connect: connection refused
+  Type     Reason     Age                    From               Message
+  Warning  Unhealthy  3m19s (x2 over 3m24s)  kubelet            Startup probe failed: Get "http://10.244.4.73:80/healthz": dial tcp 10.244.4.73:80: connect: connection refused
+                      kuma.io/application-probe-proxy-port: 0
+                      kuma.io/virtual-probes: disabled
+                      kuma.io/virtual-probes-port: 9000
+Status:               Failed
+Reason:               Evicted
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+    State:          Terminated
+      Reason:       Error
+      Exit Code:    137
+      KUMA_APPLICATION_PROBE_PROXY_PORT:  0
+    State:          Terminated
+      Reason:       ContainerStatusUnknown
+      Message:      The container could not be located when the pod was terminated
+      Exit Code:    137
+    Last State:     Terminated
+      Reason:       ContainerStatusUnknown
+      Exit Code:    137
+  Type     Reason                Age                    From                             Message
+  Warning  Unhealthy             3m28s (x2 over 3m33s)  kubelet                          Startup probe failed: Get "http://10.244.5.217:80/healthz": dial tcp 10.244.5.217:80: connect: connection refused
+  Normal   Killing               3m20s                  kubelet                          Stopping container kuma-sidecar
+  Normal   Killing               3m20s                  kubelet                          Stopping container rancher
+                      kuma.io/application-probe-proxy-port: 0
+                      kuma.io/virtual-probes: disabled
+                      kuma.io/virtual-probes-port: 9000
+Status:               Failed
+Reason:               Evicted
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+    State:          Terminated
+      Reason:       Error
+      Exit Code:    137
+      KUMA_APPLICATION_PROBE_PROXY_PORT:  0
+    State:          Terminated
+      Reason:       ContainerStatusUnknown
+      Message:      The container could not be located when the pod was terminated
+      Exit Code:    137
+    Last State:     Terminated
+      Reason:       ContainerStatusUnknown
+      Exit Code:    137
+  Type     Reason                Age                    From                             Message
+  Warning  Unhealthy             3m48s (x3 over 3m58s)  kubelet                          Startup probe failed: Get "http://10.244.4.94:80/healthz": dial tcp 10.244.4.94:80: connect: connection refused
+  Normal   Killing               3m41s                  kubelet                          Stopping container kuma-sidecar
+  Normal   Killing               3m41s                  kubelet                          Stopping container rancher
+                      kuma.io/application-probe-proxy-port: 0
+                      kuma.io/virtual-probes: disabled
+                      kuma.io/virtual-probes-port: 9000
+Status:               Failed
+Reason:               Evicted
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+    State:          Terminated
+      Reason:       ContainerStatusUnknown
+      Message:      The container could not be located when the pod was terminated
+      Exit Code:    137
+    Last State:     Terminated
+      Reason:       ContainerStatusUnknown
+      Exit Code:    137
+      KUMA_APPLICATION_PROBE_PROXY_PORT:  0
+    State:          Terminated
+      Reason:       ContainerStatusUnknown
+      Message:      The container could not be located when the pod was terminated
+      Exit Code:    137
+    Last State:     Terminated
+      Reason:       ContainerStatusUnknown
+      Exit Code:    137
+  Type     Reason                Age                    From                             Message
+  Warning  Unhealthy             3m49s (x2 over 3m54s)  kubelet                          Startup probe failed: Get "http://10.244.1.139:80/healthz": dial tcp 10.244.1.139:80: connect: connection refused
+  Normal   Killing               3m46s                  kubelet                          Stopping container kuma-sidecar
+  Normal   Killing               3m46s                  kubelet                          Stopping container rancher
+3m36s       Normal    Started                pod/rancher-6f4db95bf8-2r8hp    Started container rancher
+3m36s       Normal    Created                pod/rancher-6f4db95bf8-2r8hp    Created container: rancher
+3m36s       Normal    Pulled                 pod/rancher-6f4db95bf8-2r8hp    Container image "docker.io/kumahq/kuma-dp:2.13.2" already present on machine
+3m36s       Normal    Pulled                 pod/rancher-6f4db95bf8-2r8hp    Container image "rancher/rancher:v2.13.2" already present on machine
+3m36s       Normal    Created                pod/rancher-6f4db95bf8-2r8hp    Created container: kuma-sidecar
+3m36s       Normal    Started                pod/rancher-6f4db95bf8-2r8hp    Started container kuma-sidecar
+3m34s       Warning   Unhealthy              pod/rancher-6f4db95bf8-spnxr    Startup probe failed: Get "http://10.244.1.7:80/healthz": dial tcp 10.244.1.7:80: connect: connection refused
+3m34s       Warning   Unhealthy              pod/rancher-6f4db95bf8-xkl5q    Startup probe failed: Get "http://10.244.3.19:80/healthz": dial tcp 10.244.3.19:80: connect: connection refused
+3m32s       Normal    Created                pod/rancher-648c59679-z7r86     Created container: rancher
+3m32s       Normal    Killing                pod/rancher-6f4db95bf8-spnxr    Stopping container rancher
+3m32s       Normal    SuccessfulDelete       replicaset/rancher-6f4db95bf8   Deleted pod: rancher-6f4db95bf8-xkl5q
+3m32s       Normal    Started                pod/rancher-648c59679-cznjs     Started container rancher
+3m32s       Normal    Started                pod/rancher-648c59679-z7r86     Started container rancher
+3m32s       Normal    Killing                pod/rancher-6f4db95bf8-xkl5q    Stopping container rancher
+3m32s       Normal    Pulled                 pod/rancher-648c59679-cznjs     Container image "rancher/rancher:v2.13.2" already present on machine
+3m32s       Normal    Created                pod/rancher-648c59679-cznjs     Created container: rancher
+3m32s       Normal    Killing                pod/rancher-6f4db95bf8-spnxr    Stopping container kuma-sidecar
+3m32s       Normal    SuccessfulCreate       replicaset/rancher-648c59679    Created pod: rancher-648c59679-cznjs
+3m32s       Normal    SuccessfulCreate       replicaset/rancher-648c59679    Created pod: rancher-648c59679-z7r86
+3m32s       Normal    Pulled                 pod/rancher-648c59679-z7r86     Container image "rancher/rancher:v2.13.2" already present on machine
+3m32s       Normal    SuccessfulDelete       replicaset/rancher-6f4db95bf8   Deleted pod: rancher-6f4db95bf8-spnxr
+3m32s       Normal    Killing                pod/rancher-6f4db95bf8-xkl5q    Stopping container kuma-sidecar
+3m30s       Warning   Unhealthy              pod/rancher-6f4db95bf8-2r8hp    Startup probe failed: Get "http://10.244.5.217:80/healthz": dial tcp 10.244.5.217:80: connect: connection refused
+3m25s       Normal    UpdatedKumaDataplane   pod/rancher-6f4db95bf8-2r8hp    Updated Kuma Dataplane: rancher-6f4db95bf8-2r8hp
+3m24s       Warning   Evicted                pod/rancher-6f4db95bf8-2r8hp    Pod ephemeral local storage usage exceeds the total limit of containers 1G.
+3m22s       Warning   Unhealthy              pod/rancher-648c59679-cznjs     Startup probe failed: Get "http://10.244.1.208:80/healthz": dial tcp 10.244.1.208:80: connect: connection refused
+3m22s       Normal    Killing                pod/rancher-6f4db95bf8-2r8hp    Stopping container kuma-sidecar
+3m22s       Normal    Killing                pod/rancher-6f4db95bf8-2r8hp    Stopping container rancher
+3m22s       Warning   Unhealthy              pod/rancher-648c59679-z7r86     Startup probe failed: Get "http://10.244.4.73:80/healthz": dial tcp 10.244.4.73:80: connect: connection refused
+3m20s       Normal    Created                pod/rancher-6f4db95bf8-5hxmd    Created container: kuma-init
+3m20s       Normal    Pulled                 pod/rancher-6f4db95bf8-5hxmd    Container image "docker.io/kumahq/kuma-init:2.13.2" already present on machine
+3m20s       Normal    SuccessfulCreate       replicaset/rancher-6f4db95bf8   (combined from similar events): Created pod: rancher-6f4db95bf8-5hxmd
+3m19s       Normal    Started                pod/rancher-6f4db95bf8-5hxmd    Started container kuma-init
+3m18s       Normal    CreatedKumaDataplane   pod/rancher-6f4db95bf8-5hxmd    Created Kuma Dataplane: rancher-6f4db95bf8-5hxmd
+3m17s       Normal    SuccessfulDelete       replicaset/rancher-6f4db95bf8   Deleted pod: rancher-6f4db95bf8-5hxmd
+3m15s       Normal    UpdatedKumaDataplane   pod/rancher-6f4db95bf8-5hxmd    Updated Kuma Dataplane: rancher-6f4db95bf8-5hxmd
+3m4s        Warning   Unhealthy              pod/rancher-6f4db95bf8-spnxr    Readiness probe failed: HTTP probe failed with statuscode: 503
+3m4s        Warning   Unhealthy              pod/rancher-6f4db95bf8-xkl5q    Readiness probe failed: HTTP probe failed with statuscode: 503
+3m2s        Normal    UpdatedKumaDataplane   pod/rancher-6f4db95bf8-spnxr    Updated Kuma Dataplane: rancher-6f4db95bf8-spnxr
+3m1s        Normal    UpdatedKumaDataplane   pod/rancher-6f4db95bf8-xkl5q    Updated Kuma Dataplane: rancher-6f4db95bf8-xkl5q
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n cattle-system get endpoints imperative-api-extension -o wide
+# (ou, em clusters novos)
+kubectl -n cattle-system get endpointslice -l kubernetes.io/service-name=imperative-api-extension -o wide
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME                       ENDPOINTS                                              AGE
+imperative-api-extension   10.244.1.208:6666,10.244.3.103:6666,10.244.4.73:6666   109d
+NAME                             ADDRESSTYPE   PORTS   ENDPOINTS                               AGE
+imperative-api-extension-frsmp   IPv4          6666    10.244.3.103,10.244.1.208,10.244.4.73   109d
