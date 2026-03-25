@@ -564,3 +564,7 @@ root@klusterx-envoyingress-01:~# curl -vk https://10.19.143.84:5678
 404 page not found
 * Connection #0 to host 10.19.143.84 left intact
 
+ kubectl -n kube-system exec -it cilium-cqx4m -- cilium service list | grep 10.19.143.84
+106   10.19.143.84:5678/TCP     LoadBalancer   1 => 10.244.5.213:5678/TCP (active)
+107   10.19.143.84:5680/TCP     LoadBalancer   1 => 10.244.5.213:5680/TCP (active)
+
