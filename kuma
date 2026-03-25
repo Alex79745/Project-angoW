@@ -3737,3 +3737,91 @@ conf:
 
 kubectl logs -n kuma-system deploy/kuma-control-plane
 
+.................................,,,,,,,,,,,,,,,,,,,,------------------------------------------------
+
+
+Sim — estás muito perto, mas o teu exemplo mistura 3 coisas diferentes (workload dataplane, gateway dataplane e policy MeshGateway) e isso muda como o Dataplane deve ser escrito e onde ele deve existir (Kubernetes CRD vs “Universal resource”). Vou organizar e dar-te manifests corretos para os 2 casos:
+
+VM “workload” normal (tem inbound e opcionalmente outbound)
+VM “builtin gateway” (usa networking.gateway, normalmente sem inbound/outbound)
+Policy MeshGateway (separada, seleciona pelo kuma.io/service do gateway dataplane)
+
+
+Em Universal, o Dataplane é sempre declarado explicitamente (não é auto-criado).
+E MeshGateway/built-in gateway é servido por dataplanes com gateway: type: BUILTIN e tag kuma.io/service que o MeshGateway seleciona. [github.com], [github.com] [github.com], [github.com]
+
+
+0) Antes de tudo: “Kubernetes mode zone-cp” = onde os recursos vivem?
+No teu setup (zone CP a correr em Kubernetes), o recurso Dataplane tem de existir como CRD no cluster (porque o CP usa o store Kubernetes). Em Universal “puro” (CP fora de k8s), ele vive no store do CP via HTTP API/kumactl. A doc resume: em Universal tens de criar os Dataplane manualmente. [github.com], [github.com]
+✅ Portanto, para as tuas VMs, cria um Dataplane CRD no cluster do zone-cp (recomendado criar um namespace tipo dmz-mesh).
+
+1) VM “workload” normal (exemplo correto)
+1.1 Dataplane (Universal-style YAML que a VM usa)
+Isto é o que vai no ficheiro da VM passado em --dataplane-file (e o token deve ser para o mesmo mesh/name). Em Universal, inbound descreve o tráfego que o proxy recebe e outbound é usado quando não estás a usar transparent proxying e queres expor dependências via portas locais. [github.com], [github.com]
+YAMLtype: Dataplanemesh: defaultname: dmz-vm-1networking:  address: 10.10.1.10  inbound:    - port: 8080      servicePort: 8080      tags:        kuma.io/service: dmz-vm-1        kuma.io/protocol: httpShow more lines
+Notas importantes:
+
+Não precisas de um tags: ao nível raiz. O que conta para “serviço” é o kuma.io/service dentro do inbound (é assim que Kuma agrupa serviços). [github.com], [github.com]
+O teu outbound: - port: 15001 service: "*" não é um padrão universal “genérico”. outbound em Universal é para “portas locais” por serviço (sem transparent proxy), não um wildcard único. [github.com], [github.com]
+
+1.2 Dataplane CRD (Kubernetes store, para o CP “conhecer” o dataplane)
+No cluster (zone-cp), cria o CRD correspondente:
+YAMLapiVersion: kuma.io/v1alpha1kind: Dataplanemetadata:  name: dmz-vm-1  namespace: dmz-mesh  labels:    kuma.io/mesh: defaultspec:  networking:    address: 10.10.1.10    inbound:      - port: 8080        servicePort: 8080        tags:          kuma.io/service: dmz-vm-1          kuma.io/protocol: httpShow more lines
+
+Dataplane é o recurso que define a configuração do proxy, e em Universal ele deve ser criado manualmente. [github.com], [github.com]
+
+
+2) VM “builtin gateway” (exemplo correto)
+Aqui é onde o teu exemplo precisa de ajuste.
+2.1 Dataplane da VM gateway (BUILTIN gateway)
+Para built-in gateways, o modelo recomendado é usar a seção:
+YAMLnetworking:  gateway:    type: BUILTIN    tags:      kuma.io/service: <nome-do-gateway-service>Show more lines
+Esse kuma.io/service é o “identificador” que o MeshGateway vai selecionar. [github.com], [github.com]
+✅ YAML que a VM usa (--dataplane-file)
+YAMLtype: Dataplanemesh: defaultname: dmz-gateway-1networking:  address: 10.10.1.10  gateway:    type: BUILTIN    tags:      kuma.io/service: dmz-gatewayShow more lines
+
+Builtin gateway dataplanes usam gateway: type: BUILTIN e tag kuma.io/service que depois é usada pelo MeshGateway para configurar listeners. [github.com], [github.com]
+
+✅ Isto é essencialmente o que já tinhas antes (e estava bom).
+✅ CRD equivalente no Kubernetes (store do CP)
+YAMLapiVersion: kuma.io/v1alpha1kind: Dataplanemetadata:  name: dmz-gateway-1  namespace: dmz-mesh  labels:    kuma.io/mesh: defaultspec:  networking:    address: 10.10.1.10    gateway:      type: BUILTIN      tags:        kuma.io/service: dmz-gatewayShow more lines
+⚠️ Por que eu não recomendo declarar inbound: 443 nesse Dataplane gateway?
+Porque, no modelo de built-in gateway, quem define “listeners” (portas/protocolos) é o MeshGateway policy, e o dataplane só precisa ser marcado como gateway + tag. O docs de built-in gateways descreve exatamente esse split: Dataplane identifica a instância do gateway e MeshGateway define listeners. [github.com], [github.com]
+
+2.2 MeshGateway (policy) — separado do Dataplane
+Agora sim, o teu MeshGateway faz sentido, mas vou ajustar a sintaxe para ficar alinhada e completa:
+YAMLapiVersion: kuma.io/v1alpha1kind: MeshGatewaymetadata:  name: dmz-gateway  namespace: dmz-mesh  labels:    kuma.io/mesh: defaultspec:  selectors:    - match:        kuma.io/service: dmz-gateway  conf:    listeners:      - port: 443        protocol: HTTPSShow more lines
+
+Built-in gateways são configurados via MeshGateway/routes e servidos por dataplanes marcados como built-in gateway com tag kuma.io/service. [github.com], [github.com]
+
+💡 Depois disso, tu adicionas as routes (MeshHTTPRoute/MeshGatewayRoute dependendo da tua versão) para encaminhar para serviços.
+
+3) “Preciso mesmo criar recurso no cluster? Não devia auto-criar?”
+Só auto-cria para pods Kubernetes injetados. Para Universal/VM, o próprio Kuma diz que “em Universal tens de criar Dataplane manualmente”. 
+No teu caso, como o CP do zone está em Kubernetes, o “manual” significa CRD no cluster (não aparece sozinho). [github.com], [github.com]
+
+4) Debug: que logs ver no kuma-control-plane?
+Sim, este comando é o certo:
+Shellkubectl logs -n kuma-system deploy/kuma-control-plane --since=30mShow more lines
+E para focar em problemas de dataplane/xDS:
+Shellkubectl logs -n kuma-system deploy/kuma-control-plane --since=30m \  | egrep -i "dataplane|xds|sds|denied|unauth|token|gateway|bootstrap"Show more lines
+Também ajuda consultar endpoints do HTTP API (porta 5681/5682) — o Kuma expõe endpoints como /meshes/{mesh}/dataplanes e /tokens/dataplane. 
+E lembra: em multi-zone, dataplanes conectam ao zone CP, enquanto o global usa KDS (5685) para sync. [github.com] [kuma.io], [kuma.io]
+
+5) Checklist final (para não voltar a cair no “gRPC 13”)
+Para cada VM:
+
+Token gerado para mesh=default e name=<dataplane-name>
+--cp-address=https://<zone-xds-lb>:5678 (bootstrap via HTTPS; depois Envoy faz gRPC xDS) [bookstack.cn], [kuma.io], [github.com]
+--ca-cert-file aponta para CA que assina o cert do CP
+CRD Dataplane existe no cluster (kubectl get dataplanes -n dmz-mesh)
+Para gateway: Dataplane com networking.gateway.type: BUILTIN + MeshGateway policy separado [github.com], [github.com]
+
+
+Pergunta rápida para fechar com 100% de certeza
+Tu queres o gateway DMZ como TLS passthrough (L4) ou TLS termination (L7 HTTPS) no gateway?
+
+Se for termination, o MeshGateway com protocol: HTTPS faz sentido e vais precisar de configurar routes/certs no gateway.
+Se for passthrough, o listener/protocol muda.
+
+Diz-me qual dos dois e eu já te devolvo os manifests de routes (HTTPRoute/TCPRoute) que faltam para o gateway realmente encaminhar tráfego.
