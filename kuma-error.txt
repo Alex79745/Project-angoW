@@ -428,4 +428,139 @@ name mismatch
 token mismatch
 gateway identity rejection
 or “dataplane is connecting via unsupported proxy”
+------------------------------------------------------------------------------------------------------------------------
+########################################################################################################################
+
+
+~# nc -vz 10.19.143.84 5678
+Connection to 10.19.143.84 5678 port [tcp/*] succeeded!
+root@klusterx-envoyingress-01:~# nc -vz 10.244.5.213 5678
+Connection to 10.244.5.213 5678 port [tcp/*] succeeded!
+root@klusterx-envoyingress-01:~# openssl s_client -connect 10.19.143.84:5678 
+CONNECTED(00000003)
+Can't use SSL_get_servername
+depth=0 
+verify error:num=18:self-signed certificate
+verify return:1
+depth=0 
+verify return:1
+---
+Certificate chain
+ 0 s:
+   i:
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Mar 21 17:41:00 2026 GMT; NotAfter: Mar 18 17:41:00 2036 GMT
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIDPDCCAiSgAwIBAgIRAKgPDEk0gsmwubE8ojHX1UUwDQYJKoZIhvcNAQELBQAw
+ADAeFw0yNjAzMjExNzQxMDBaFw0zNjAzMTgxNzQxMDBaMAAwggEiMA0GCSqGSIb3
+DQEBAQUAA4IBDwAwggEKAoIBAQC8nyhSh3DvDGxYWQ9XWsQkuwyMU/foAjMu3KGT
+XC9xczku5qdpVLR+01JjM3jVGNxyT5OwW238yFXmIYPRuEaJ+cLFl9JM6yqdT9AA
+xbP737aT/H35HbhA3e7iLGF9CIVNibXEyHkBUlptNb3OHB7nPm1fB6ayruIvuCcV
+WhRlJciUI+xe2ZB5gfszo6cqjE/r5WkHG8YYNIbsPxHZqGte4zwJNxWLwwZNRPIQ
+0AN1PNeL+Tou0XvpGp/CWpUphvuta8XL+qw9fS+bKranUR0hlRPxKLBhM6Y6cUZ7
+yhESEm0v08veV50rAxUw1j0GPh+M2h3bd7GisNiPKvIEXEAhAgMBAAGjgbAwga0w
+DgYDVR0PAQH/BAQDAgKkMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdEwEB/wQF
+MAMBAf8wHQYDVR0OBBYEFA9owO6F2EcXWPOIba0CSSS/EDDWMFYGA1UdEQEB/wRM
+MEqCHmt1bWEtY29udHJvbC1wbGFuZS5rdW1hLXN5c3RlbYIia3VtYS1jb250cm9s
+LXBsYW5lLmt1bWEtc3lzdGVtLnN2Y4cEChOPVDANBgkqhkiG9w0BAQsFAAOCAQEA
+rjAvXmKsHF+n3xZdwOLylLSWY9/sdpJSNXy7G5OT1I7hADYQq8Of23eR3MPEsYMg
+a8aRpEjB6DqNeUrkQjICDaDKqB+mUD/uwqLfgbPKK+uGgq5lF3mLA18efvg/0U6a
+G6YSD6t98walEdr2cw6nriyNDn6zIVconQ+slKClGFZuQw1kk9+U9VFNxuNgPcQZ
+pTnrM8Wpq1JTPL13rVzwJJCZftahbo3xq/3L4PTILtSClNaZDpGybUurRvytPAdz
+roP0uR3BlrrbyUvHEDzUWQCo/Pxapkml3N8RbFpYUMG73rvWvhlTtAKAt19o2NBN
+0k2AQZxVZe9QUafINI/l6w==
+-----END CERTIFICATE-----
+subject=
+issuer=
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 1372 bytes and written 357 bytes
+Verification error: self-signed certificate
+---
+New, TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
+Server public key is 2048 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 18 (self-signed certificate)
+---
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_128_GCM_SHA256
+    Session-ID: 32C220B0BCA6F66B7FB326369C8D04B98C1AE8714BFC546DB11C3C36A837838E
+    Session-ID-ctx: 
+    Resumption PSK: 8B1DFE9935D5CE85ABA88A1FAC4AA996C01F59D1DEC48E4FA7A0202B9545BB78
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 604800 (seconds)
+    TLS session ticket:
+    0000 - 39 01 b0 19 5c 7b b7 70-aa 95 16 e6 7e 64 52 dc   9...\{.p....~dR.
+    0010 - 9f d6 55 4f db b6 92 f2-32 5a 38 8f a9 06 6a 98   ..UO....2Z8...j.
+    0020 - 1d ce 59 38 60 05 3d f9-a7 00 f9 25 49 0f 75 64   ..Y8`.=....%I.ud
+    0030 - 1a f8 a7 fd 22 5c c4 30-16 9f 70 a4 b6 98 2a 6a   ...."\.0..p...*j
+    0040 - fe 28 39 5a 18 47 6a ba-f9 de 2c cf b2 65 27 90   .(9Z.Gj...,..e'.
+    0050 - f4 03 16 65 99 81 57 9a-eb 13 67 45 58 3b 90 45   ...e..W...gEX;.E
+    0060 - af d9 fb ab 72 2a d0 6f-83                        ....r*.o.
+
+    Start Time: 1774444839
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self-signed certificate)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+closed
+root@klusterx-envoyingress-01:~# curl -vk https://10.19.143.84:5678
+* Uses proxy env variable no_proxy == 'http://rb-proxy-sl.bosch.com:8008'
+*   Trying 10.19.143.84:5678...
+* Connected to 10.19.143.84 (10.19.143.84) port 5678
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / X25519 / RSASSA-PSS
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: [NONE]
+*  start date: Mar 21 17:41:00 2026 GMT
+*  expire date: Mar 18 17:41:00 2036 GMT
+*   Certificate level 0: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://10.19.143.84:5678/
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: 10.19.143.84:5678]
+* [HTTP/2] [1] [:path: /]
+* [HTTP/2] [1] [user-agent: curl/8.5.0]
+* [HTTP/2] [1] [accept: */*]
+> GET / HTTP/2
+> Host: 10.19.143.84:5678
+> User-Agent: curl/8.5.0
+> Accept: */*
+> 
+< HTTP/2 404 
+< content-type: text/plain; charset=utf-8
+< x-content-type-options: nosniff
+< content-length: 19
+< date: Wed, 25 Mar 2026 13:21:27 GMT
+< 
+404 page not found
+* Connection #0 to host 10.19.143.84 left intact
 
