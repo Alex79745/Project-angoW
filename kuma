@@ -3825,3 +3825,225 @@ Se for termination, o MeshGateway com protocol: HTTPS faz sentido e vais precisa
 Se for passthrough, o listener/protocol muda.
 
 Diz-me qual dos dois e eu já te devolvo os manifests de routes (HTTPRoute/TCPRoute) que faltam para o gateway realmente encaminhar tráfego.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Now this is a proper architecture question — good, because what you pasted is actually very close to the correct mental model. Let me clean it up and give you a production-ready architecture decision, not just YAML.
+
+🧠 First: what is the best architecture here?
+
+Using Kuma in multi-zone with VMs + Kubernetes, the clean/pro approach is:
+
+✅ Recommended Production Architecture
+🔵 Global Control Plane (dedicated)
+Runs in its own cluster (infra-manager)
+Mode: Kubernetes
+❌ No dataplanes
+❌ No sidecars
+✔ Only policy + CA + tokens + KDS
+🟢 Zone Control Plane (per cluster)
+Runs in each workload cluster (your infra cluster)
+Mode: Kubernetes
+✔ Handles:
+sidecar injection
+dataplane auth
+Envoy xDS (port 5678)
+🟡 VMs (DMZ / external)
+Mode: Universal dataplanes
+Connect to:
+ZONE CP → 5678 (NOT global)
+
+✔ No Kubernetes resources required
+✔ No Deployment required
+
+🔴 Gateway Layer (optional, only if needed)
+
+ONLY if you need ingress / DMZ routing:
+
+Use builtin gateway (recommended)
+Or use k8s ingress gateway
+⚠️ Where you went wrong (important)
+
+You mixed:
+
+VM workload dataplane ✅
+Builtin gateway dataplane ✅
+MeshGateway policy ✅
+
+👉 These are 3 separate layers
+
+🧩 Clean Architecture Choices
+OPTION A — SIMPLE (RECOMMENDED FIRST)
+
+👉 No gateway, just mesh
+
+VM → Zone CP → Services
+
+✔ Best for:
+
+internal service discovery
+testing
+debugging your current issue
+OPTION B — PROPER DMZ GATEWAY
+Internet / DMZ
+      ↓
+VM Gateway (builtin)
+      ↓
+Mesh (services in k8s)
+
+✔ Best for:
+
+exposing services
+TLS termination
+controlled ingress
+🧠 Key Design Rule (VERY IMPORTANT)
+
+👉 In Kuma:
+
+Dataplane = instance
+MeshGateway = configuration
+Zone CP = authority
+✅ CORRECT WAY (your case)
+
+You want:
+
+"resolve URLs + DMZ + VMs"
+
+👉 So architecture should be:
+
+1. VM as normal workload (NOT gateway yet)
+
+Start with this:
+
+type: Dataplane
+mesh: default
+name: dmz-vm-1
+
+networking:
+  address: 10.10.1.10
+
+  inbound:
+    - port: 8080
+      servicePort: 8080
+      tags:
+        kuma.io/service: dmz-vm-1
+
+✔ This must work FIRST
+
+2. THEN add gateway (only after stable)
+
+Correct gateway dataplane:
+
+type: Dataplane
+mesh: default
+name: dmz-gateway-1
+
+networking:
+  address: 10.10.1.10
+
+  gateway:
+    type: BUILTIN
+    tags:
+      kuma.io/service: dmz-gateway
+3. MeshGateway (policy)
+apiVersion: kuma.io/v1alpha1
+kind: MeshGateway
+metadata:
+  name: dmz-gateway
+  namespace: kuma-system
+  labels:
+    kuma.io/mesh: default
+spec:
+  selectors:
+    - match:
+        kuma.io/service: dmz-gateway
+  conf:
+    listeners:
+      - port: 443
+        protocol: HTTPS
+🔥 CRITICAL ANSWER to your main doubt
+
+“Do I need to create Dataplane CRD in Kubernetes?”
+
+👉 YES — in your setup:
+
+Because:
+
+Zone CP runs in Kubernetes
+It uses Kubernetes as datastore
+
+So:
+
+✔ VM alone is NOT enough
+✔ You MUST create Dataplane resource in cluster
+
+🧠 Why you saw it “before”
+
+You said:
+
+“before I saw it without TLS”
+
+That’s because:
+
+it connected temporarily
+or you were hitting different CP / mode
+
+👉 With proper auth → CP enforces strict validation → no auto-creation
+
+🔥 BEST PRACTICE (production)
+
+✔ Always create Dataplane CRD explicitly
+✔ Always generate token AFTER CP is stable
+✔ Always match:
+
+token.name == dataplane.name
+mesh == same
+service tag == consistent
+🚨 About your gRPC 13
+
+At this point, based on everything:
+
+👉 It is NOT architecture anymore
+
+It is:
+
+❌ Token mismatch
+❌ Signing key mismatch
+❌ TLS/LB interference
+❌ Wrong CP endpoint
+🎯 Final architecture recommendation
+
+For your environment:
+
+✔ Infra-manager cluster
+Global CP
+✔ Infra cluster
+Zone CP
+Kubernetes services
+sidecar injection
+✔ DMZ VMs
+Universal dataplanes
+optional gateway
+🧩 Final clarity (this will unlock everything)
+
+👉 You DO NOT need:
+
+Deployment for VM
+Sidecar injection for VM
+Gateway unless exposing traffic
+
+👉 You DO need:
+
+Dataplane CRD (because CP is in Kubernetes)
+Correct token
+Correct CP endpoint
+💬 Final question (important)
+
+You asked at the end:
+
+TLS passthrough or termination?
+
+👉 This changes EVERYTHING:
+
+TLS passthrough (L4) → simpler, no cert handling
+TLS termination (L7 HTTPS) → requires certs + routes
