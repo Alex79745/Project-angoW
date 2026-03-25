@@ -4047,3 +4047,125 @@ TLS passthrough or termination?
 
 TLS passthrough (L4) → simpler, no cert handling
 TLS termination (L7 HTTPS) → requires certs + routes
+
+
+
+
+
+
+
+
+
+
+#################################################################################################################################################################33
+
+
+You’re on the right architecture, and the write‑up you pasted is mostly correct — with two key clarifications that will keep you sane in production:
+
+Where the Dataplane “resource” lives depends on the Control Plane’s backing store (Kubernetes CRDs vs Universal store via HTTP API). [github.com], [github.com]
+For VMs connecting to a Zone CP running on Kubernetes, the VM does not auto-create anything; you must ensure the Dataplane exists in the Zone CP’s store (which is Kubernetes CRDs in your setup). [github.com], [github.com]
+
+Below is a cleaned, production-ready decision and the “correct” YAML layout.
+
+✅ Production architecture decision (what you pasted, cleaned)
+Global Control Plane (dedicated cluster)
+
+Runs in its own Kubernetes cluster.
+Purpose: policies, CA, token issuance (for zones), KDS fanout. [kuma.io], [github.com]
+No dataplanes, no sidecars, no workloads (best practice). [github.com], [kuma.io]
+
+Zone Control Plane (per workload cluster)
+
+Runs in each cluster where workloads live.
+Purpose: sidecar injection, dataplane authentication, bootstrap/xDS for dataplanes. [github.com], [kuma.io]
+
+VMs in DMZ (Universal dataplanes)
+
+Run kuma-dp on VMs (Universal mode dataplanes).
+Connect to the Zone CP, not the Global CP. [github.com], [kuma.io]
+
+This is exactly the “clean/pro” multi-zone split.
+
+🔥 Critical answer to your main doubt
+“Do I need to create a Dataplane CRD in Kubernetes for VMs?”
+✅ Yes — in your setup (Zone CP on Kubernetes), you should.
+Reason:
+
+In Universal, Kuma requires you to manually create Dataplane resources for workloads. [github.com], [github.com]
+Your Zone CP is running on Kubernetes, so its backing store is Kubernetes CRDs. Therefore the “manual Dataplane resource” must exist as a Dataplane CRD in that cluster (not auto-created). [github.com], [github.com]
+
+
+The dataplane token authenticates a dataplane, but it doesn’t magically create persistent state in the store; the Dataplane resource is the declared desired state. [github.com], [github.com]
+
+
+✅ Clean separation: the 3 layers you mixed (and how to write them)
+You correctly noticed there are three separate things:
+
+Dataplane = “an instance” (workload or gateway instance). [github.com]
+MeshGateway = “gateway configuration” (listeners, protocols). [github.com]
+Zone CP = authority / store / xDS server. [github.com], [kuma.io]
+
+That split is the right mental model.
+
+1) VM workload dataplane (normal service)
+A) VM-side Dataplane file (used by kuma-dp run --dataplane-file)
+This is Universal dataplane syntax: you define inbound and tags (service identity). [github.com], [github.com]
+YAMLtype: Dataplanemesh: defaultname: dmz-vm-1networking:  address: 10.10.1.10  inbound:    - port: 8080      servicePort: 8080      tags:        kuma.io/service: dmz-vm-1        kuma.io/protocol: httpShow more lines
+
+Your earlier outbound: - port: 15001 service: "*" is not the standard Universal model. Outbounds are used when you don’t do transparent proxying and want explicit “local ports per upstream service”. [github.com], [github.com]
+
+B) Kubernetes Dataplane CRD (so the Zone CP can generate config)
+Because your Zone CP store is Kubernetes, create a matching CRD:
+YAMLapiVersion: kuma.io/v1alpha1kind: Dataplanemetadata:  name: dmz-vm-1  namespace: dmz-mesh  labels:    kuma.io/mesh: defaultspec:  networking:    address: 10.10.1.10    inbound:      - port: 8080        servicePort: 8080        tags:          kuma.io/service: dmz-vm-1          kuma.io/protocol: httpShow more lines
+This aligns with “Universal requires manual Dataplane resources”, but implemented as CRDs because you run CP on Kubernetes. [github.com], [github.com]
+
+2) VM builtin gateway dataplane (DMZ gateway instance)
+For built-in gateways, don’t model it as a normal inbound workload; instead, mark the dataplane as a gateway instance:
+A) VM-side dataplane file
+YAMLtype: Dataplanemesh: defaultname: dmz-gateway-1networking:  address: 10.10.1.10  gateway:    type: BUILTIN    tags:      kuma.io/service: dmz-gatewayShow more lines
+This is exactly how built-in gateways are represented: “Dataplane configured as built-in gateway with a kuma.io/service tag that MeshGateway will select.” [github.com], [github.com]
+B) Kubernetes Dataplane CRD
+YAMLapiVersion: kuma.io/v1alpha1kind: Dataplanemetadata:  name: dmz-gateway-1  namespace: dmz-mesh  labels:    kuma.io/mesh: defaultspec:  networking:    address: 10.10.1.10    gateway:      type: BUILTIN      tags:        kuma.io/service: dmz-gatewayShow more lines
+
+3) MeshGateway policy (the “configuration”)
+This is a policy resource that defines listeners/protocols for dataplanes that match the selector. Built-in gateway docs describe this split: dataplane instance + MeshGateway listeners. [github.com]
+YAMLapiVersion: kuma.io/v1alpha1kind: MeshGatewaymetadata:  name: dmz-gateway  namespace: dmz-mesh  labels:    kuma.io/mesh: defaultspec:  selectors:    - match:        kuma.io/service: dmz-gateway  conf:    listeners:      - port: 443        protocol: HTTPSShow more lines
+
+✅ CP address scheme: your kuma-dp service should use https://…:5678
+This one matters because you just hit it:
+
+kuma-dp fetches bootstrap over HTTP(S) from the CP. The CLI reference and systemd example use --cp-address=https://<cp>:5678 and --ca-cert-file to trust the CP. [kuma.io], [bookstack.cn]
+After bootstrap, Envoy connects to xDS (gRPC) as configured in that bootstrap. [github.com]
+
+So your production systemd unit for VMs should keep:
+Plain Text--cp-address=https://<zone-xds-lb>:5678--ca-cert-file=<ca.crt>Show more lines
+ [bookstack.cn], [kuma.io], [github.com]
+
+🔎 “kubectl logs -n kuma-system deploy/kuma-control-plane?”
+Yes — and the right filters
+Shellkubectl -n kuma-system logs deploy/kuma-control-plane --since=30mkubectl -n kuma-system logs deploy/kuma-control-plane --since=30m \  | egrep -i "bootstrap|xds|dataplane|token|denied|unauth|gateway"Show more lines
+Also, Kuma’s HTTP API exposes useful introspection endpoints like /meshes/{mesh}/dataplanes and /meshes/{mesh}/dataplanes/{name}/xds. [github.com]
+
+✅ Answer to your final question: TLS passthrough or termination?
+This does change everything:
+TLS passthrough (L4)
+
+Gateway listener is TCP/TLS passthrough (no certs stored in gateway)
+Simplest operationally
+You route by SNI (depending on policy objects/version) and backend keeps TLS
+
+TLS termination (L7 HTTPS)
+
+Gateway needs certs (Kuma Secret / cert chain)
+Routes are HTTP-level (Host/Path)
+More moving parts, but easier routing features
+
+If you tell me which one you want for DMZ (passthrough vs terminate), I’ll give you the exact next manifests (MeshHTTPRoute/MeshTCPRoute/Secrets) for your Kuma 2.13.x setup.
+
+Quick check before we proceed
+Two questions so I don’t guess:
+
+For the DMZ gateway: passthrough or terminate TLS on the gateway?
+Are your VMs supposed to be services (workloads) and gateway, or only gateway VMs?
+
+Answer those and I’ll produce the production-ready YAML set (Dataplane CRDs + MeshGateway + routes + secrets) tailored to your cluster.
