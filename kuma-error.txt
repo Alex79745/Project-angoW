@@ -262,3 +262,170 @@ dmz-gateway     dmz-gateway-2
 $ kubectl -n kuma-system logs deploy/kuma-control-plane --since=10m | grep -i "incorrect service name" || true
 2026-03-25T11:23:55.513Z        ERROR   controllers.MeshGatewayInstance.gateway-to-gateway-instance-mapper      failed to fetch GatewayInstances        {"gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "error": "incorrect service name: dmz-gateway"}
 2026-03-25T11:24:24.273Z        ERROR   controllers.MeshGatewayInstance.gateway-to-gateway-instance-mapper      failed to fetch GatewayInstances        {"gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "error": "incorrect service name: dmz-gateway"}
+------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------
+Good, this log line is the key signal, and it tells us exactly what is still wrong:
+StreamAggregatedResources gRPC config stream to 10.19.143.84:5678 closed: 13
+
+This is not a networking error anymore.
+This is Kuma control‑plane rejecting the dataplane at the gRPC/XDS layer.
+I’ll be very direct and precise now.
+
+🚨 What error code 13 means (in this context)
+In gRPC:
+
+Code 13 = PERMISSION_DENIED / INTERNAL (auth-related)
+
+In Kuma, this specific message only happens when:
+✅ TCP connection succeeded
+✅ TLS handshake may have succeeded
+❌ Dataplane authentication / identity validation failed
+So the dataplane reached 10.19.143.84:5678, but the control-plane closed the stream intentionally.
+This rules out:
+
+Cilium
+LB
+Firewall
+Routing
+Gateway vs non‑gateway
+
+This is now pure Kuma auth / identity / xDS semantics.
+
+⚠️ Most important rule (this is where your setup is still wrong)
+
+A Dataplane (VM, Gateway, sidecar) must NEVER connect to the Kuma Control Plane through a MeshGateway / L7 path.
+
+🔴 xDS (port 5678) must be:
+
+Direct
+L4
+No Envoy in the middle
+No MeshGateway
+No TLS termination
+No HTTP routing
+No SNI logic
+
+If you point a dataplane at:
+10.19.143.84:5678   (LB / ingress / gateway)
+
+and that IP is fronted by Envoy / Gateway in any way, Kuma will reject it.
+👉 Gateways are for application traffic only, never for xDS.
+That alone can produce gRPC 13.
+
+✅ Correct xDS topology (MANDATORY)
+✅ This is correct
+kuma-dp (VM)
+   |
+   |  mTLS (Kuma CA)
+   |
+kuma-control-plane Pod / Service :5678
+
+❌ This is broken (what you are currently doing)
+kuma-dp (VM)
+   |
+   v
+Cilium LB / MeshGateway / Envoy
+   |
+   v
+kuma-control-plane
+
+Even TCP passthrough gateways are not allowed for xDS.
+
+✅ Second critical rule: token + name + mesh must match EXACTLY
+Your dataplane YAML:
+YAMLtype: Dataplanemesh: defaultname: dmz-gateway-1Show more lines
+Your token must be generated as:
+mesh = default
+name = dmz-gateway-1
+
+Even a single character mismatch → gRPC 13.
+
+✅ Third rule: Gateways are special dataplanes
+When you use:
+YAMLgateway:  type: BUILTINShow more lines
+You are telling Kuma:
+
+“This dataplane is a Gateway. Apply gateway auth rules.”
+
+Which means:
+
+It must be registered as a gateway identity
+Token must match gateway name
+It cannot reuse tokens from non-gateway dataplanes
+It must connect directly to CP
+
+
+✅ What you must do now (step by step)
+✅ 1. STOP using 10.19.143.84:5678
+That address must NOT be a gateway or ingress VIP.
+From the VM, the xDS address must be one of:
+
+The ClusterIP of kuma-control-plane
+A NodeIP:5678
+A dedicated L4 LB VIP that is NOT Envoy-based
+
+✅ Example:
+ShellKUMA_CONTROL_PLANE_URL=https://10.19.143.66:5678Show more lines
+(where 10.19.143.66 is a control-plane node or direct service VIP)
+
+✅ 2. Verify what 10.19.143.84 actually is
+Run on the cluster:
+Shellkubectl -n kuma-system get svc -o widekubectl -n kube-system exec -it cilium-XXXX -- cilium service list | grep 10.19.143.84Show more lines
+If that VIP is:
+
+Cilium LB with Envoy
+MeshGateway
+Gateway API
+HTTPRoute / TCPRoute
+
+➡️ It must NOT be used for xDS
+
+✅ 3. Regenerate the dataplane token correctly
+Use kumactl outside the CP pod (as we discussed earlier):
+Shellkumactl generate dataplane-token \  --mesh default \  --name dmz-gateway-1 \  --valid-for 8760hShow more lines
+⚠️ Do NOT reuse old tokens
+⚠️ Do NOT reuse tokens from other DPs
+
+✅ 4. Ensure the VM dataplane uses DIRECT CP address
+Example systemd env:
+ShellKUMA_CONTROL_PLANE_URL=https://10.19.143.66:5678KUMA_DATAPLANE_TOKEN_PATH=/etc/kuma/tokenKUMA_DATAPLANE_FILE=/etc/kuma/dp-dmz-gw-1.yamlShow more lines
+⚠️ If 10.19.143.66 is a NodeIP, ensure the CP is listening on 0.0.0.0:5678.
+
+✅ 5. Validate certificates (VERY common hidden cause)
+On the VM:
+Shellopenssl s_client -connect 10.19.143.66:5678 -showcertsShow more lines
+Check:
+
+Issuer = Kuma CA
+SAN includes CP DNS/IP
+No intermediate missing
+
+If the CP cert SAN doesn’t match the address you use → gRPC 13.
+
+✅ What this is NOT anymore
+❌ Not Cilium
+❌ Not LB
+❌ Not routing
+❌ Not TLS termination mistakes
+❌ Not gateway “mode” issues
+❌ Not UI showing unavailable
+This is pure Kuma control-plane auth & topology correctness.
+
+✅ Why “gateway change didn’t help”
+Because:
+
+Gateways are irrelevant for xDS.
+
+You changed the application path, but xDS must remain direct.
+
+✅ Final sanity check (one command)
+Run this on the control-plane:
+Shellkubectl -n kuma-system logs deploy/kuma-control-plane --since=5m | egrep -i "dmz-gateway|unauth|reject|permission|denied|identity"Show more lines
+You will almost certainly see:
+
+name mismatch
+token mismatch
+gateway identity rejection
+or “dataplane is connecting via unsupported proxy”
+
