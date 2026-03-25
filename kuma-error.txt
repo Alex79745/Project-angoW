@@ -221,3 +221,44 @@ E0324 12:31:18.809135       1 wrap.go:53] "Timeout or abort while handling" logg
 E0324 12:31:18.809460       1 wrap.go:53] "Timeout or abort while handling" logger="UnhandledError" method="GET" URI="/apis/ext.cattle.io/v1/kubeconfigs?allowWatchBookmarks=true&resourceVersion=54397058&timeout=15m0s&timeoutSeconds=372&watch=true" auditID="bb841d91-6c99-41bf-8c55-b0f4ebcbbdca"
 E0324 12:31:18.811289       1 wrap.go:53] "Timeout or abort while handling" logger="UnhandledError" method="GET" URI="/apis/ext.cattle.io/v1/tokens?allowWatchBookmarks=true&resourceVersion=54396125&timeout=5m4s&timeoutSeconds=304&watch=true" auditID="3ce408a2-2313-4d31-b586-fa4bd5436abb"
 
+
+
+------------------------------------------------------------------------------------------------------------
+
+2026-03-25T11:14:53.904Z        INFO    kds-mux-client  initializing rpc stream for executing config dump on data plane proxies {"client-id": "omni-infra", "rpc": "XDS Configs"}
+2026-03-25T11:15:52.206Z        INFO    kds-mux-client  initializing Kuma Discovery Service (KDS) stream for zone to global sync of resources with delta xDS    {"client-id": "omni-infra", "rpc": "zone-to-global"}
+2026-03-25T11:15:52.206Z        INFO    kds-mux-client  initializing rpc stream for executing config dump on data plane proxies {"client-id": "omni-infra", "rpc": "XDS Configs"}
+2026-03-25T11:15:52.206Z        INFO    kds-mux-client  initializing Kuma Discovery Service (KDS) stream for global to zone sync of resources with delta xDS    {"client-id": "omni-infra", "rpc": "global-to-zone"}
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl get dataplanes -A
+NAMESPACE       NAME                       KUMA.IO/SERVICE                                   KUMA.IO/SERVICE
+cattle-system   rancher-84b768c8f6-2l6bw   imperative-api-extension_cattle-system_svc_6666   rancher_cattle-system_svc_80
+cattle-system   rancher-84b768c8f6-qstpk   imperative-api-extension_cattle-system_svc_6666   rancher_cattle-system_svc_80
+cattle-system   rancher-84b768c8f6-t2b2r   imperative-api-extension_cattle-system_svc_6666   rancher_cattle-system_svc_80
+dmz-gateway     dmz-gateway-1
+dmz-gateway     dmz-gateway-2
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl -n kuma-system logs deploy/kuma-control-plane --since=10m | grep -i "incorrect service name" || true
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ kubectl get dataplanes -A | egrep -i "dmz-gateway|dmz-mesh-gateway"
+dmz-gateway     dmz-gateway-1
+dmz-gateway     dmz-gateway-2
+:29:56.502Z        INFO    kds-mux-client  starting        {"client-id": "omni-infra", "rpc": "healthcheck"}
+2026-03-25T11:29:56.502Z        INFO    kds-mux-client  sending health check    {"client-id": "omni-infra", "rpc": "healthcheck"}
+2026-03-25T11:29:56.503Z        ERROR   kds-mux-client  health check failed     {"client-id": "omni-infra", "rpc": "healthcheck", "error": "rpc error: code = Canceled desc = grpc: the client connection is closing"}
+2026-03-25T11:29:56.503Z        ERROR   kds-zone.kds-mux-client component terminated with an error      {"generationID": 1272, "error": "rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing: dial tcp 10.19.143.83:5685: connect: connection refused\""}
+2026-03-25T11:31:00.900Z        INFO    kds-mux-client  initializing Kuma Discovery Service (KDS) stream for zone to global sync of resources with delta xDS    {"client-id": "omni-infra", "rpc": "zone-to-global"}
+2026-03-25T11:31:00.900Z        INFO    kds-mux-client  initializing Kuma Discovery Service (KDS) stream for global to zone sync of resources with delta xDS    {"client-id": "omni-infra", "rpc": "global-to-zone"}
+2026-03-25T11:31:00.900Z        INFO    kds-mux-client  initializing rpc stream for executing clusters on data plane proxies    {"client-id": "omni-infra", "rpc": "clusters"}
+2026-03-25T11:31:00.900Z        INFO    kds-mux-client  initializing rpc stream for executing stats on data plane proxies       {"client-id": "omni-infra", "rpc": "stats"}
+2026-03-25T11:31:00.900Z        INFO    kds-mux-client  initializing rpc stream for executing config dump on data plane proxies {"client-id": "omni-infra", "rpc": "XDS Configs"}
+2026-03-25T11:31:00.900Z        INFO    kds-mux-client  starting        {"client-id": "omni-infra", "rpc": "healthcheck"}
+2026-03-25T11:31:00.900Z        INFO    kds-mux-client  sending health check    {"client-id": "omni-infra", "rpc": "healthcheck"}
+2026-03-25T11:31:00.901Z        ERROR   kds-mux-client  health check failed     {"client-id": "omni-infra", "rpc": "healthcheck", "error": "rpc error: code = Canceled desc = grpc: the client connection is closing"}
+2026-03-25T11:31:00.901Z        ERROR   kds-zone.kds-mux-client component terminated with an error      {"generationID": 1273, "error": "rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing: dial tcp 10.19.143.83:5685: connect: connection refused\""}
+$ kubectl -n kuma-system logs deploy/kuma-control-plane --since=10m | grep -i "incorrect service name" || true
+2026-03-25T11:23:55.513Z        ERROR   controllers.MeshGatewayInstance.gateway-to-gateway-instance-mapper      failed to fetch GatewayInstances        {"gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "error": "incorrect service name: dmz-gateway"}
+2026-03-25T11:24:24.273Z        ERROR   controllers.MeshGatewayInstance.gateway-to-gateway-instance-mapper      failed to fetch GatewayInstances        {"gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-mesh-gateway", "mesh": "default", "gateway": "dmz-gateway", "mesh": "default", "gateway": "dmz-gateway-2c4zfxfwcxz9d7f6", "mesh": "default", "error": "incorrect service name: dmz-gateway"}
