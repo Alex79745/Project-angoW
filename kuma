@@ -3682,3 +3682,58 @@ global:
   image:
     # Leave empty to let the Helm chart use its compatible appVersion
     tag: ""
+
+
+####################################################################################################################################################
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+type: Dataplane
+mesh: default
+name: dmz-vm-1
+
+networking:
+  address: 10.10.1.10
+
+  inbound:
+    - port: 8080
+      servicePort: 8080
+      tags:
+        kuma.io/service: dmz-vm-1
+
+  outbound:
+    - port: 15001
+      service: "*"
+
+  tags:
+    kuma.io/service: dmz-vm-1
+
+-------------------------------
+type: Dataplane
+mesh: default
+name: dmz-gateway-1
+
+networking:
+  address: 10.10.1.10
+
+  inbound:
+    - port: 443
+      servicePort: 443
+      tags:
+        kuma.io/service: dmz-gateway
+
+  tags:
+    kuma.io/service: dmz-gateway
+
+
+type: MeshGateway
+mesh: default
+name: dmz-gateway
+selectors:
+  - match:
+      kuma.io/service: dmz-gateway
+conf:
+  listeners:
+    - port: 443
+      protocol: HTTPS
+
+kubectl logs -n kuma-system deploy/kuma-control-plane
+
