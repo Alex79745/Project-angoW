@@ -1,0 +1,97 @@
+Job Responsibility
+Kubernetes infrastructure engineer
+
+I operate with high degree of technical independence, designing, implementing,automating and stabilizing the cloud native architecture designed by me,i define technical roadmap, making architectural decisions,and ensuring platform design aligns with well architect framework, CNCF and business requirements.
+I identify platform gaps, design solutions, and help assign implementation activities to other team members as part of overall architecture(example, our own IPAM/proxsync/netbox or envoy/consul-kuma client connection). Currently also knowledge transfer on the architecture design with workshops, meanwhile i remain accountable for the final outcome, system stability and long-term maintainability.
+
+
+Motivation
+I am highly motivated by designing and implementing complex, secure, and scalable infrastructure end-to-end, my main strength lies in translating business and platform requirements into resilient technical solutions, particularly in constrained and security-first environments such as talos os clusters.
+
+Cloud architecture, software-defined networking, service mesh, devOps and desecOps motivate me a lot. i would like to spend more time on system design, architecture evolution , and long term platform strategy, and less time on manual or operations tasks.
+
+Also is important to me that my role, responsibilities, technical delivery and compensation accurately reflect the level of technical ownership and accountability i carry, especially when delivering critical infrastructure that enables other team to work effectively.
+
+
+Learning & Development
+
+I would like to develop further my expertise in platform-level security and governance for systems especially immutable, in areas as policy-as-code, security benchmarks, automated compliance enforcement
+
+key focus areas include Kubernetes policy engines(like admission control concepts), security auditing aligned with CIS benchmarks, and deeper integration of secrets management and identity based access control.
+
+i would also like to continue developing architectural leadership skills, including system design communication, devOps and desecOps toolset and end to end integration, as well as risk assessment, and cross-team technical alignment.
+Also take certifications that align with current role, and technical tools i forsee(ex: cka, ckd,cks, terraform pro etc).
+
+
+
+there golas for the team 
+
+
+Goal	Action
+ 
+PETa - Professional Excellent Targets
+Contribution Goals
+
+1. Contribute to build a united team culture in Lisbon where we actively share our values, knowledge, and experiences across different topics, so everyone learns from each other and feels connected to a common purpose.
+
+2. Actively contribute to knowledge sharing to reduce single‑point dependencies. Support peers through collaboration, shadowing, or backup to ensure continuity of delivery.
+
+3. Maintain and regularly update an individual development plan focused on future‑critical skills and customer value. Engage in learning initiatives related to AI, automation, or emerging technologies and apply learnings where possible.
+
+Not Started
+Goal Details
+Goal (Results | Learning | Collaboration)	PETa - Professional Excellent Targets
+Description (Please note, this field can contain a max. of 4000 characters.)	1. Contribute to build a united team culture in Lisbon where we actively share our values, knowledge, and experiences across different topics, so everyone learns from each other and feels connected to a common purpose.
+
+2. Actively contribute to knowledge sharing to reduce single‑point dependencies. Support peers through collaboration, shadowing, or backup to ensure continuity of delivery.
+
+3. Maintain and regularly update an individual development plan focused on future‑critical skills and customer value. Engage in learning initiatives related to AI, automation, or emerging technologies and apply learnings where possible.
+Goal Achievement Degree/ Notes (e.g. degree of task completion, reasons for any deviations – whether these were the responsibilities of the associate or not) Please note, this field can contain a max. of 4000 characters.	
+Category	Goals
+In case of change (status, description, etc), please document the reason here:	
+ 
+BDO-P Goals
+Contribution Goals
+
+- Continuously optimize and enhance platform offerings in an user centric and cost effective approach​
+- Facilitate platform security​ and governance
+- Ensure reliable, scalable & efficient offerings by good collaboration with service providers
+- Support to make data easily accessible​ even from outside of Bosch
+- Provide implementation support to avoid/reduce non optimized cloud infra set ups
+- Improve ‘Operations’ mindset towards ‘Reliability engineering’ and offer a centralized service
+
+Not Started
+Goal Details
+Goal (Results | Learning | Collaboration)	BDO-P Goals
+Description (Please note, this field can contain a max. of 4000 characters.)	- Continuously optimize and enhance platform offerings in an user centric and cost effective approach​
+- Facilitate platform security​ and governance
+- Ensure reliable, scalable & efficient offerings by good collaboration with service providers
+- Support to make data easily accessible​ even from outside of Bosch
+- Provide implementation support to avoid/reduce non optimized cloud infra set ups
+- Improve ‘Operations’ mindset towards ‘Reliability engineering’ and offer a centralized service
+Goal Achievement Degree/ Notes (e.g. degree of task completion, reasons for any deviations – whether these were the responsibilities of the associate or not) Please note, this field can contain a max. of 4000 characters.	
+Category	Goals
+In case of change (status, description, etc), please document the reason here:	
+ 
+KlusterX
+Contribution Goals
+
+MAS Cluster Onboarding:
+- Help MAS Pipeline/Ops team to onboard/migrate the existing clusters to new BDO Managed cluster
+- Stabilize MAS cluster once onboarded
+BDO Application (On –PREM)
+- Migrate 3 BDO owned/managed application from BD Managed On PREM servers/Openshift to SL4 KlusterX Kube clusters
+- Plan and design strategy to offer Kubernetes as a Service to PS users
+Take over operations of On-PREM services from Team xPlatform
+
+Not Started
+Goal Details
+Goal (Results | Learning | Collaboration)	KlusterX
+Description (Please note, this field can contain a max. of 4000 characters.)	MAS Cluster Onboarding:
+- Help MAS Pipeline/Ops team to onboard/migrate the existing clusters to new BDO Managed cluster
+- Stabilize MAS cluster once onboarded
+BDO Application (On –PREM)
+- Migrate 3 BDO owned/managed application from BD Managed On PREM servers/Openshift to SL4 KlusterX Kube clusters
+- Plan and design strategy to offer Kubernetes as a Service to PS users
+Take over operations of On-PREM services from Team xPlatform
+Goal Achievement Degree/ Notes (e.g. degree of task completion, reasons for any deviations – whether these were the responsibilities of the associate or not) Please note, this field can contain a max. of 4000 characters.
