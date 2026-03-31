@@ -1,0 +1,44 @@
+websocket issue almost ready 
+
+$ kubectl get proxytemplate.kuma.io -n kuma-system  -o yaml
+apiVersion: v1
+items:
+- apiVersion: kuma.io/v1alpha1
+  kind: ProxyTemplate
+  mesh: default
+  metadata:
+    annotations:
+      kuma.io/display-name: websocket-bidirectional
+    creationTimestamp: "2026-03-31T16:10:49Z"
+    generation: 1
+    labels:
+      kuma.io/origin: global
+    name: websocket-bidirectional-xvzdwb7278vb6c5w
+    resourceVersion: "59056211"
+    uid: 24ce1829-c243-47a1-917f-a854760410bf
+  spec:
+    conf:
+      imports:
+      - default-proxy
+      modifications:
+      - networkFilter:
+          match:
+            name: envoy.filters.network.http_connection_manager
+          operation: patch
+          value: "name: envoy.filters.network.http_connection_manager\ntyped_config:\n
+            \ '@type': type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager\n
+            \ upgrade_configs:\n    - upgrade_type: websocket\n      enabled: true\n
+            \ \n"
+      - cluster:
+          match:
+            name: .*rancher.*
+          operation: patch
+          value: |
+            typed_config:
+              '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+              upstream_protocol_options:
+                explicit_http_config:
+                  http_protocol_options: {}
+kind: List
+metadata:
+  resourceVersion: ""
