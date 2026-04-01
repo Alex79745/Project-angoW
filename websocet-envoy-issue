@@ -765,3 +765,27 @@ spec:
 
 
             "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+
+
+
+the issue with zone ingress is  networking.advertisedAddress/advertisedPort (what other zone will use) i need to with not like kubectl -n kuma-system patch ds kuma-ingress --type='json' -p='[
+  {
+    "op":"add",
+    "path":"/spec/template/spec/containers/0/env/-",
+    "value":{
+      "name":"NODE_IP",
+      "valueFrom":{"fieldRef":{"fieldPath":"status.hostIP"}}
+    }
+  },
+  {
+    "op":"add",
+    "path":"/spec/template/metadata/annotations/kuma.io~1ingress-public-address",
+    "value":"$(NODE_IP)"
+  },
+  {
+    "op":"add",
+    "path":"/spec/template/metadata/annotations/kuma.io~1ingress-public-port",
+    "value":"10001"
+  }
+]'
+ in simialar way
