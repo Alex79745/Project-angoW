@@ -147,3 +147,8 @@ Critical error
 │ 2026/04/01 13:37:16 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
 │ 2026/04/01 13:37:20 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
 │ 2026/04/01 13:37:21 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                               
+
+
+https://github.com/kumahq/kuma/issues/4256
+
+https://github.com/envoyproxy/envoy/issues/38645
