@@ -656,4 +656,52 @@ The MeshProxyPatch "rancher-websocket-fix" is invalid:
 * spec.default.appendModifications[1].cluster.operation: Unsupported value: "patch": supported values: "Add", "Remove", "Patch"
 * spec.targetRef.kind: Unsupported value: "ZoneIngress": supported values: "Mesh", "MeshSubset", "MeshGateway", "MeshService", "MeshExternalService", "MeshMultiZoneService", "MeshServiceSubset", "MeshHTTPRoute", "Dataplane"
 
+####################
 
+
+apiVersion: kuma.io/v1alpha1
+kind: MeshProxyPatch
+metadata:
+  name: rancher-websocket-fix
+  namespace: kuma-system
+  labels:
+    kuma.io/mesh: default
+spec:
+  targetRef:
+    kind: Dataplane
+    tags:
+      kuma.io/service: zone-ingress
+
+  default:
+    appendModifications:
+
+    # 1️⃣ FIX HTTP CONNECTION MANAGER
+    - networkFilter:
+        match:
+          name: envoy.filters.network.http_connection_manager
+        operation: Patch
+        value: |
+          typed_config:
+            upgrade_configs:
+              - upgrade_type: websocket
+                enabled: true
+
+            common_http_protocol_options:
+              idle_timeout: 0s
+
+            stream_idle_timeout: 0s
+            request_timeout: 0s
+
+    # 2️⃣ FORCE HTTP/1.1 UPSTREAM
+    - cluster:
+        match:
+          name: .*rancher.*
+        operation: Patch
+        value: |
+          typed_extension_protocol_options:
+            envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+              "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+              explicit_http_config:
+                http_protocol_options: {}
+              common_http_protocol_options:
+                idle_timeout: 0s
