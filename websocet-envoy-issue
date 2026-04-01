@@ -445,4 +445,205 @@ spec:
                 http_protocol_options: {}
               common_http_protocol_options:
                 idle_timeout: 0s
-``
+
+
+
+
+Short answer: yes — this is the RIGHT direction and much better than before, but there are 2 critical fixes you still need, otherwise you can still get the same errors.
+
+I’ll be very precise so you don’t waste time.
+
+✅ What you did RIGHT
+
+✔ Using MeshProxyPatch instead of ProxyTemplate → correct for ZoneIngress
+✔ Targeting:
+
+targetRef:
+  kind: ZoneIngress
+
+→ 🔥 this is exactly what you needed
+
+✔ You included:
+
+upgrade_configs ✅
+timeouts = 0 ✅
+HTTP/1.1 upstream config ✅
+
+👉 This is already 80–85% correct
+
+🚨 CRITICAL FIXES (you must change this)
+❌ 1. operation: Patch → WRONG (case sensitive)
+
+You wrote:
+
+operation: Patch
+
+👉 This will NOT work properly
+
+✅ MUST be:
+
+operation: patch
+
+(lowercase)
+
+❌ 2. You are OVERWRITING instead of PATCHING safely
+
+This part:
+
+value: |
+  name: envoy.filters.network.http_connection_manager
+  typed_config:
+
+👉 This replaces too much of the filter
+
+💥 Risk:
+
+you may break:
+- routing
+- other filters
+- gzip
+- auth
+✅ FIX: make it a SAFE PATCH (only what you need)
+
+Replace ONLY the fields you need:
+
+✅ CORRECTED VERSION (SAFE + PRODUCTION READY)
+apiVersion: kuma.io/v1alpha1
+kind: MeshProxyPatch
+metadata:
+  name: rancher-websocket-fix
+  namespace: kuma-system
+  labels:
+    kuma.io/mesh: default
+spec:
+  targetRef:
+    kind: ZoneIngress
+  default:
+    appendModifications:
+
+    # 1️⃣ FIX HTTP CONNECTION MANAGER (SAFE PATCH)
+    - networkFilter:
+        match:
+          name: envoy.filters.network.http_connection_manager
+        operation: patch
+        value: |
+          typed_config:
+            upgrade_configs:
+              - upgrade_type: websocket
+                enabled: true
+
+            common_http_protocol_options:
+              idle_timeout: 0s
+
+            stream_idle_timeout: 0s
+            request_timeout: 0s
+
+    # 2️⃣ FORCE HTTP/1.1 UPSTREAM
+    - cluster:
+        match:
+          name: .*rancher.*
+        operation: patch
+        value: |
+          typed_extension_protocol_options:
+            envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+              "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+              explicit_http_config:
+                http_protocol_options: {}
+              common_http_protocol_options:
+                idle_timeout: 0s
+⚠️ OPTIONAL BUT STRONGLY RECOMMENDED
+
+Add this (prevents weird edge cases):
+
+            normalize_path: false
+            merge_slashes: false
+
+inside typed_config
+
+🔁 AFTER APPLY (MANDATORY)
+kubectl apply -f patch.yaml
+kubectl rollout restart daemonset kuma-ingress -n kuma-system
+🧪 HOW TO CONFIRM IT WORKED
+
+Run:
+
+kubectl exec -n kuma-system -it <ingress-pod> -c kuma-dp -- curl localhost:9901/config_dump | grep -i websocket -A 10
+
+You should see:
+
+upgrade_type: websocket
+idle_timeout: 0s
+🎯 EXPECTED RESULT
+
+Your errors should disappear:
+
+❌ websocket 1006
+❌ invalid Sec-WebSocket-Key
+❌ unexpected EOF
+❌ remotedialer reconnect loop
+🧠 FINAL VERDICT
+
+👉 Your config was:
+
+VERY CLOSE (senior-level already)
+
+👉 The only real issues:
+
+❌ wrong operation case
+❌ too aggressive overwrite of Envoy config
+💬 If someone challenges you, say this
+
+“We needed a targeted patch on ZoneIngress to enforce HTTP/1.1 and disable Envoy timeouts without overriding the full connection manager.”
+
+If you want, next I can:
+
+👉 give you a tap filter to literally see the broken headers live (this is next-level debugging, almost nobody in teams does this properly)
+
+
+
+#################################
+
+
+apiVersion: kuma.io/v1alpha1
+kind: MeshProxyPatch
+metadata:
+  name: rancher-websocket-fix
+  namespace: kuma-system
+  labels:
+    kuma.io/mesh: default
+spec:
+  targetRef:
+    kind: ZoneIngress
+  default:
+    appendModifications:
+
+    # 1️⃣ FIX HTTP CONNECTION MANAGER (SAFE PATCH)
+    - networkFilter:
+        match:
+          name: envoy.filters.network.http_connection_manager
+        operation: patch
+        value: |
+          typed_config:
+            upgrade_configs:
+              - upgrade_type: websocket
+                enabled: true
+
+            common_http_protocol_options:
+              idle_timeout: 0s
+
+            stream_idle_timeout: 0s
+            request_timeout: 0s
+
+    # 2️⃣ FORCE HTTP/1.1 UPSTREAM
+    - cluster:
+        match:
+          name: .*rancher.*
+        operation: patch
+        value: |
+          typed_extension_protocol_options:
+            envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+              "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+              explicit_http_config:
+                http_protocol_options: {}
+              common_http_protocol_options:
+                idle_timeout: 0s
