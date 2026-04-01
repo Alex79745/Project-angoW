@@ -647,3 +647,13 @@ spec:
                 http_protocol_options: {}
               common_http_protocol_options:
                 idle_timeout: 0s
+
+
+
+ kubectl apply -f  mesh-patch.yaml
+The MeshProxyPatch "rancher-websocket-fix" is invalid:
+* spec.default.appendModifications[0].networkFilter.operation: Unsupported value: "patch": supported values: "Remove", "Patch", "AddFirst", "AddBefore", "AddAfter", "AddLast"
+* spec.default.appendModifications[1].cluster.operation: Unsupported value: "patch": supported values: "Add", "Remove", "Patch"
+* spec.targetRef.kind: Unsupported value: "ZoneIngress": supported values: "Mesh", "MeshSubset", "MeshGateway", "MeshService", "MeshExternalService", "MeshMultiZoneService", "MeshServiceSubset", "MeshHTTPRoute", "Dataplane"
+
+
