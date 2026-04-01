@@ -786,6 +786,111 @@ the issue with zone ingress is  networking.advertisedAddress/advertisedPort (wha
     "op":"add",
     "path":"/spec/template/metadata/annotations/kuma.io~1ingress-public-port",
     "value":"10001"
+
+
+
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              INTERNET / CLIENTS                            │
+│                                                                              │
+│   HTTPS Requests: tenant-a.com, tenant-b.com, tenant-c.com                │
+│   Source: <ORIGINAL_CLIENT_IP>                                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         TIER 1: GLOBAL ENTRYPOINT                            │
+│                         (Single IP Constraint Met)                           │
+│                                                                              │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                     KEEPALIVED (VRRP)                                  │   │
+│   │  Virtual Router ID: 51                                                │   │
+│   │  Virtual IP: 203.0.113.10/32  ◄─── Only Additional IP Needed        │   │
+│   │  State: MASTER (Node 1) ◄───────┐    BACKUP (Node 2)                  │   │
+│   │  Interface: eth0                │    Priority: 100                    │   │
+│   └─────────────────────────────────┼─────────────────────────────────────┘   │
+│                                     │                                        │
+│                                     ▼                                        │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                     ENVOY DATA PLANE (Stateless)                       │   │
+│   │                     ┌─────────┐    ┌─────────┐                        │   │
+│   │  ┌──────────────────│ Node 1  │◄──►│ Node 2  │──────────────────┐     │   │
+│   │  │    (Active)     │ :8443   │    │ :8443   │     (Standby/Active) │   │   │
+│   │  │                 └────┬────┘    └────┬────┘                      │   │
+│   │  │                      │              │                           │   │
+│   │  │  Listens: 203.0.113.10:443                                         │   │
+│   │  │  Filter: SNI Inspector (TLS Handshake Inspection)                │   │
+│   │  │                                                                    │   │
+│   │  │  Dynamic Routing:                                                  │   │
+│   │  │  ├── SNI=tenant-a.com ──► Cluster: tenant-a.com (from cache/XDS)  │   │
+│   │  │  ├── SNI=tenant-b.com ──► Cluster: tenant-b.com (from cache/XDS)  │   │
+│   │  │  └── SNI=unknown    ──► XDS FETCH (On-Demand Lookup)              │   │
+│   │  │                                                                    │   │
+│   │  │  PROXY Protocol v2: Enabled (Preserves <ORIGINAL_CLIENT_IP>)      │   │
+│   │  │  TLS Mode: Passthrough (Terminates at Tenant Cluster)             │   │
+│   │  └────────────────────────────────────────────────────────────────────┘   │
+│   └─────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                       │
+│                                      │ gRPC/XDS (Management Plane)            │
+│                                      ▼                                       │
+│   ┌─────────────────────────────────────────────────────────────────────────┐  │
+│   │              GO CONTROL PLANE (Custom Service)                          │  │
+│   │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐              │  │
+│   │  │   XDS        │◄───│   SQLite/    │    │   Watcher    │              │  │
+│   │  │   Server     │    │   PostgreSQL │    │   (DB Poll)  │              │  │
+│   │  │   (ADS)      │    │              │    │              │              │  │
+│   │  └──────────────┘    └──────────────┘    └──────────────┘              │  │
+│   │         │                                                              │  │
+│   │         │ On-Demand: When Envoy asks for "tenant-z.com":                │  │
+│   │         │ 1. SELECT ingress_ip FROM tenants WHERE domain='tenant-z.com'  │  │
+│   │         │ 2. Return Cluster Config (IP: 203.0.113.12:443)               │  │
+│   │         │ 3. Envoy caches for 300s (TTL)                                 │  │
+│   │         └──────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                       │
+                                       │ TCP Connections (Data Plane)
+                                       │ + PROXY Protocol v2 Header
+                                       │   (Contains: <ORIGINAL_CLIENT_IP>)
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    TIER 2: TENANT CLUSTERS (Talos Linux)                    │
+│                    (Isolated, Same Internal CIDRs OK)                        │
+│                                                                              │
+│  ┌───────────────────────────┐  ┌───────────────────────────┐              │
+│  │     TALOS CLUSTER A        │  │     TALOS CLUSTER B        │              │
+│  │     (Tenant: tenant-a.com) │  │     (Tenant: tenant-b.com) │              │
+│  │                            │  │                            │              │
+│  │  External IP: 203.0.113.11 │  │  External IP: 203.0.113.12 │              │
+│  │  ┌─────────────────────┐   │  │  ┌─────────────────────┐   │              │
+│  │  │  CILIUM GATEWAY API │   │  │  │  CILIUM GATEWAY API │   │              │
+│  │  │  ┌───────────────┐  │   │  │  │  ┌───────────────┐  │   │              │
+│  │  │  │ Ingress Pod   │  │   │  │  │  │ Ingress Pod   │  │   │              │
+│  │  │  │ :443          │  │   │  │  │  │ :443          │  │   │              │
+│  │  │  │               │  │   │  │  │  │               │  │   │              │
+│  │  │  │ Config:       │  │   │  │  │  │ Config:       │  │   │              │
+│  │  │  │ proxy_protocol│  │   │  │  │  │ proxy_protocol│  │   │              │
+│  │  │  │ version: 2    │  │   │  │  │  │ version: 2    │  │   │              │
+│  │  │  └───────────────┘  │   │  │  │  └───────────────┘  │   │              │
+│  │  └─────────────────────┘   │  │  └───────────────────────┘   │              │
+│  │           │                │  │           │                │              │
+│  │  Internal Pod Network:     │  │  Internal Pod Network:     │              │
+│  │  10.0.0.0/8 (OVERLAPS!)    │  │  10.0.0.0/8 (OVERLAPS!)    │              │
+│  │           │                │  │           │                │              │
+│  │  ┌────────▼────────┐       │  │  ┌────────▼────────┐       │              │
+│  │  │  App Pod        │       │  │  │  App Pod        │       │              │
+│  │  │  10.0.1.5       │       │  │  │  10.0.1.5       │       │              │
+│  │  │  (sees real IP  │       │  │  │  (sees real IP  │       │              │
+│  │  │   via PROXY v2) │       │  │  │   via PROXY v2) │       │              │
+│  │  └─────────────────┘       │  │  └─────────────────┘       │              │
+│  └───────────────────────────┘  └───────────────────────────┘              │
+│                                                                              │
+│  ┌───────────────────────────┐  ┌───────────────────────────┐              │
+│  │     TALOS CLUSTER C        │  │     [More Clusters...]     │              │
+│  │     (tenant-c.com)         │  │                            │              │
+│  │     203.0.113.13           │  │     203.0.113.14...        │              │
+│  └───────────────────────────┘  └───────────────────────────┘              │
+└─────────────────────────────────────────────────────────────────────────────┘
   }
 ]'
  in simialar way
