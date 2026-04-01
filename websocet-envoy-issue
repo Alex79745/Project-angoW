@@ -42,3 +42,91 @@ items:
 kind: List
 metadata:
   resourceVersion: ""
+
+
+
+
+
+Critical error 
+2026/04/01 13:28:04 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:28:27 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:28:32 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:28:41 [ERROR] Error during subscribe websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length    │
+│ 2026/04/01 13:28:41 [ERROR] Unknown error: websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length            │
+│ 2026/04/01 13:28:41 [ERROR] http: superfluous response.WriteHeader call from github.com/rancher/apiserver/pkg/middleware.gzipResponseWriter.WriteHeader (gzip.go:38)     │
+│ 2026/04/01 13:29:43 [ERROR] Error during subscribe websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length    │
+│ 2026/04/01 13:29:43 [ERROR] Unknown error: websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length            │
+│ 2026/04/01 13:29:43 [ERROR] http: superfluous response.WriteHeader call from github.com/rancher/apiserver/pkg/middleware.gzipResponseWriter.WriteHeader (gzip.go:38)     │
+│ 2026/04/01 13:30:03 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:30:06 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:30:08 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:30:23 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:30:28 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ I0401 13:30:31.971781      43 warnings.go:107] "Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice"                                    │
+│ 2026/04/01 13:30:34 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:30:35 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:30:39 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:30:40 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:31:23 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:31:28 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:31:29 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:31:34 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:31:39 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:31:44 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:31:52 [ERROR] Failed to handle tunnel request from remote address 127.0.0.6:41955 (X-Forwarded-For: 10.19.143.82): response 401: failed authentication     │
+│ I0401 13:32:09.259535      43 warnings.go:107] "Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice"                                    │
+│ I0401 13:32:10.563407      43 warnings.go:107] "Warning: The v1alpha2 version of ReferenceGrant has been deprecated and will be removed in a future release of the API.  │
+│ 2026/04/01 13:32:13 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:32:18 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:32:24 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:32:29 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:32:57 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:33:02 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:33:05 [ERROR] http: TLS handshake error from 127.0.0.6:36717: remote error: tls: bad certificate                                                           │
+│ 2026/04/01 13:33:05 [ERROR] http: TLS handshake error from 127.0.0.6:60127: remote error: tls: bad certificate                                                           │
+│ 2026/04/01 13:33:05 [ERROR] http: TLS handshake error from 127.0.0.6:37439: remote error: tls: bad certificate                                                           │
+│ 2026/04/01 13:33:08 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:33:13 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:33:19 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:33:24 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF
+
+
+
+026/04/01 13:34:24 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ I0401 13:34:33.972409      43 warnings.go:107] "Warning: cilium.io/v2alpha1 CiliumBGPPeeringPolicy is deprecated; use cilium.io/v2 CRDs (CiliumBGPClusterConfig, CiliumB │
+│ 2026/04/01 13:34:36 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:34:41 [ERROR] Error during subscribe websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length    │
+│ 2026/04/01 13:34:41 [ERROR] Unknown error: websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length            │
+│ 2026/04/01 13:34:41 [ERROR] http: superfluous response.WriteHeader call from github.com/rancher/apiserver/pkg/middleware.gzipResponseWriter.WriteHeader (gzip.go:38)     │
+│ 2026/04/01 13:34:41 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:34:44 [ERROR] Error during subscribe websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length    │
+│ 2026/04/01 13:34:44 [ERROR] Unknown error: websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length            │
+│ 2026/04/01 13:34:44 [ERROR] http: superfluous response.WriteHeader call from github.com/rancher/apiserver/pkg/middleware.gzipResponseWriter.WriteHeader (gzip.go:38)     │
+│ 2026/04/01 13:34:48 [ERROR] Error during subscribe websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length    │
+│ 2026/04/01 13:34:48 [ERROR] Unknown error: websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length            │
+│ 2026/04/01 13:34:48 [ERROR] http: superfluous response.WriteHeader call from github.com/rancher/apiserver/pkg/middleware.gzipResponseWriter.WriteHeader (gzip.go:38)     │
+│ 2026/04/01 13:34:59 [ERROR] Error during subscribe websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length    │
+│ 2026/04/01 13:34:59 [ERROR] Unknown error: websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length            │
+│ 2026/04/01 13:34:59 [ERROR] http: superfluous response.WriteHeader call from github.com/rancher/apiserver/pkg/middleware.gzipResponseWriter.WriteHeader (gzip.go:38)     │
+│ 2026/04/01 13:35:23 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:35:26 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:35:28 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:35:31 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:35:39 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:35:44 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:36:11 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:36:16 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:36:27 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:36:32 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:36:54 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:36:54 [ERROR] Error during subscribe websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length    │
+│ 2026/04/01 13:36:54 [ERROR] Unknown error: websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length            │
+│ 2026/04/01 13:36:54 [ERROR] http: superfluous response.WriteHeader call from github.com/rancher/apiserver/pkg/middleware.gzipResponseWriter.WriteHeader (gzip.go:38)     │
+│ 2026/04/01 13:36:59 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:37:11 [ERROR] Error during subscribe websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length    │
+│ 2026/04/01 13:37:11 [ERROR] Unknown error: websocket: not a websocket handshake: 'Sec-WebSocket-Key' header must be Base64 encoded value of 16-byte in length            │
+│ 2026/04/01 13:37:11 [ERROR] http: superfluous response.WriteHeader call from github.com/rancher/apiserver/pkg/middleware.gzipResponseWriter.WriteHeader (gzip.go:38)     │
+│ 2026/04/01 13:37:15 [INFO] Handling backend connection request [c-2g6hv]                                                                                                 │
+│ 2026/04/01 13:37:16 [INFO] Handling backend connection request [stv-cluster-c-2g6hv]                                                                                     │
+│ 2026/04/01 13:37:20 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                                                  │
+│ 2026/04/01 13:37:21 [INFO] error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF                               
