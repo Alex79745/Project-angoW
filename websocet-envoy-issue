@@ -198,3 +198,198 @@ Critical error
 https://github.com/kumahq/kuma/issues/4256
 
 https://github.com/envoyproxy/envoy/issues/38645
+
+
+
+Yes — you’re very close now, and your thinking is correct:
+
+❗ You CANNOT use pure TCP passthrough because Rancher expects HTTP/WebSocket (L7), not raw TCP.
+
+So the correct path is:
+
+✅ Keep HTTP (L7)
+✅ Force HTTP/1.1
+✅ Fix Envoy behavior (timeouts + upgrade + headers)
+🔥 Problem in YOUR current ProxyTemplate
+
+Your config:
+
+upstream_protocol_options:
+  explicit_http_config:
+    http_protocol_options: {}
+
+👉 This is NOT enough
+
+It only says:
+
+"allow HTTP/1.1"
+
+BUT Envoy can still:
+
+❌ Try HTTP/2 upstream
+❌ Mis-handle upgrade
+❌ Apply default timeouts
+🎯 WHAT YOU MUST ADD (CRITICAL FIX)
+
+You need 3 missing pieces:
+
+✅ 1. FORCE HTTP/1.1 PROPERLY (not partial)
+
+Replace your cluster patch with THIS:
+
+- cluster:
+    match:
+      name: .*rancher.*
+    operation: patch
+    value: |
+      typed_extension_protocol_options:
+        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+          '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+          explicit_http_config:
+            http_protocol_options: {}
+          common_http_protocol_options:
+            idle_timeout: 0s
+✅ 2. FIX CONNECTION MANAGER (YOU ARE MISSING TIMEOUTS)
+
+Your current:
+
+upgrade_configs:
+  - upgrade_type: websocket
+    enabled: true
+
+👉 That’s only 30% of the fix
+
+🔥 Replace with THIS FULL PATCH:
+- networkFilter:
+    match:
+      name: envoy.filters.network.http_connection_manager
+    operation: patch
+    value: |
+      name: envoy.filters.network.http_connection_manager
+      typed_config:
+        '@type': type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+
+        upgrade_configs:
+          - upgrade_type: websocket
+            enabled: true
+
+        common_http_protocol_options:
+          idle_timeout: 0s
+
+        stream_idle_timeout: 0s
+        request_timeout: 0s
+✅ 3. (VERY IMPORTANT) — APPLY TO RIGHT TARGET
+
+Right now your ProxyTemplate is:
+
+kuma.io/origin: global
+
+👉 But NO selector → risky
+
+✔️ You should explicitly target:
+For Rancher traffic:
+selectors:
+  - match:
+      kuma.io/service: zone-ingress
+
+AND optionally:
+
+  - match:
+      kuma.io/service: rancher
+💥 WHY YOU STILL SEE THIS ERROR
+Sec-WebSocket-Key must be Base64 encoded
+
+👉 That ONLY happens when:
+
+Envoy is still touching/modifying HTTP incorrectly
+⚠️ KEY DETAIL YOU MISSED
+
+👉 WebSockets REQUIRE:
+
+HTTP/1.1 + NO transformation + NO timeout
+🧠 WHAT YOUR TEAM LEAD DID
+
+You said:
+
+“he patched and it worked but drops”
+
+👉 That means:
+
+✅ upgrade fixed
+❌ protocol + timeout NOT fixed
+🚀 FINAL CLEAN VERSION (PUT THIS)
+
+Replace your ProxyTemplate with:
+
+apiVersion: kuma.io/v1alpha1
+kind: ProxyTemplate
+metadata:
+  name: websocket-fix-final
+  mesh: default
+spec:
+  selectors:
+    - match:
+        kuma.io/service: zone-ingress
+  conf:
+    imports:
+      - default-proxy
+    modifications:
+      - networkFilter:
+          match:
+            name: envoy.filters.network.http_connection_manager
+          operation: patch
+          value: |
+            name: envoy.filters.network.http_connection_manager
+            typed_config:
+              '@type': type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+
+              upgrade_configs:
+                - upgrade_type: websocket
+                  enabled: true
+
+              common_http_protocol_options:
+                idle_timeout: 0s
+
+              stream_idle_timeout: 0s
+              request_timeout: 0s
+
+      - cluster:
+          match:
+            name: .*rancher.*
+          operation: patch
+          value: |
+            typed_extension_protocol_options:
+              envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+                '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+                explicit_http_config:
+                  http_protocol_options: {}
+                common_http_protocol_options:
+                  idle_timeout: 0s
+⚠️ AFTER APPLYING
+kubectl rollout restart daemonset kuma-ingress -n kuma-system
+🧪 EXPECTED RESULT
+
+Logs will STOP showing:
+
+❌ 1006
+❌ invalid websocket handshake
+❌ unexpected EOF
+🎯 FINAL TRUTH (you reached it)
+
+You were right when you said:
+
+“i need to enforce http/1.1”
+
+👉 YES — but ALSO:
+
++ disable timeouts
++ ensure upgrade works
++ apply at ZoneIngress (NOT only sidecar)
+💬 Strong sentence you can use
+
+“The issue was Envoy not fully enforcing HTTP/1.1 and still applying timeouts — WebSocket upgrade alone is not enough.”
+
+If you want, next step I can help you:
+
+👉 validate via /config_dump to prove 100% it’s fixed
+👉 or optimize this for production (timeouts not fully 0, but safe
