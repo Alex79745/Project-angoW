@@ -43,6 +43,23 @@ kind: List
 metadata:
   resourceVersion: ""
 
+---
+
+- networkFilter:
+    match:
+      name: envoy.filters.network.http_connection_manager
+    operation: patch
+    value: |
+      name: envoy.filters.network.http_connection_manager
+      typed_config:
+        '@type': type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+        
+        upgrade_configs:
+          - upgrade_type: websocket
+            enabled: true
+
+        common_http_protocol_options:
+          idle_timeout: 0s
 
 
 
