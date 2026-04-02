@@ -74,3 +74,36 @@ Replace NodePort with LB / BGP VIP
 mTLS between planes
 Better service discovery
 HA for control plan
+
+
+#############################################################
+
+About your idea (VERY GOOD)
+
+You said:
+
+“I’ll create an epic (xDS svc discovery) and include this project”
+
+👉 This is exactly what senior people do
+
+But do it cleanly:
+
+🔥 Structure your Epic like this
+EPIC: Multi-Cluster Service Discovery via xDS
+
+Include:
+
+Architecture (core)
+Envoy VM entrypoint
+Control plane (Go / xDS)
+Cluster integration
+Routing (SNI / HTTP/TLS routes)
+Exposure (NodePort → LB → BGP future)
+Observability
+Backup / recovery (Velero tie-in)
+Then tasks under it:
+implement xDS CP
+integrate cluster A
+integrate cluster B
+define routing model
+expose gateway
