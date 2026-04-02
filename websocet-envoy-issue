@@ -913,7 +913,72 @@ the issue with zone ingress is  networking.advertisedAddress/advertisedPort (wha
    Gateway        Gateway        Gateway
    (TLS pass)     (TLS pass)     (TLS pass)
 
+🚪 5. GATEWAY API (PER CLUSTER)
+GatewayClass
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: cilium
+spec:
+  controllerName: io.cilium/gateway-controller
+Gateway (TLS passthrough)
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: edge-gateway
+  namespace: default
+  annotations:
+    io.cilium.proxy-protocol: "true"
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - name: tls
+    port: 443
+    protocol: TLS
+    tls:
+      mode: Passthrough
+TLSRoute
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: tenant-a
+spec:
+  parentRefs:
+  - name: edge-gateway
+  hostnames:
+  - "tenant-a.com"
+  rules:
+  - backendRefs:
+    - name: app-service
+      port: 443
+📦 6. APP REQUIREMENT
 
+Your app (e.g. Rancher):
+
+MUST support:
+TLS
+PROXY protocol v2
+
+If not:
+
+👉 connection resets → looks like “no healthy upstream”
+
+🔐 7. SECURITY (PROD MUST)
+Envoy VM
+Allow:
+443 inbound
+9901 admin → PRIVATE ONLY
+Kubernetes
+NetworkPolicies (Cilium native)
+Limit Gateway exposure
+📊 8. OBSERVABILITY
+Envoy
+curl localhost:9901/stats
+curl localhost:9901/clusters
+Cilium
+cilium status
+cilium monitor
+hubble observe
 
 🚪 5. GATEWAY API (PER CLUSTER)
 GatewayClass
