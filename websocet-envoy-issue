@@ -1046,3 +1046,150 @@ Cilium
 cilium status
 cilium monitor
 hubble observe
+----
+
+Ah, perfect — now I understand your confusion about HTTP routes vs. SNI/TCP routes and the CiliumClass controller issue. Let’s clarify everything, step by step, and then I’ll give a Go skeleton for the xDS control plane.
+
+1️⃣ HTTP Routes vs SNI (TCP) Routing
+TCP passthrough (SNI-based)
+Envoy VM sees TLS handshake from client.
+Extracts SNI (tenant-a.com) → maps to cluster.
+Passes encrypted TLS to the backend cluster.
+Works for any service: Grafana, Rancher, APIs, etc., without decrypting TLS.
+Example:
+Client: https://rancher.tenant-a.com
+Envoy SNI filter → cluster-tenant-a
+TCP passthrough → tenant-a Cilium Gateway → Pod running Rancher
+In this mode, HTTP routing inside Envoy is not required.
+Envoy does TCP L4 routing, only inspecting SNI.
+HTTP routing (optional, L7)
+If you terminate TLS in Envoy, you can do HTTP routing:
+SNI / Host header → /api → Rancher Pod
+SNI / Host header → /grafana → Grafana Pod
+SNI / Host header → / → Other services
+Requires Envoy to terminate TLS.
+You then can generate HTTP routes per cluster and per service.
+
+Why tenant-a.com?
+
+It’s just the SNI / TLS hostname.
+Could be rancher.a.example.com or grafana.a.example.com.
+Each unique hostname maps to a cluster or service dynamically.
+
+So if one cluster has Grafana + Rancher + other APIs, you could have different hostnames:
+
+Hostname	Backend Cluster / Service
+rancher.tenant-a.com	cluster-A / Rancher
+grafana.tenant-a.com	cluster-A / Grafana
+api.tenant-a.com	cluster-A / API
+The Go xDS control plane maps hostname → cluster/service.
+For TCP passthrough, Envoy just needs cluster endpoint IP/port, nothing more.
+2️⃣ CiliumClass Waiting for Controller
+In multi-cluster or Cilium Gateway mode, CiliumClass CRD may appear Pending if:
+cilium operator in the cluster is not ready.
+The gateway API controller is missing or misconfigured.
+BGP config / L2 advertisement not available → Cilium doesn’t assign routes yet.
+
+You need:
+
+cilium status --all-nodes
+kubectl get pods -n cilium
+
+Make sure operator + agent + gateway pods are ready.
+
+Only after that the CiliumClass CRD will be bound and ready.
+3️⃣ Go xDS Skeleton
+
+Here’s a minimal, production-ready skeleton for dynamic SNI → cluster mapping, supporting multiple HTTP hostnames per cluster.
+
+package main
+
+import (
+    "log"
+    "net"
+    "time"
+
+    "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+    "github.com/envoyproxy/go-control-plane/pkg/server/v3"
+    "google.golang.org/grpc"
+)
+
+type Tenant struct {
+    Hostnames []string // SNI / HTTP Host
+    ClusterIP string
+    Port      uint32
+}
+
+// Simple in-memory DB
+var tenants = []Tenant{
+    {Hostnames: []string{"rancher.tenant-a.com"}, ClusterIP: "10.0.1.5", Port: 443},
+    {Hostnames: []string{"grafana.tenant-a.com"}, ClusterIP: "10.0.1.6", Port: 443},
+}
+
+func main() {
+    // Create Envoy xDS snapshot cache
+    snapshotCache := cache.NewSnapshotCache(false, cache.IDHash{}, nil)
+
+    go func() {
+        ticker := time.NewTicker(10 * time.Second)
+        for range ticker.C {
+            updateSnapshot(snapshotCache)
+        }
+    }()
+
+    grpcServer := grpc.NewServer()
+    srv := server.NewServer(nil, snapshotCache)
+    // Register gRPC services for ADS
+    // TODO: Register: AggregatedDiscoveryServiceServer(srv)
+    lis, _ := net.Listen("tcp", ":18000")
+    log.Println("Starting xDS gRPC server on :18000")
+    grpcServer.Serve(lis)
+}
+
+func updateSnapshot(cache cache.SnapshotCache) {
+    clusters := make([]cache.Resource, len(tenants))
+    listeners := make([]cache.Resource, len(tenants))
+
+    for i, t := range tenants {
+        clusterName := t.Hostnames[0]
+        clusters[i] = buildCluster(clusterName, t.ClusterIP, t.Port)
+        listeners[i] = buildListener(clusterName, clusterName)
+    }
+
+    snapshot, _ := cache.NewSnapshot("1",
+        map[cache.ResourceType][]cache.Resource{
+            cache.ClusterType:  clusters,
+            cache.ListenerType: listeners,
+        },
+    )
+    cache.SetSnapshot("envoy-node-id", snapshot)
+    log.Println("Updated snapshot with tenants")
+}
+
+func buildCluster(name, ip string, port uint32) cache.Resource {
+    return &cache.Cluster{} // Fill with envoy.Cluster proto for TCP passthrough
+}
+
+func buildListener(name, sni string) cache.Resource {
+    return &cache.Listener{} // Fill with envoy.Listener proto, match SNI, forward to cluster
+}
+
+Key points:
+
+Tenant.Hostnames → SNI or HTTP hostname.
+TCP passthrough works for any service (Rancher, Grafana, etc.).
+You can extend to HTTP route mapping if you terminate TLS.
+Snapshot updates are dynamic — no static cluster config required.
+
+✅ Next Steps:
+
+Make sure Cilium operator + Gateway pods are ready in each cluster.
+Decide TCP passthrough (SNI) vs TLS termination + HTTP routing.
+Use Go xDS skeleton to generate cluster + listener dynamically.
+Keep VIP + VRRP for HA.
+Once the skeleton works, expand to 100+ clusters.
+
+I can also expand the Go skeleton to include:
+
+Automatic HTTP routes per tenant (Grafana, Rancher, API)
+SDS/TLS support f
