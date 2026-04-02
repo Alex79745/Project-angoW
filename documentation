@@ -1,0 +1,76 @@
+What your documentation should do
+
+Not a tutorial.
+
+Not a wall of YAML.
+
+It should prove:
+
+👉 You designed the system
+
+🔥 Structure (use this exactly)
+1. Problem Statement
+
+Why this exists:
+
+Multi-cluster ingress
+Tenant routing
+Centralized control
+Avoid L3 overlap (ClusterCIDR issues)
+2. Architecture Overview
+
+Describe:
+
+Envoy VM (entrypoint)
+xDS Control Plane
+Cluster dataplanes
+Routing via SNI
+
+👉 Make it clear:
+
+This is YOUR design
+3. Traffic Flow (VERY IMPORTANT)
+
+Like:
+
+Client
+ ↓
+VIP (L2/BGP)
+ ↓
+Envoy (VM)
+ ↓ (xDS config)
+NodeIP:NodePort
+ ↓
+Gateway (Cilium / Traefik)
+ ↓
+Service
+ ↓
+Pod
+
+👉 This alone = architect-level thinking
+
+4. Design Decisions
+
+Explain WHY:
+
+Why xDS
+Why not static config
+Why NodePort (current state)
+Why Gateway API
+Why avoiding ClusterCIDR overlap
+5. Trade-offs / Risks
+
+This is where you shine:
+
+Custom Go CP vs Kuma
+NodePort exposure
+Multiple L7 layers (Envoy + Traefik)
+Scalability concerns
+
+👉 This proves seniority
+
+6. Future Improvements
+Replace NodePort with LB / BGP VIP
+mTLS between planes
+Better service discovery
+HA for control plan
