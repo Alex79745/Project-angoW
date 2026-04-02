@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ingress-envoy
+  namespace: ingress-system
+spec:
+  selector:
+    matchLabels:
+      app: ingress-envoy
+  template:
+    metadata:
+      labels:
+        app: ingress-envoy
+    spec:
+      hostNetwork: true
+      containers:
+        - name: envoy
+          image: envoyproxy/envoy:v1.30-latest
+          args:
+            - "-c"
+            - "/etc/envoy/envoy.yaml"
+          ports:
+            - containerPort: 443
+              hostPort: 443
+          volumeMounts:
+            - name: config
+              mountPath: /etc/envoy
+      volumes:
+        - name: config
+          configMap:
+            name: envoy-config
+
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ingress-envoy
+  namespace: ingress-system
+spec:
+  selector:
+    matchLabels:
+      app: ingress-envoy
+  template:
+    metadata:
+      labels:
+        app: ingress-envoy
+    spec:
+      hostNetwork: true
+      containers:
+        - name: envoy
+          image: envoyproxy/envoy:v1.30-latest
+          args:
+            - "-c"
+            - "/etc/envoy/envoy.yaml"
+          ports:
+            - containerPort: 443
+              hostPort: 443
+          volumeMounts:
+            - name: config
+              mountPath: /etc/envoy
+      volumes:
+        - name: config
+          configMap:
+            name: envoy-config
+
+
+
+"/etc/envoy/envoy.yaml"
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-nodeport
+  namespace: kube-system
+spec:
+  type: NodePort
+  selector:
+    io.cilium.gateway: "true"
+  ports:
+    - name: https
+      port: 443
+      targetPort: 443
+      nodePort: 30443
