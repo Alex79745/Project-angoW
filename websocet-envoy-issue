@@ -913,6 +913,16 @@ the issue with zone ingress is  networking.advertisedAddress/advertisedPort (wha
    Gateway        Gateway        Gateway
    (TLS pass)     (TLS pass)     (TLS pass)
 
+
+helm upgrade --install cilium cilium/cilium \
+  -n kube-system \
+  --set kubeProxyReplacement=strict \
+  --set gatewayAPI.enabled=true \
+  --set l7Proxy=false \
+  --set routingMode=native \
+  --set autoDirectNodeRoutes=true
+
+
 🚪 5. GATEWAY API (PER CLUSTER)
 GatewayClass
 apiVersion: gateway.networking.k8s.io/v1
