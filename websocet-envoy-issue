@@ -894,3 +894,21 @@ the issue with zone ingress is  networking.advertisedAddress/advertisedPort (wha
   }
 ]'
  in simialar way
+
+
+                ┌──────────────┐
+                │   Envoy VM   │
+                │  (L4 SNI)    │
+                └──────┬───────┘
+                       │
+                (xDS dynamic)
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+   203.0.113.11   203.0.113.12   203.0.113.13
+        │              │              │
+   Cluster A      Cluster B      Cluster C
+   (Cilium)       (Cilium)       (Cilium)
+        │              │              │
+   Gateway        Gateway        Gateway
+   (TLS pass)     (TLS pass)     (TLS pass)
