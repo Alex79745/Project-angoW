@@ -944,3 +944,69 @@ I can help you write:
 the “Routing Layer” doc (Traefik / Envoy / TLS / risks)
 the “Cluster Provisioning Flow” (Terraform + NetBox + Proxmox)
 or the “Service Discovery (xDS-style)” doc
+
+
+###########################################################################################################################################################################
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. Routing Layer — (Traefik / Envoy / TLS)
+Purpose
+
+Define a standardized and scalable approach for external and internal service exposure across clusters, ensuring secure communication and consistent traffic management.
+
+Why this exists
+
+Previously:
+
+No unified ingress strategy
+Service exposure handled inconsistently
+No clear approach for multi-cluster routing
+TLS handling was not standardized
+
+👉 Result:
+
+harder to scale
+harder to debug
+inconsistent security posture
+Design Overview
+
+The routing layer introduces a centralized and standardized ingress strategy based on:
+
+Traefik (Ingress Controller)
+Entry point for HTTP/HTTPS traffic
+Handles TLS termination and routing rules
+Envoy (Selective use / extensibility layer)
+Supports advanced routing patterns
+Enables future extensibility (e.g., dynamic config, xDS integration)
+Key Design Decisions
+1. Standardized Ingress per Cluster
+Each cluster has a defined ingress entry point
+Avoids ad-hoc exposure patterns
+2. TLS Strategy
+Centralized TLS handling via ingress
+Supports:
+TLS termination
+TLS passthrough (for specific services if required)
+3. No Full Service Mesh
+Avoided service mesh complexity (e.g., sidecars, overhead)
+Chosen lightweight routing approach instead
+4. Multi-Cluster Readiness
+Routing layer designed to support:
+future cross-cluster traffic
+integration with external discovery (xDS in separate epic)
+What Changed
+From inconsistent ingress → standardized routing layer
+From unclear TLS handling → defined strategy
+From single-cluster mindset → multi-cluster ready design
+How to Use
+Services expose endpoints via Kubernetes ingress resources
+Routing rules defined declaratively
+TLS handled automatically via ingress configuration
+Risks & Considerations
+Without full mesh, some advanced traffic features are limited
+Requires discipline in ingress configuration
+TLS misconfiguration can affect multiple services
+Future Improvements
+Integration with xDS-based dynamic routing (separate epic)
+Advanced traffic strategies (canary, traffic splitting)
+Observability improvements (metrics, tracing at ingress layer)
+____________________________________________________________________________________________________________________________________________________________________________
