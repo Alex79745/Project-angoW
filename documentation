@@ -1017,6 +1017,14 @@ Traefik is primarily designed as a cluster-wide ingress controller. For this rea
 The main reasons include:
 
 Resource visibility and isolation: Traefik requires cluster-level permissions and watches resources across namespaces. Misconfigurations in one tenant’s resources may affect others.
+
+
+Cluster A → Agent → Control Plane
+Cluster B → Agent → Control Plane
+
+Control Plane → Envoy (xDS or API)
+
+Envoy → routes traffic → clusters
 Shared CRDs: Advanced configuration resources, like Middleware or TLSOptions, are cluster-scoped. Conflicting definitions can impact multiple tenants.
 Traffic and availability risks: Routing rules, middleware, or heavy traffic from one tenant can interfere with others, affecting reliability and performance.
 Observability and privacy: Logs, metrics, and traces are shared by default, which may expose sensitive information across tenants.
