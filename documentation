@@ -1283,7 +1283,167 @@ per-cluster router
 service mapping
 internal logic
 🎯 Final answer (short and clear)
+###############################
 
+“If I curl something like /clusters or /routes, I should see
+app.company.com → nodeIP:nodePort (Traefik)”
+
+✔ Yes — that’s correct for your design
+
+But let me clean it up so it’s accurate and future-proof.
+
+🧠 1. What you should see from your Control Plane API
+
+When you do:
+
+curl localhost:8080/routes
+
+👉 You SHOULD get something like:
+
+[
+  {
+    "domain": "app.company.com",
+    "endpoints": [
+      "192.168.1.10:30443",
+      "192.168.1.11:30443"
+    ]
+  }
+]
+🔑 2. Important clarification (this is where you were slightly off)
+
+You said:
+
+“svc should point to nodeip:nodeport”
+
+👉 Small correction:
+
+svc (Kubernetes Service) = internal
+nodeIP:nodePort = external access to ingress (Traefik)
+So the correct mapping is:
+app.company.com
+   ↓
+Envoy (SNI)
+   ↓
+nodeIP:nodePort   ← (Traefik entrypoint)
+   ↓
+Traefik routes
+   ↓
+svc (internal)
+   ↓
+pods
+⚙️ 3. What your agent SHOULD register
+
+You don’t register services.
+
+👉 You register ingress endpoints
+
+Correct payload:
+{
+  "cluster": "cluster-a",
+  "domains": [
+    {
+      "domain": "app.company.com",
+      "endpoints": [
+        "192.168.1.10:30443",
+        "192.168.1.11:30443"
+      ]
+    }
+  ]
+}
+🔍 4. What you verify from VM (your exact use case)
+
+When you said:
+
+“curl localhost/cluster should show this”
+
+✔ Yes — that’s your debug view
+
+You’re validating:
+
+cluster registered ✔
+endpoints correct ✔
+domain mapped ✔
+🚨 5. One important improvement (very important)
+
+Right now you're thinking:
+
+always NodePort
+
+That’s fine for now, but design it like:
+
+"endpoints": ["IP:PORT"]
+
+NOT:
+
+"nodeIP": "...",
+"nodePort": ...
+
+👉 Why?
+
+Because later you can switch to:
+
+LoadBalancer IP
+VIP
+MetalLB
+external DNS
+
+WITHOUT changing your model
+
+🧠 6. About your “curl app.com should work” idea
+
+You said:
+
+“app.com curl should be ok since trafec knows route”
+
+⚠️ Careful here:
+
+From the VM:
+
+curl https://app.company.com
+
+ONLY works if:
+
+DNS points to Envoy
+OR you use /etc/hosts
+
+👉 Otherwise test like:
+
+curl -k https://nodeIP:nodePort -H "Host: app.company.com"
+
+✔ This simulates Envoy behavior
+
+🔥 7. The key thing you finally nailed
+
+You said:
+
+“trafec node knows the route to app.com”
+
+✔ YES — that’s exactly the model
+
+🧭 8. Final clean mental model
+Envoy:
+domain → cluster ingress endpoint
+Traefik:
+domain → svc → pods
+🎯 9. Final answer to your question
+
+“Should I see nodeIP:nodePort in control plane?”
+
+👉 ✔ YES (for now, given your infra)
+
+But structure it generically as:
+
+👉 endpoint = IP:PORT
+
+🚀 10. You are now at the correct level
+
+What you’re doing now:
+
+validating routing chain ✔
+separating layers ✔
+defining clean contracts ✔
+
+👉 This is platform/system design thinking
 “What should upstream be?”
 
 👉 Upstream = cluster ingress endpoint (Traefik), NOT services
