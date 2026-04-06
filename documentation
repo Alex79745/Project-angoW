@@ -1109,3 +1109,181 @@ polls every few seconds
 Option B (later)
 real xDS (gRPC stream)
 push updates
+################################
+
+1. Your core question (reframed)
+
+“What does Traefik look like so Envoy knows where to send traffic?”
+
+👉 Answer:
+
+Envoy does NOT care about Traefik config at all.
+
+Envoy only needs:
+
+domain → cluster ingress endpoint(s)
+🔑 2. The key separation (this is critical)
+🌍 Outside cluster (Envoy)
+
+Knows ONLY:
+
+app.company.com → 10.0.0.10:443
+☸️ Inside cluster (Traefik)
+
+Knows:
+
+app.company.com → svc → pods
+
+👉 They are completely independent layers
+
+🔁 3. Full request flow (final mental model)
+Client
+  ↓ (TLS with SNI: app.company.com)
+Envoy
+  ↓ (TCP passthrough)
+Cluster ingress (Traefik)
+  ↓
+Kubernetes Service
+  ↓
+Pods
+⚙️ 4. What Traefik actually looks like
+
+Inside the cluster, you define:
+
+Example (IngressRoute or Ingress)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app
+spec:
+  rules:
+    - host: app.company.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-app
+                port:
+                  number: 80
+Or with TLS passthrough (important)
+
+If you’re doing TLS passthrough, Traefik must be configured like:
+
+TCP router
+based on SNI
+
+Example concept:
+
+tcp:
+  routers:
+    app:
+      rule: "HostSNI(`app.company.com`)"
+      service: app-service
+      tls:
+        passthrough: true
+
+  services:
+    app-service:
+      loadBalancer:
+        servers:
+          - address: "my-app:443"
+
+👉 This is what makes the chain work
+
+🌐 5. What Envoy needs (your main concern)
+
+Envoy upstream = Traefik entrypoint
+
+So your upstream should be:
+✅ BEST:
+10.0.0.10:443   ← cluster ingress IP
+⚠️ If using NodePort:
+node1-ip:nodeport
+node2-ip:nodeport
+
+👉 NOT:
+
+❌ svc.cluster.local
+❌ pod IPs
+❌ internal DNS
+
+🧩 6. Final mapping example (clean)
+Agent sends:
+{
+  "domain": "app.company.com",
+  "endpoints": [
+    "10.0.0.10:443",
+    "10.0.0.11:443"
+  ]
+}
+Envoy builds:
+app.company.com → [10.0.0.10:443, 10.0.0.11:443]
+Traefik routes internally:
+app.company.com → my-app service
+🔥 7. Important insight (you were slightly mixing this)
+
+You said:
+
+“upstream should be clear like url-nodeip:port443 or nodeport”
+
+✔ Almost correct
+
+But the clean version is:
+
+👉 Always point to ingress layer only
+
+So:
+
+✔ cluster-ingress-ip:443
+✔ OR node-ip:nodeport (fallback)
+
+🚀 8. Failover (you asked for it)
+
+Now the powerful part:
+
+Same domain → multiple clusters
+{
+  "domain": "app.company.com",
+  "endpoints": [
+    "10.0.0.10:443",   // cluster A
+    "10.0.1.10:443"    // cluster B
+  ]
+}
+
+Envoy:
+
+load balances across clusters
+
+👉 That’s your multi-cluster failover
+
+⚠️ 9. Critical requirement for this to work
+
+ALL clusters must:
+
+✔ expose same domain
+✔ have same routing config
+✔ have same service
+
+👉 Otherwise:
+
+💥 inconsistent behavior
+
+🧠 10. Final architecture (you nailed it)
+
+You now have:
+
+Envoy:
+global entrypoint
+SNI routing
+multi-cluster aware
+Traefik:
+per-cluster router
+service mapping
+internal logic
+🎯 Final answer (short and clear)
+
+“What should upstream be?”
+
+👉 Upstream = cluster ingress endpoint (Traefik), NOT services
