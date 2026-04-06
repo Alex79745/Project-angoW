@@ -1028,3 +1028,84 @@ Envoy → routes traffic → clusters
 Shared CRDs: Advanced configuration resources, like Middleware or TLSOptions, are cluster-scoped. Conflicting definitions can impact multiple tenants.
 Traffic and availability risks: Routing rules, middleware, or heavy traffic from one tenant can interfere with others, affecting reliability and performance.
 Observability and privacy: Logs, metrics, and traces are shared by default, which may expose sensitive information across tenants.
+
+
+4. Agent Design (per cluster)
+
+This is the key piece you were missing
+
+What the agent does:
+runs inside cluster (or near ingress)
+discovers:
+domains
+ingress IP
+sends to control plane
+Example payload (registration)
+{
+  "cluster_name": "cluster-a",
+  "endpoint": "10.0.0.10:443",
+  "services": [
+    {
+      "name": "app1",
+      "domain": "app.company.com",
+      "port": 443,
+      "protocol": "tcp"
+    }
+  ]
+}
+API endpoint (Control Plane)
+POST /register
+Heartbeat
+POST /heartbeat
+{
+  "cluster_name": "cluster-a"
+}
+
+👉 Every ~30 seconds
+
+🔁 5. Control Plane Logic
+On /register:
+upsert cluster
+replace services list
+store in DB
+On /heartbeat:
+update last_heartbeat
+mark cluster healthy
+Background job:
+
+Every X seconds:
+
+if now - last_heartbeat > 60s:
+    mark cluster as unhealthy
+🌐 6. Envoy Integration (SNI passthrough)
+
+Since you’re doing TLS passthrough, Envoy uses:
+
+👉 SNI (Server Name)
+
+Envoy needs:
+domain → cluster endpoint mapping
+Example mapping:
+app.company.com → cluster-a → 10.0.0.10:443
+⚙️ 7. How Envoy gets config
+Option A (simple — recommended now)
+
+Control Plane exposes:
+
+GET /routes
+
+Response:
+
+[
+  {
+    "domain": "app.company.com",
+    "endpoint": "10.0.0.10:443"
+  }
+]
+
+Envoy:
+
+polls every few seconds
+Option B (later)
+real xDS (gRPC stream)
+push updates
