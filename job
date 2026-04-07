@@ -191,3 +191,38 @@ I can help you write:
 the “Routing Layer” doc (Traefik / Envoy / TLS / risks)
 the “Cluster Provisioning Flow” (Terraform + NetBox + Proxmox)
 or the “Service Discovery (xDS-style)” doc
+
+
+##########################################################################################################################################
+
+🧩 Job Responsibility
+
+Kubernetes Infrastructure Engineer
+
+I operate with a high degree of technical independence, contributing to the design, implementation, automation, and stabilization of cloud-native platform architecture.
+
+I have led key parts of the multi-cluster routing and platform design (Envoy, Traefik, and control plane integration), ensuring alignment with CNCF best practices, security requirements, and business needs.
+
+I contribute to shaping the technical roadmap, identifying platform gaps, and designing scalable solutions. I also support task breakdown and implementation alignment across the team for complex initiatives (e.g., IPAM/NetBox integration, proxy synchronization, and service connectivity).
+
+Additionally, I contribute to knowledge sharing through documentation and workshops, helping onboard team members into the platform architecture. I remain actively involved in ensuring system reliability, maintainability, and long-term scalability.
+
+🚀 Motivation
+
+I am highly motivated by designing and implementing secure, scalable, and resilient infrastructure systems end-to-end. My strength lies in translating business and platform requirements into robust technical solutions, particularly in constrained and security-focused environments such as Talos-based Kubernetes clusters.
+
+I am particularly interested in cloud architecture, software-defined networking, service connectivity, and platform engineering (DevOps / DevSecOps).
+
+Going forward, I would like to increase my focus on system design, architecture evolution, and long-term platform strategy, while continuing to reduce manual operational overhead through automation.
+
+It is also important to me to ensure alignment between my responsibilities, technical ownership, and overall role expectations.
+
+📚 Learning & Development
+
+I would like to further develop my expertise in platform security, governance, and compliance for modern infrastructure systems, particularly in immutable and Kubernetes-based environments.
+
+Key areas of focus include policy-as-code, admission control concepts, security benchmarking (e.g., CIS), and automated compliance enforcement. I am also interested in advancing my knowledge in secrets management and identity-based access control.
+
+In parallel, I aim to continue developing architectural and communication skills, including system design articulation, cross-team alignment, and risk assessment.
+
+I also plan to pursue certifications aligned with my role and the platform technologies in use (e.g., CKA, CKAD, CKS, Terraform).
