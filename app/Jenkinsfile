@@ -1,0 +1,22 @@
+pipeline {
+  agent any
+  environment {
+    COMPOSE_PROJECT_DIR = "${WORKSPACE}/app"
+  }
+  stages {
+    stage('Build') {
+      steps {
+        dir('app') {
+          sh 'docker-compose build --pull'
+        }
+      }
+    }
+    stage('Deploy') {
+      steps {
+        dir('app') {
+          sh 'docker-compose down && docker-compose up -d --remove-orphans'
+        }
+      }
+    }
+  }
+}
