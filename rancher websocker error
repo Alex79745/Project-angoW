@@ -40,3 +40,11 @@ static_resources:
                     socket_address:
                       address: 10.
                       port_value: 31028
+
+
+
+curl -i -H "Connection: Upgrade" \
+     -H "Upgrade: websocket" \
+     -H "Host: ://teu-dominio.com" \
+     -k https://<IP_DO_TRAEFIK>/ping
+
