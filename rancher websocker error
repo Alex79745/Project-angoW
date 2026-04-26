@@ -48,3 +48,25 @@ curl -i -H "Connection: Upgrade" \
      -H "Host: ://teu-dominio.com" \
      -k https://<IP_DO_TRAEFIK>/ping
 
+
+error: unable to upgrade connection: error dialing backend: read tcp 10.5.193.180:56552->10.19.143.82:443: read: connection reset by peer
+
+ 
+
+error: unable to upgrade connection: e
+
+error: unable to upgrade connection: error dialing backend: read tcp 10.5.193.180:37582->10.19.143.74:443: read: connection reset by peer
+curl -i -H "Connection: Upgrade" \
+     -H "Upgrade: websocket" \
+     -H "Host: ://rancher-klusterx.de.bosch.com" \
+     -k https://10.19.143.67/ping
+HTTP/2 404 
+content-type: text/plain; charset=utf-8
+x-content-type-options: nosniff
+content-length: 19
+date: Sun, 26 Apr 2026 22:37:29 GMT
+
+404 page not found
+
+
+
