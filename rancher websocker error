@@ -2295,3 +2295,20 @@ content-length: 4
 
 < 
 * Connection #0 to host 10.19.143.68 left intact
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: rancher-passthrough
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: HostSNI(`rancher-klusterx.de.bosch.com`)
+    services:
+    - name: envoy-vms-service
+      port: 443
+  tls:
+    passthrough: true
+
+
