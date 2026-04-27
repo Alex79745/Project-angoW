@@ -168,3 +168,2058 @@ and infra-db has console access
 
 and infra-db has console access
 
+},
+
+      {
+
+       "name": "envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+
+       "category": "envoy.upstream_options",
+
+       "type_urls": \[
+
+        "envoy.extensions.upstreams.http.v3.HttpProtocolOptions"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.extensions.upstreams.tcp.v3.TcpProtocolOptions",
+
+       "category": "envoy.upstream_options",
+
+       "type_urls": \[
+
+        "envoy.extensions.upstreams.tcp.v3.TcpProtocolOptions"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.upstreams.http.http_protocol_options",
+
+       "category": "envoy.upstream_options"
+
+      },
+
+      {
+
+       "name": "envoy.upstreams.tcp.tcp_protocol_options",
+
+       "category": "envoy.upstream_options"
+
+      },
+
+      {
+
+       "name": "envoy.upstream.local_address_selector.default_local_address_selector",
+
+       "category": "envoy.upstream.local_address_selector",
+
+       "type_urls": \[
+
+        "envoy.config.upstream.local_address_selector.v3.DefaultLocalAddressSelector"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.health_check.event_sink.file",
+
+       "category": "envoy.health_check.event_sinks",
+
+       "type_urls": \[
+
+        "envoy.extensions.health_check.event_sinks.file.v3.HealthCheckEventFileSink"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.dog_statsd",
+
+       "category": "envoy.stats_sinks"
+
+      },
+
+      {
+
+       "name": "envoy.graphite_statsd",
+
+       "category": "envoy.stats_sinks"
+
+      },
+
+      {
+
+       "name": "envoy.metrics_service",
+
+       "category": "envoy.stats_sinks"
+
+      },
+
+      {
+
+       "name": "envoy.open_telemetry_stat_sink",
+
+       "category": "envoy.stats_sinks"
+
+      },
+
+      {
+
+       "name": "envoy.stat_sinks.dog_statsd",
+
+       "category": "envoy.stats_sinks",
+
+       "type_urls": \[
+
+        "envoy.config.metrics.v3.DogStatsdSink"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.stat_sinks.graphite_statsd",
+
+       "category": "envoy.stats_sinks",
+
+       "type_urls": \[
+
+        "envoy.extensions.stat_sinks.graphite_statsd.v3.GraphiteStatsdSink"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.stat_sinks.hystrix",
+
+       "category": "envoy.stats_sinks",
+
+       "type_urls": \[
+
+        "envoy.config.metrics.v3.HystrixSink"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.stat_sinks.metrics_service",
+
+       "category": "envoy.stats_sinks",
+
+       "type_urls": \[
+
+        "envoy.config.metrics.v3.MetricsServiceConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.stat_sinks.open_telemetry",
+
+       "category": "envoy.stats_sinks",
+
+       "type_urls": \[
+
+        "envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.stat_sinks.statsd",
+
+       "category": "envoy.stats_sinks",
+
+       "type_urls": \[
+
+        "envoy.config.metrics.v3.StatsdSink"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.stat_sinks.wasm",
+
+       "category": "envoy.stats_sinks",
+
+       "type_urls": \[
+
+        "envoy.extensions.stat_sinks.wasm.v3.Wasm"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.statsd",
+
+       "category": "envoy.stats_sinks"
+
+      },
+
+      {
+
+       "name": "envoy.connection_handler.default",
+
+       "category": "envoy.connection_handler"
+
+      },
+
+      {
+
+       "name": "envoy.extensions.http.cache_v2.file_system_http_cache",
+
+       "category": "envoy.http.cache_v2",
+
+       "type_urls": \[
+
+        "envoy.extensions.http.cache_v2.file_system_http_cache.v3.FileSystemHttpCacheV2Config"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.extensions.http.cache_v2.simple",
+
+       "category": "envoy.http.cache_v2",
+
+       "type_urls": \[
+
+        "envoy.extensions.http.cache_v2.simple_http_cache.v3.SimpleHttpCacheV2Config"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.common_inputs.environment_variable",
+
+       "category": "envoy.matching.common_inputs",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.environment_variable.v3.Config"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.filters.connection_pools.tcp.generic",
+
+       "category": "envoy.upstreams",
+
+       "type_urls": \[
+
+        "envoy.extensions.upstreams.tcp.generic.v3.GenericConnectionPoolProto"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.access_loggers.extension_filters.cel",
+
+       "category": "envoy.access_loggers.extension_filters",
+
+       "type_urls": \[
+
+        "envoy.extensions.access_loggers.filters.cel.v3.ExpressionFilter"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.string_matcher.lua",
+
+       "category": "envoy.string_matcher",
+
+       "type_urls": \[
+
+        "envoy.extensions.string_matcher.lua.v3.Lua"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.http.header_validators.envoy_default",
+
+       "category": "envoy.http.header_validators",
+
+       "type_urls": \[
+
+        "envoy.extensions.http.header_validators.envoy_default.v3.HeaderValidatorConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.route_config_update_requester.default",
+
+       "category": "envoy.route_config_update_requester"
+
+      },
+
+      {
+
+       "name": "envoy.compression.brotli.compressor",
+
+       "category": "envoy.compression.compressor",
+
+       "type_urls": \[
+
+        "envoy.extensions.compression.brotli.compressor.v3.Brotli"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.compression.gzip.compressor",
+
+       "category": "envoy.compression.compressor",
+
+       "type_urls": \[
+
+        "envoy.extensions.compression.gzip.compressor.v3.Gzip"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.compression.zstd.compressor",
+
+       "category": "envoy.compression.compressor",
+
+       "type_urls": \[
+
+        "envoy.extensions.compression.zstd.compressor.v3.Zstd"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.compression.brotli.decompressor",
+
+       "category": "envoy.compression.decompressor",
+
+       "type_urls": \[
+
+        "envoy.extensions.compression.brotli.decompressor.v3.Brotli"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.compression.gzip.decompressor",
+
+       "category": "envoy.compression.decompressor",
+
+       "type_urls": \[
+
+        "envoy.extensions.compression.gzip.decompressor.v3.Gzip"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.compression.zstd.decompressor",
+
+       "category": "envoy.compression.decompressor",
+
+       "type_urls": \[
+
+        "envoy.extensions.compression.zstd.decompressor.v3.Zstd"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.quic.crypto_stream.server.quiche",
+
+       "category": "envoy.quic.server.crypto_stream",
+
+       "type_urls": \[
+
+        "envoy.extensions.quic.crypto_stream.v3.CryptoServerStreamConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.retry_priorities.previous_priorities",
+
+       "category": "envoy.retry_priorities",
+
+       "type_urls": \[
+
+        "envoy.extensions.retry.priority.previous_priorities.v3.PreviousPrioritiesConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "auto",
+
+       "category": "envoy.thrift_proxy.transports"
+
+      },
+
+      {
+
+       "name": "framed",
+
+       "category": "envoy.thrift_proxy.transports"
+
+      },
+
+      {
+
+       "name": "header",
+
+       "category": "envoy.thrift_proxy.transports"
+
+      },
+
+      {
+
+       "name": "unframed",
+
+       "category": "envoy.thrift_proxy.transports"
+
+      },
+
+      {
+
+       "name": "envoy.network.dns_resolver.cares",
+
+       "category": "envoy.network.dns_resolver",
+
+       "type_urls": \[
+
+        "envoy.extensions.network.dns_resolver.cares.v3.CaresDnsResolverConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.network.dns_resolver.getaddrinfo",
+
+       "category": "envoy.network.dns_resolver",
+
+       "type_urls": \[
+
+        "envoy.extensions.network.dns_resolver.getaddrinfo.v3.GetAddrInfoDnsResolverConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.health_checkers.grpc",
+
+       "category": "envoy.health_checkers",
+
+       "type_urls": \[
+
+        "envoy.config.core.v3.HealthCheck.GrpcHealthCheck"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.health_checkers.http",
+
+       "category": "envoy.health_checkers",
+
+       "type_urls": \[
+
+        "envoy.config.core.v3.HealthCheck.HttpHealthCheck"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.health_checkers.redis",
+
+       "category": "envoy.health_checkers",
+
+       "type_urls": \[
+
+        "envoy.extensions.health_checkers.redis.v3.Redis"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.health_checkers.tcp",
+
+       "category": "envoy.health_checkers",
+
+       "type_urls": \[
+
+        "envoy.config.core.v3.HealthCheck.TcpHealthCheck"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.health_checkers.thrift",
+
+       "category": "envoy.health_checkers",
+
+       "type_urls": \[
+
+        "envoy.extensions.health_checkers.thrift.v3.Thrift"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.rds_factory.default",
+
+       "category": "envoy.rds_factory"
+
+      },
+
+      {
+
+       "name": "envoy.matching.generic_proxy.input.host",
+
+       "category": "envoy.matching.generic_proxy_request_input.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.filters.network.generic_proxy.matcher.v3.HostMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.generic_proxy.input.method",
+
+       "category": "envoy.matching.generic_proxy_request_input.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.filters.network.generic_proxy.matcher.v3.MethodMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.generic_proxy.input.path",
+
+       "category": "envoy.matching.generic_proxy_request_input.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.filters.network.generic_proxy.matcher.v3.PathMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.generic_proxy.input.property",
+
+       "category": "envoy.matching.generic_proxy_request_input.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.filters.network.generic_proxy.matcher.v3.PropertyMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.generic_proxy.input.request",
+
+       "category": "envoy.matching.generic_proxy_request_input.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.filters.network.generic_proxy.matcher.v3.RequestMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.generic_proxy.input.service",
+
+       "category": "envoy.matching.generic_proxy_request_input.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.filters.network.generic_proxy.matcher.v3.ServiceMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.geoip_providers.maxmind",
+
+       "category": "envoy.geoip_providers",
+
+       "type_urls": \[
+
+        "envoy.extensions.geoip_providers.maxmind.v3.MaxMindConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.quic.connection_debug_visitor.basic",
+
+       "category": "envoy.quic.connection_debug_visitor",
+
+       "type_urls": \[
+
+        "envoy.extensions.quic.connection_debug_visitor.v3.BasicConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.quic.connection_debug_visitor.quic_stats",
+
+       "category": "envoy.quic.connection_debug_visitor",
+
+       "type_urls": \[
+
+        "envoy.extensions.quic.connection_debug_visitor.quic_stats.v3.Config"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.cluster.dns",
+
+       "category": "envoy.clusters",
+
+       "type_urls": \[
+
+        "envoy.extensions.clusters.dns.v3.DnsCluster"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.cluster.eds",
+
+       "category": "envoy.clusters"
+
+      },
+
+      {
+
+       "name": "envoy.cluster.logical_dns",
+
+       "category": "envoy.clusters"
+
+      },
+
+      {
+
+       "name": "envoy.cluster.original_dst",
+
+       "category": "envoy.clusters"
+
+      },
+
+      {
+
+       "name": "envoy.cluster.static",
+
+       "category": "envoy.clusters"
+
+      },
+
+      {
+
+       "name": "envoy.cluster.strict_dns",
+
+       "category": "envoy.clusters"
+
+      },
+
+      {
+
+       "name": "envoy.clusters.aggregate",
+
+       "category": "envoy.clusters",
+
+       "type_urls": \[
+
+        "envoy.extensions.clusters.aggregate.v3.ClusterConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.clusters.dynamic_forward_proxy",
+
+       "category": "envoy.clusters",
+
+       "type_urls": \[
+
+        "envoy.extensions.clusters.dynamic_forward_proxy.v3.ClusterConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.clusters.redis",
+
+       "category": "envoy.clusters",
+
+       "type_urls": \[
+
+        "envoy.extensions.clusters.redis.v3.RedisClusterConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.clusters.reverse_connection",
+
+       "category": "envoy.clusters",
+
+       "type_urls": \[
+
+        "envoy.extensions.clusters.reverse_connection.v3.ReverseConnectionClusterConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.cel_data_input",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "xds.type.matcher.v3.HttpAttributesCelMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.destination_ip",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.DestinationIPInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.destination_port",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.DestinationPortInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.direct_source_ip",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.DirectSourceIPInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.dns_san",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.ssl.v3.DnsSanInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.dynamic_metadata",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.DynamicMetadataInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.filter_state",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.FilterStateInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.network_namespace",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.NetworkNamespaceInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.request_headers",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.type.matcher.v3.HttpRequestHeaderMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.request_trailers",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.type.matcher.v3.HttpRequestTrailerMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.response_headers",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.type.matcher.v3.HttpResponseHeaderMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.response_trailers",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.type.matcher.v3.HttpResponseTrailerMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.server_name",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.ServerNameInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.source_ip",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.SourceIPInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.source_port",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.SourcePortInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.source_type",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.network.v3.SourceTypeInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.status_code_class_input",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.type.matcher.v3.HttpResponseStatusCodeClassMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.status_code_input",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.type.matcher.v3.HttpResponseStatusCodeMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.subject",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.ssl.v3.SubjectInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.matching.inputs.uri_san",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.extensions.matching.common_inputs.ssl.v3.UriSanInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "query_params",
+
+       "category": "envoy.matching.http.input",
+
+       "type_urls": \[
+
+        "envoy.type.matcher.v3.HttpRequestQueryParamMatchInput"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.load_balancing_policies.client_side_weighted_round_robin",
+
+       "category": "envoy.load_balancing_policies",
+
+       "type_urls": \[
+
+        "envoy.extensions.load_balancing_policies.client_side_weighted_round_robin.v3.ClientSideWeightedRoundRobin"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.load_balancing_policies.cluster_provided",
+
+       "category": "envoy.load_balancing_policies",
+
+       "type_urls": \[
+
+        "envoy.extensions.load_balancing_policies.cluster_provided.v3.ClusterProvided"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.load_balancing_policies.least_request",
+
+       "category": "envoy.load_balancing_policies",
+
+       "type_urls": \[
+
+        "envoy.extensions.load_balancing_policies.least_request.v3.LeastRequest"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.load_balancing_policies.maglev",
+
+       "category": "envoy.load_balancing_policies",
+
+       "type_urls": \[
+
+        "envoy.extensions.load_balancing_policies.maglev.v3.Maglev"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.load_balancing_policies.override_host",
+
+       "category": "envoy.load_balancing_policies",
+
+       "type_urls": \[
+
+        "envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.load_balancing_policies.random",
+
+       "category": "envoy.load_balancing_policies",
+
+       "type_urls": \[
+
+        "envoy.extensions.load_balancing_policies.random.v3.Random"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.load_balancing_policies.ring_hash",
+
+       "category": "envoy.load_balancing_policies",
+
+       "type_urls": \[
+
+        "envoy.extensions.load_balancing_policies.ring_hash.v3.RingHash"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.load_balancing_policies.round_robin",
+
+       "category": "envoy.load_balancing_policies",
+
+       "type_urls": \[
+
+        "envoy.extensions.load_balancing_policies.round_robin.v3.RoundRobin"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.load_balancing_policies.subset",
+
+       "category": "envoy.load_balancing_policies",
+
+       "type_urls": \[
+
+        "envoy.extensions.load_balancing_policies.subset.v3.Subset"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.filters.listener.original_dst.local_ip",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.filters.listener.original_dst.remote_ip",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.network.application_protocols",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.network.ip",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.network.transport_socket.original_dst_address",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.network.upstream_server_name",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.network.upstream_subject_alt_names",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.ratelimit.hits_addend",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.router.debug_config",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.string",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.tcp_proxy.cluster",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.tcp_proxy.disable_tunneling",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.tcp_proxy.per_connection_idle_timeout_ms",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.upstream.dynamic_host",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.upstream.dynamic_port",
+
+       "category": "filter_state.object"
+
+      },
+
+      {
+
+       "name": "envoy.internal_redirect_predicates.allow_listed_routes",
+
+       "category": "envoy.internal_redirect_predicates",
+
+       "type_urls": \[
+
+        "envoy.extensions.internal_redirect.allow_listed_routes.v3.AllowListedRoutesConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.internal_redirect_predicates.previous_routes",
+
+       "category": "envoy.internal_redirect_predicates",
+
+       "type_urls": \[
+
+        "envoy.extensions.internal_redirect.previous_routes.v3.PreviousRoutesConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.internal_redirect_predicates.safe_cross_scheme",
+
+       "category": "envoy.internal_redirect_predicates",
+
+       "type_urls": \[
+
+        "envoy.extensions.internal_redirect.safe_cross_scheme.v3.SafeCrossSchemeConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.request_id.uuid",
+
+       "category": "envoy.request_id",
+
+       "type_urls": \[
+
+        "envoy.extensions.request_id.uuid.v3.UuidRequestIdConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.regex_engines.google_re2",
+
+       "category": "envoy.regex_engines",
+
+       "type_urls": \[
+
+        "envoy.extensions.regex_engines.v3.GoogleRE2"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.http.original_ip_detection.custom_header",
+
+       "category": "envoy.http.original_ip_detection",
+
+       "type_urls": \[
+
+        "envoy.extensions.http.original_ip_detection.custom_header.v3.CustomHeaderConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.http.original_ip_detection.xff",
+
+       "category": "envoy.http.original_ip_detection",
+
+       "type_urls": \[
+
+        "envoy.extensions.http.original_ip_detection.xff.v3.XffConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.rate_limit_descriptors.expr",
+
+       "category": "envoy.rate_limit_descriptors",
+
+       "type_urls": \[
+
+        "envoy.extensions.rate_limit_descriptors.expr.v3.Descriptor"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.key_value.file_based",
+
+       "category": "envoy.common.key_value",
+
+       "type_urls": \[
+
+        "envoy.extensions.key_value.file_based.v3.FileBasedKeyValueStoreConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.filters.udp.dns_filter",
+
+       "category": "envoy.filters.udp_listener",
+
+       "type_urls": \[
+
+        "envoy.extensions.filters.udp.dns_filter.v3.DnsFilterConfig"
+
+       \]
+
+      },
+
+      {
+
+       "name": "envoy.filters.udp_listener.udp_proxy",
+
+       "category": "envoy.filters.udp_listener",
+
+       "type_urls": \[
+
+        "envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig"
+
+       \]
+
+      }
+
+     \]
+
+    },
+
+    "static_resources": {
+
+     "clusters": \[
+
+      {
+
+       "name": "xds_cluster",
+
+       "type": "STATIC",
+
+       "connect_timeout": "2s",
+
+       "http2_protocol_options": {},
+
+       "load_assignment": {
+
+        "cluster_name": "xds_cluster",
+
+        "endpoints": \[
+
+         {
+
+          "lb_endpoints": \[
+
+           {
+
+            "endpoint": {
+
+             "address": {
+
+              "socket_address": {
+
+               "address": "10.19.143.66",
+
+               "port_value": 31028
+
+              }
+
+             }
+
+            }
+
+           }
+
+          \]
+
+         }
+
+        \]
+
+       }
+
+      }
+
+     \]
+
+    },
+
+    "dynamic_resources": {
+
+     "lds_config": {
+
+      "ads": {},
+
+      "resource_api_version": "V3"
+
+     },
+
+     "cds_config": {
+
+      "ads": {},
+
+      "resource_api_version": "V3"
+
+     },
+
+     "ads_config": {
+
+      "api_type": "GRPC",
+
+      "grpc_services": \[
+
+       {
+
+        "envoy_grpc": {
+
+         "cluster_name": "xds_cluster"
+
+        }
+
+       }
+
+      \],
+
+      "transport_api_version": "V3"
+
+     }
+
+    },
+
+    "admin": {
+
+     "access_log_path": "/var/log/envoy/admin_access.log",
+
+     "address": {
+
+      "socket_address": {
+
+       "address": "127.0.0.1",
+
+       "port_value": 19000
+
+      }
+
+     }
+
+    }
+
+   },
+
+   "last_updated": "2026-04-02T13:40:41.103Z"
+
+  },
+
+  {
+
+   "@type": "type.googleapis.com/envoy.admin.v3.ClustersConfigDump",
+
+   "version_info": "10",
+
+   "static_clusters": \[
+
+    {
+
+     "cluster": {
+
+      "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+
+      "name": "xds_cluster",
+
+      "type": "STATIC",
+
+      "connect_timeout": "2s",
+
+      "http2_protocol_options": {},
+
+      "load_assignment": {
+
+       "cluster_name": "xds_cluster",
+
+       "endpoints": \[
+
+        {
+
+         "lb_endpoints": \[
+
+          {
+
+           "endpoint": {
+
+            "address": {
+
+             "socket_address": {
+
+              "address": "10.19.143.66",
+
+              "port_value": 31028
+
+             }
+
+            }
+
+           }
+
+          }
+
+         \]
+
+        }
+
+       \]
+
+      }
+
+     },
+
+     "last_updated": "2026-04-02T13:40:41.110Z"
+
+    }
+
+   \],
+
+   "dynamic_active_clusters": \[
+
+    {
+
+     "version_info": "10",
+
+     "cluster": {
+
+      "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+
+      "name": "cluster_c931f391-2a57-4192-b5a3-fcd0eb8197cc",
+
+      "type": "STRICT_DNS",
+
+      "connect_timeout": "5s",
+
+      "health_checks": \[
+
+       {
+
+        "timeout": "5s",
+
+        "interval": "10s",
+
+        "unhealthy_threshold": 3,
+
+        "healthy_threshold": 2,
+
+        "tcp_health_check": {}
+
+       }
+
+      \],
+
+      "load_assignment": {
+
+       "cluster_name": "cluster_c931f391-2a57-4192-b5a3-fcd0eb8197cc",
+
+       "endpoints": \[
+
+        {
+
+         "lb_endpoints": \[
+
+          {
+
+           "endpoint": {
+
+            "address": {
+
+             "socket_address": {
+
+              "address": "10.19.143.67",
+
+              "port_value": 443
+
+             }
+
+            }
+
+           },
+
+           "load_balancing_weight": 100
+
+          }
+
+         \]
+
+        },
+
+        {
+
+         "lb_endpoints": \[
+
+          {
+
+           "endpoint": {
+
+            "address": {
+
+             "socket_address": {
+
+              "address": "10.19.143.70",
+
+              "port_value": 443
+
+             }
+
+            }
+
+           },
+
+           "load_balancing_weight": 100
+
+          }
+
+         \]
+
+        },
+
+        {
+
+         "lb_endpoints": \[
+
+          {
+
+           "endpoint": {
+
+            "address": {
+
+             "socket_address": {
+
+              "address": "10.19.143.71",
+
+              "port_value": 443
+
+             }
+
+            }
+
+           },
+
+           "load_balancing_weight": 100
+
+          }
+
+         \]
+
+        },
+
+        {
+
+         "lb_endpoints": \[
+
+          {
+
+           "endpoint": {
+
+            "address": {
+
+             "socket_address": {
+
+              "address": "10.19.143.68",
+
+              "port_value": 443
+
+             }
+
+            }
+
+           },
+
+           "load_balancing_weight": 100
+
+          }
+
+         \]
+
+        }
+
+       \]
+
+      }
+
+     },
+
+     "last_updated": "2026-04-07T15:11:14.217Z"
+
+    }
+
+   \]
+
+  },
+
+  {
+
+   "@type": "type.googleapis.com/envoy.admin.v3.ListenersConfigDump",
+
+   "version_info": "1",
+
+   "dynamic_listeners": \[
+
+    {
+
+     "name": "listener_main",
+
+     "active_state": {
+
+      "version_info": "1",
+
+      "listener": {
+
+       "@type": "type.googleapis.com/envoy.config.listener.v3.Listener",
+
+       "name": "listener_main",
+
+       "address": {
+
+        "socket_address": {
+
+         "address": "0.0.0.0",
+
+         "port_value": 443
+
+        }
+
+       },
+
+       "filter_chains": \[
+
+        {
+
+         "filter_chain_match": {
+
+          "server_names": \[
+
+           "netbox-klusterx.de.bosch.com"
+
+          \]
+
+         },
+
+         "filters": \[
+
+          {
+
+           "name": "envoy.filters.network.tcp_proxy",
+
+           "typed_config": {
+
+            "@type": "type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy",
+
+            "stat_prefix": "tcp_netbox-klusterx.de.bosch.com",
+
+            "cluster": "cluster_c931f391-2a57-4192-b5a3-fcd0eb8197cc"
+
+           }
+
+          }
+
+         \]
+
+        },
+
+        {
+
+         "filter_chain_match": {
+
+          "server_names": \[
+
+           "rancher-klusterx.de.bosch.com"
+
+          \]
+
+         },
+
+         "filters": \[
+
+          {
+
+           "name": "envoy.filters.network.tcp_proxy",
+
+           "typed_config": {
+
+            "@type": "type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy",
+
+            "stat_prefix": "tcp_rancher-klusterx.de.bosch.com",
+
+            "cluster": "cluster_c931f391-2a57-4192-b5a3-fcd0eb8197cc"
+
+           }
+
+          }
+
+         \]
+
+        },
+
+        {
+
+         "filter_chain_match": {
+
+          "server_names": \[
+
+           "grafana-klusterx.de.bosch.com"
+
+          \]
+
+         },
+
+         "filters": \[
+
+          {
+
+           "name": "envoy.filters.network.tcp_proxy",
+
+           "typed_config": {
+
+            "@type": "type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy",
+
+            "stat_prefix": "tcp_grafana-klusterx.de.bosch.com",
+
+            "cluster": "cluster_c931f391-2a57-4192-b5a3-fcd0eb8197cc"
+
+           }
+
+          }
+
+         \]
+
+        }
+
+       \],
+
+       "listener_filters": \[
+
+        {
+
+         "name": "envoy.filters.listener.tls_inspector",
+
+         "typed_config": {
+
+          "@type": "type.googleapis.com/envoy.extensions.filters.listener.tls_inspector.v3.TlsInspector"
+
+         }
+
+        }
+
+       \]
+
+      },
+
+      "last_updated": "2026-04-08T08:12:24.299Z"
+
+     }
+
+    }
+
+   \]
+
+  },
+
+  {
+
+   "@type": "type.googleapis.com/envoy.admin.v3.SecretsConfigDump"
+
+  }
+
+ \]
+
+}
+
+root@klusterx-envoyingress-01:\~#
