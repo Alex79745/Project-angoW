@@ -2312,3 +2312,30 @@ spec:
     passthrough: true
 
 
+
+############3
+
+ kubectl apply -f  ingress-tcp-rancher.yaml
+error: resource mapping not found for name: "rancher-passthrough" namespace: "" from "ingress-tcp-rancher.yaml": no matches for kind "IngressRouteTCP" in version "traefik.containo.us/v1alpha1"
+ensure CRDs are installed first
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ ^Cgress-tcp-rancher.yaml
+
+PAA3LIS@LIS-C-002L2 MINGW64 ~
+$ cat ingress-tcp-rancher.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: rancher-passthrough
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: HostSNI(`rancher-klusterx.de.bosch.com`)
+    services:
+    - name: envoy-vms-service
+      port: 443
+  tls:
+    passthrough: true
+
