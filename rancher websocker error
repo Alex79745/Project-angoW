@@ -68,5 +68,103 @@ date: Sun, 26 Apr 2026 22:37:29 GMT
 
 404 page not found
 
+hello. how are you?  
 
+what did you tried to get this error?  er... po
+
+09:46
+
+what did you tried to get this error? 
+
+error: unable to upgrade connection: error dialing backend: read tcp 10.5.193.180:56552->10.19.143.82:443: read: connection reset by peer
+
+ 
+
+ 
+
+ 
+
+error: unable to upgrade connection: error ... por Reckzuegel Lukas (PS/BDO-C)
+
+terça-feira 13:20
+
+ 
+
+error: unable to upgrade connection: error dialing backend: read tcp 10.5.193.180:37582->10.19.143.74:443: read: connection reset by peer
+
+ 
+
+trying to open a shell with
+
+09:52
+
+trying to open a shell with kubectl
+
+from my laptop por
+
+09:52
+
+from my laptop
+
+did you dowloaded the kubeconfig or you tri... por 
+
+09:54
+
+did you dowloaded the kubeconfig or you tried cluster endpoits directly?, i downloaded kubeconfig and is working normally
+
+i let rancher generate this kubeconfig por 
+
+09:55
+
+i let rancher generate this kubeconfig
+
+Reckzuegel Lukas (PS/BDO-C)
+
+09:55
+
+you get this when pressing on the top downl... por
+
+09:55
+
+you get this when pressing on the top download
+
+and then I try to click on console 
+
+09:55
+
+and then I try to click on console
+
+09:55
+
+yes iam using it too, i added in to my kube... por)
+
+09:57
+
+Papa Alexandre (PS/BDO-P-PO)
+
+yes iam using it too, i added in to my kubectx 
+
+Início da citação, Reckzuegel Lukas (PS/BDO... por 
+
+09:57
+
+27/04/2026 09:55
+
+📷
+
+maybe this pod you are tring is not working
+
+I'll get this for all pods  por 
+
+09:58
+
+I'll get this for all pods 
+
+09:58
+
+and infra-db has console access 
+
+09:58
+
+and infra-db has console access
 
