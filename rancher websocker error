@@ -2223,3 +2223,8 @@ and infra-db has console access
 }
 
 root@klusterx-envoyingress-01:\~#
+
+
+
+
+sudo tcpdump -i any port 443 -A -s 0 'tcp[tcpflags] & (tcp-rst|tcp-fin) != 0'
