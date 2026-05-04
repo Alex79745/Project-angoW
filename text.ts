@@ -126,3 +126,46 @@ metadata:
 spec:
   blocks:
     - cidr: "192.168.1.240/29" # Assigns IPs .200 through .207
+
+
+
+
+time="2026-05-04T15:52:36Z" level=error msg="Failed to dial steve aggregation server: read tcp 10.244.1.45:55668->10.19.143.82:443: read: connection reset by peer"      │
+│ time="2026-05-04T15:52:36Z" level=warning msg="[2] encountered error \"write tcp 10.244.1.45:57512->10.19.143.74:443: write: broken pipe\" while writing error \"tunnel  │
+│ time="2026-05-04T15:52:36Z" level=error msg="Remotedialer proxy error" error="read tcp 10.244.1.45:57512->10.19.143.74:443: read: connection reset by peer"              │
+│ time="2026-05-04T15:52:36Z" level=warning msg="[2] encountered error \"write tcp 10.244.1.45:57512->10.19.143.74:443: write: broken pipe\" while writing error \"writeto │
+│ time="2026-05-04T15:52:46Z" level=error msg="Failed to dial steve aggregation server: read tcp 10.244.1.45:44736->10.19.143.74:443: read: connection reset by peer"      │
+│ time="2026-05-04T15:52:46Z" level=info msg="Connecting to wss://rancher-klusterx.de.bosch.com/v3/connect with token starting with prc8rgw97spjtzvnn2skw6hnlqt"           │
+│ time="2026-05-04T15:52:46Z" level=info msg="Connecting to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                    │
+│ time="2026-05-04T15:52:46Z" level=info msg="Connected to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                     │
+│ time="2026-05-04T15:52:51Z" level=error msg="Remotedialer proxy error" error="read tcp 10.244.1.45:41276->10.19.143.82:443: read: connection reset by peer"              │
+│ time="2026-05-04T15:52:56Z" level=error msg="Failed to dial steve aggregation server: read tcp 10.244.1.45:58720->10.19.143.82:443: read: connection reset by peer"      │
+│ time="2026-05-04T15:53:01Z" level=info msg="Connecting to wss://rancher-klusterx.de.bosch.com/v3/connect with token starting with prc8rgw97spjtzvnn2skw6hnlqt"           │
+│ time="2026-05-04T15:53:01Z" level=info msg="Connecting to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                    │
+│ time="2026-05-04T15:53:01Z" level=info msg="Connected to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                     │
+│ time="2026-05-04T15:53:06Z" level=error msg="Failed to dial steve aggregation server: read tcp 10.244.1.45:54604->10.19.143.74:443: read: connection reset by peer"      │
+│ time="2026-05-04T15:53:06Z" level=error msg="Remotedialer proxy error" error="read tcp 10.244.1.45:54614->10.19.143.74:443: read: connection reset by peer"              │
+│ time="2026-05-04T15:53:16Z" level=error msg="Failed to dial steve aggregation server: read tcp 10.244.1.45:50798->10.19.143.82:443: read: connection reset by peer"      │
+│ time="2026-05-04T15:53:16Z" level=info msg="Connecting to wss://rancher-klusterx.de.bosch.com/v3/connect with token starting with prc8rgw97spjtzvnn2skw6hnlqt"           │
+│ time="2026-05-04T15:53:16Z" level=info msg="Connecting to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                    │
+│ time="2026-05-04T15:53:16Z" level=info msg="Connected to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                     │
+│ time="2026-05-04T15:53:21Z" level=error msg="Remotedialer proxy error" error="read tcp 10.244.1.45:34906->10.19.143.74:443: read: connection reset by peer"              │
+│ time="2026-05-04T15:53:26Z" level=error msg="Failed to dial steve aggregation server: read tcp 10.244.1.45:55152->10.19.143.82:443: read: connection reset by peer"      │
+│ time="2026-05-04T15:53:31Z" level=info msg="Connecting to wss://rancher-klusterx.de.bosch.com/v3/connect with token starting with prc8rgw97spjtzvnn2skw6hnlqt"           │
+│ time="2026-05-04T15:53:31Z" level=info msg="Connecting to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                    │
+│ time="2026-05-04T15:53:31Z" level=info msg="Connected to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                     │
+│ time="2026-05-04T15:53:36Z" level=error msg="Failed to dial steve aggregation server: read tcp 10.244.1.45:52876->10.19.143.74:443: read: connection reset by peer"      │
+│ time="2026-05-04T15:53:36Z" level=warning msg="[2] encountered error \"write tcp 10.244.1.45:52882->10.19.143.74:443: write: broken pipe\" while writing error \"tunnel  │
+│ time="2026-05-04T15:53:36Z" level=error msg="Remotedialer proxy error" error="read tcp 10.244.1.45:52882->10.19.143.74:443: read: connection reset by peer"              │
+│ time="2026-05-04T15:53:36Z" level=warning msg="[2] encountered error \"write tcp 10.244.1.45:52882->10.19.143.74:443: write: broken pipe\" while writing error \"dial tc │
+│ time="2026-05-04T15:53:46Z" level=error msg="Failed to dial steve aggregation server: read tcp 10.244.1.45:60800->10.19.143.82:443: read: connection reset by peer"      │
+│ time="2026-05-04T15:53:46Z" level=info msg="Connecting to wss://rancher-klusterx.de.bosch.com/v3/connect with token starting with prc8rgw97spjtzvnn2skw6hnlqt"           │
+│ time="2026-05-04T15:53:46Z" level=info msg="Connecting to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                    │
+│ time="2026-05-04T15:53:46Z" level=info msg="Connected to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                     │
+│ time="2026-05-04T15:53:50Z" level=warning msg="[2] encountered error \"write tcp 10.244.1.45:45476->10.19.143.74:443: write: broken pipe\" while writing error \"tunnel  │
+│ time="2026-05-04T15:53:50Z" level=error msg="Remotedialer proxy error" error="read tcp 10.244.1.45:45476->10.19.143.74:443: read: connection reset by peer"              │
+│ time="2026-05-04T15:53:50Z" level=warning msg="[2] encountered error \"write tcp 10.244.1.45:45476->10.19.143.74:443: write: broken pipe\" while writing error \"writeto │
+│ time="2026-05-04T15:53:56Z" level=error msg="Failed to dial steve aggregation server: read tcp 10.244.1.45:51740->10.19.143.74:443: read: connection reset by peer"      │
+│ time="2026-05-04T15:54:00Z" level=info msg="Connecting to wss://rancher-klusterx.de.bosch.com/v3/connect with token starting with prc8rgw97spjtzvnn2skw6hnlqt"           │
+│ time="2026-05-04T15:54:00Z" level=info msg="Connecting to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                                    │
+│ time="2026-05-04T15:54:00Z" level=info msg="Connected to proxy" url="wss://rancher-klusterx.de.bosch.com/v3/connect"                                    
