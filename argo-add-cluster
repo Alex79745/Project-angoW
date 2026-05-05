@@ -1,0 +1,23 @@
+#!/bin/bash
+
+RANCHER_URL="https://rancher.example.com"
+RANCHER_TOKEN="token-xxxxx:yyyyyy"
+
+ARGOCD_SERVER="argocd.example.com"
+
+argocd login $ARGOCD_SERVER
+
+clusters=$(curl -s -u "$RANCHER_TOKEN" \
+  "$RANCHER_URL/v3/clusters" | jq -r '.data[].id')
+
+for cluster in $clusters; do
+  echo "Processing $cluster"
+
+  curl -s -u "$RANCHER_TOKEN" \
+    -X POST \
+    "$RANCHER_URL/v3/clusters/$cluster?action=generateKubeconfig" \
+    | jq -r '.config' > kubeconfig-$cluster.yaml
+
+  argocd cluster add --kubeconfig kubeconfig-$cluster.yaml $cluster --yes
+
+done
