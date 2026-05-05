@@ -21,3 +21,49 @@ for cluster in $clusters; do
   argocd cluster add --kubeconfig kubeconfig-$cluster.yaml $cluster --yes
 
 done
+##################################################
+
+Good, let’s do this clean and correctly so you don’t fight with the setup later.
+
+🚀 What you need
+
+There are 2 things:
+
+ArgoCD CLI (argocd) → run commands from your machine
+ArgoCD Server (in Kubernetes) → actual GitOps engine
+
+👉 You need both
+
+🧠 Official documentation (use these)
+ArgoCD install: https://argo-cd.readthedocs.io/en/stable/getting_started/
+CLI install: https://argo-cd.readthedocs.io/en/stable/cli_installation/
+🖥️ PART 1 — Install ArgoCD CLI
+✅ Linux
+curl -sSL -o argocd \
+https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+
+chmod +x argocd
+
+sudo mv argocd /usr/local/bin/
+
+Test:
+
+argocd version
+✅ Windows (Git Bash)
+
+👉 Best way (simple and clean):
+
+curl -sSL -o /c/bin/argocd.exe \
+https://github.com/argoproj/argo-cd/releases/latest/download/argocd-windows-amd64.exe
+
+Then:
+
+Create folder:
+C:\bin
+Add to PATH:
+Search “Environment Variables”
+Add C:\bin
+
+Test in Git Bash:
+
+argocd version
