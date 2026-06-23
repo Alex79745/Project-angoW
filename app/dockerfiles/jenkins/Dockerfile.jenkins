@@ -1,0 +1,6 @@
+FROM jenkins/jenkins:lts-jdk11
+USER root
+RUN apt-get update && apt-get install -y docker.io docker-compose
+RUN groupadd -g 999 docker || true
+RUN usermod -aG docker jenkins || true
+USER jenkins
